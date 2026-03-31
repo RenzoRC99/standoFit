@@ -1,7 +1,7 @@
 package com.standofit.back.shared.domain.valueobjects;
 
-import com.standofit.back.shared.domain.DomainError;
-import com.standofit.back.shared.domain.DomainException;
+import com.standofit.back.shared.domain.valueobjects.errors.ValueobjectErrors;
+import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
 
 public abstract class BaseVO <T>  {
 
@@ -17,9 +17,7 @@ public abstract class BaseVO <T>  {
 
     public void validateNotNull(){
         if(value == null){
-            throw new DomainException(
-                    DomainError.NULL_VALUE,getClass().getSimpleName()
-            );
+            throw new ValueObjectException(this.getClass(),ValueobjectErrors.NULL_VALUE.getMessage());
         }
     }
 }
