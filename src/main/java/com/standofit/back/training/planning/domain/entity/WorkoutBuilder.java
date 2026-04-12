@@ -12,14 +12,12 @@ final class WorkoutBuilder {
     private WorkoutName name;
     private WorkoutDescription description;
     private List<WorkoutDay> days;
-    private WorkoutVersion version;
     private final WorkoutCreatedAt createdAt;
 
-     WorkoutBuilder(WorkoutDescription description, WorkoutName name, WorkoutVersion version, List<WorkoutDay> days) {
+     WorkoutBuilder(WorkoutDescription description, WorkoutName name, List<WorkoutDay> days) {
         this.id = new WorkoutId(UUID.randomUUID());
         this.description = description;
         this.name = name;
-        this.version = version;
         this.days = days;
         this.createdAt = new WorkoutCreatedAt(Instant.now());
     }
@@ -28,7 +26,6 @@ final class WorkoutBuilder {
          this.id = workout.getId();
          this.name = workout.getName();
          this.description = workout.getDescription();
-         this.version = workout.getVersion();
          this.days = workout.getDays();
          this.createdAt = workout.getCreatedAt();
     }
@@ -48,11 +45,6 @@ final class WorkoutBuilder {
         return this;
     }
 
-    WorkoutBuilder withVersion(WorkoutVersion version) {
-        this.version = version;
-        return this;
-    }
-
     Workout build() {
         WorkoutUpdatedAt finalUpdatedAt = new WorkoutUpdatedAt(Instant.now());
         return new Workout(
@@ -60,7 +52,6 @@ final class WorkoutBuilder {
                 name,
                 description,
                 days,
-                version,
                 createdAt,
                 finalUpdatedAt
         );
