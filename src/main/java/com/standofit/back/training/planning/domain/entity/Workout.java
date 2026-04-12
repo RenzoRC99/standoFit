@@ -8,8 +8,10 @@ import com.standofit.back.training.planning.domain.vo.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
-public class Workout extends AggregateRoot {
+public final class Workout extends AggregateRoot {
     private final WorkoutId id;
     private final WorkoutName name;
     private final WorkoutDescription description;
@@ -40,6 +42,7 @@ public class Workout extends AggregateRoot {
             WorkoutName name,
             List<WorkoutDay> days
     ) {
+        validateNotEmpty(days, "days");
         return new WorkoutBuilder
                 (description, name, days)
                 .build();
@@ -80,9 +83,18 @@ public class Workout extends AggregateRoot {
                 .build();
     }
 
-    public Workout renameDay(WorkoutDayId dayId, WorkoutDayName newName) {
+    public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
+        List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
+        validateNotEmpty(ids, "day IDs to rename");
+
+        List<WorkoutDay> updatedDays = this.days.stream()
+                .map(day -> dayNames.containsKey(day.getId()) 
+                        ? day.rename(dayNames.get(day.getId())) 
+                        : day)
+                .toList();
+
         return new WorkoutBuilder(this)
-                .withDays(transformDay(dayId, day -> day.rename(newName)))
+                .withDays(updatedDays)
                 .build();
     }
 
@@ -132,7 +144,7 @@ public class Workout extends AggregateRoot {
                 .build();
     }
 
-    private List<WorkoutDay> transformDay(WorkoutDayId id, java.util.function.Function<WorkoutDay, WorkoutDay> transformer) {
+    private List<WorkoutDay> transformDay(WorkoutDayId id, Function<WorkoutDay, WorkoutDay> transformer) {
         if (this.days.stream().noneMatch(day -> day.getId().equals(id))) {
             throw new IllegalArgumentException("Workout day not found: " + id.value());
         }
@@ -142,7 +154,7 @@ public class Workout extends AggregateRoot {
                 .toList();
     }
 
-    private void validateNotEmpty(List<?> list, String context) {
+    private static void validateNotEmpty(List<?> list, String context) {
         if (list == null || list.isEmpty()) {
             throw new IllegalArgumentException("Must provide at least one " + context);
         }
