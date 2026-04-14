@@ -13,4 +13,10 @@ public abstract class IntegerVO extends BaseVO<Integer> {
             throw new ValueObjectException(this.getClass(),formattedMessage);
         }
     }
+    protected void isAtLeast(Integer min){
+        if(value() < min){
+            String formattedMessage = String.format(ValueobjectErrors.INT_SMALLER_THAN.getMessage(),min);
+            throw new ValueObjectException(this.getClass(),formattedMessage);
+        }
+    }
 }

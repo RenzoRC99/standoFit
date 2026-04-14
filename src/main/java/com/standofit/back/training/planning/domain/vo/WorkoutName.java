@@ -6,5 +6,6 @@ public class WorkoutName extends StringVO {
     public WorkoutName(String value) {
         super(value);
         ensureIsNotEmptyOrBlank();
+        ensureLengthRange(1, 100);
     }
 }

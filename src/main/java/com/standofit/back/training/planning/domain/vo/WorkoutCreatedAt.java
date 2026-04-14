@@ -8,8 +8,4 @@ public class WorkoutCreatedAt extends DateTimeVO {
     public WorkoutCreatedAt(Instant value) {
         super(value);
     }
-
-    public static WorkoutCreatedAt initialize(WorkoutCreatedAt value) {
-        return value != null ? value : new WorkoutCreatedAt(Instant.now());
-    }
 }

@@ -3,12 +3,14 @@ package com.standofit.back.training.planning.domain.entity;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
-import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class WorkoutDay {
+
     private final WorkoutDayId id;
     private final WorkoutDayName name;
     private final List<WorkoutExercise> exercises;
@@ -19,12 +21,20 @@ public final class WorkoutDay {
         this.exercises = (exercises != null) ? List.copyOf(exercises) : List.of();
     }
 
-    public WorkoutDayId getId() { return id; }
-    public WorkoutDayName getName() { return name; }
-    public List<WorkoutExercise> getExercises() { return exercises; }
-
     static WorkoutDay create(WorkoutDayName name, List<WorkoutExercise> exercises) {
         return new WorkoutDayBuilder(name, exercises).build();
+    }
+
+    public WorkoutDayId getId() {
+        return id;
+    }
+
+    public WorkoutDayName getName() {
+        return name;
+    }
+
+    public List<WorkoutExercise> getExercises() {
+        return exercises;
     }
 
     WorkoutDay rename(WorkoutDayName name) {
@@ -34,6 +44,10 @@ public final class WorkoutDay {
     }
 
     WorkoutDay addExercises(List<WorkoutExercise> newExercises) {
+        validateIdsNotExist(newExercises.stream()
+                .map(WorkoutExercise::getId)
+                .toList());
+
         List<WorkoutExercise> updated = new ArrayList<>(this.exercises);
         updated.addAll(newExercises);
 
@@ -43,6 +57,8 @@ public final class WorkoutDay {
     }
 
     WorkoutDay removeExercises(List<WorkoutExerciseId> idsToRemove) {
+        validateIdsExist(idsToRemove);
+
         List<WorkoutExercise> updated = this.exercises.stream()
                 .filter(ex -> !idsToRemove.contains(ex.getId()))
                 .toList();
@@ -53,6 +69,9 @@ public final class WorkoutDay {
     }
 
     WorkoutDay updateExercises(List<WorkoutExercise> updatedExercises) {
+        validateIdsExist(updatedExercises.stream()
+                .map(WorkoutExercise::getId)
+                .toList());
 
         var updatesById = updatedExercises.stream()
                 .collect(Collectors.toMap(WorkoutExercise::getId, ex -> ex));
@@ -66,20 +85,27 @@ public final class WorkoutDay {
                 .build();
     }
 
-    WorkoutDay reorderExercises(List<WorkoutExerciseId> orderedIds) {
-        if (orderedIds.size() != this.exercises.size()) {
-            throw new IllegalArgumentException("The number of IDs must match the current number of exercises");
-        }
+    private Set<WorkoutExerciseId> getExerciseIds() {
+        return this.exercises.stream()
+                .map(WorkoutExercise::getId)
+                .collect(Collectors.toSet());
+    }
 
-        List<WorkoutExercise> reordered = orderedIds.stream()
-                .map(id -> this.exercises.stream()
-                        .filter(ex -> ex.getId().equals(id))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Exercise ID not found: " + id.value())))
-                .toList();
+    private void validateIdsExist(List<WorkoutExerciseId> ids) {
+        ids.stream()
+                .filter(id -> !getExerciseIds().contains(id))
+                .findFirst()
+                .ifPresent(id -> {
+                    throw new IllegalArgumentException("Exercise with id '" + id.value() + "' not found");
+                });
+    }
 
-        return new WorkoutDayBuilder(this)
-                .withExercises(reordered)
-                .build();
+    private void validateIdsNotExist(List<WorkoutExerciseId> ids) {
+        ids.stream()
+                .filter(getExerciseIds()::contains)
+                .findFirst()
+                .ifPresent(id -> {
+                    throw new IllegalArgumentException("Exercise with id '" + id.value() + "' already exists");
+                });
     }
 }

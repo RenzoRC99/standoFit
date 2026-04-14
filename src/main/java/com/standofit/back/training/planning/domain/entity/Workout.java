@@ -9,9 +9,12 @@ import com.standofit.back.training.planning.domain.vo.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class Workout extends AggregateRoot {
+
     private final WorkoutId id;
     private final WorkoutName name;
     private final WorkoutDescription description;
@@ -20,8 +23,8 @@ public final class Workout extends AggregateRoot {
     private final WorkoutUpdatedAt updatedAt;
 
     Workout(WorkoutId id, WorkoutName name, WorkoutDescription description,
-                   List<WorkoutDay> days,
-                   WorkoutCreatedAt createdAt, WorkoutUpdatedAt updatedAt) {
+            List<WorkoutDay> days,
+            WorkoutCreatedAt createdAt, WorkoutUpdatedAt updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,13 +32,6 @@ public final class Workout extends AggregateRoot {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    public WorkoutId getId() { return id; }
-    public WorkoutName getName() { return name; }
-    public WorkoutDescription getDescription() { return description; }
-    public List<WorkoutDay> getDays() { return days; }
-    public WorkoutCreatedAt getCreatedAt() { return createdAt; }
-    public WorkoutUpdatedAt getUpdatedAt() { return updatedAt;}
 
     public static Workout create(
             WorkoutDescription description,
@@ -46,6 +42,36 @@ public final class Workout extends AggregateRoot {
         return new WorkoutBuilder
                 (description, name, days)
                 .build();
+    }
+
+    private static void validateNotEmpty(List<?> list, String context) {
+        if (list == null || list.isEmpty()) {
+            throw new IllegalArgumentException("Must provide at least one " + context);
+        }
+    }
+
+    public WorkoutId getId() {
+        return id;
+    }
+
+    public WorkoutName getName() {
+        return name;
+    }
+
+    public WorkoutDescription getDescription() {
+        return description;
+    }
+
+    public List<WorkoutDay> getDays() {
+        return days;
+    }
+
+    public WorkoutCreatedAt getCreatedAt() {
+        return createdAt;
+    }
+
+    public WorkoutUpdatedAt getUpdatedAt() {
+        return updatedAt;
     }
 
     public Workout renameWorkout(WorkoutName name) {
@@ -63,6 +89,23 @@ public final class Workout extends AggregateRoot {
     public Workout addDays(List<WorkoutDay> newDays) {
         validateNotEmpty(newDays, "days to add");
 
+        Set<String> existingNames = this.days.stream()
+                .map(day -> day.getName().value().toLowerCase())
+                .collect(Collectors.toSet());
+
+        List<String> newNames = newDays.stream()
+                .map(day -> day.getName().value().toLowerCase())
+                .toList();
+
+        validateNoDuplicateNames(newNames);
+
+        newNames.stream()
+                .filter(existingNames::contains)
+                .findFirst()
+                .ifPresent(name -> {
+                    throw new IllegalArgumentException("Day with name '" + name + "' already exists");
+                });
+
         List<WorkoutDay> updatedDays = new ArrayList<>(this.days);
         updatedDays.addAll(newDays);
 
@@ -73,6 +116,8 @@ public final class Workout extends AggregateRoot {
 
     public Workout removeDays(List<WorkoutDayId> dayIds) {
         validateNotEmpty(dayIds, "day IDs to remove");
+
+        validateDayIdsExist(dayIds);
 
         List<WorkoutDay> updatedDays = this.days.stream()
                 .filter(day -> !dayIds.contains(day.getId()))
@@ -87,9 +132,17 @@ public final class Workout extends AggregateRoot {
         List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
         validateNotEmpty(ids, "day IDs to rename");
 
+        validateDayIdsExist(ids);
+
+        List<String> names = dayNames.values().stream()
+                .map(vo -> vo.value().toLowerCase())
+                .toList();
+
+        validateNoDuplicateNames(names);
+
         List<WorkoutDay> updatedDays = this.days.stream()
-                .map(day -> dayNames.containsKey(day.getId()) 
-                        ? day.rename(dayNames.get(day.getId())) 
+                .map(day -> dayNames.containsKey(day.getId())
+                        ? day.rename(dayNames.get(day.getId()))
                         : day)
                 .toList();
 
@@ -105,6 +158,7 @@ public final class Workout extends AggregateRoot {
                 .withDays(transformDay(dayId, day -> day.addExercises(newExercises)))
                 .build();
     }
+
     public Workout updateExercisesInDay(WorkoutDayId dayId, List<WorkoutExercise> updatedExercises) {
         validateNotEmpty(updatedExercises, "updated exercises");
 
@@ -122,6 +176,16 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout reorderDays(List<WorkoutDayId> orderedIds) {
+        validateNotEmpty(orderedIds, "day IDs to reorder");
+
+        List<String> ids = orderedIds.stream()
+                .map(id -> id.value().toString())
+                .toList();
+
+        validateNoDuplicateNames(ids);
+
+        validateDayIdsExist(orderedIds);
+
         if (orderedIds.size() != this.days.size()) {
             throw new IllegalArgumentException("The number of IDs must match the current number of days");
         }
@@ -138,12 +202,6 @@ public final class Workout extends AggregateRoot {
                 .build();
     }
 
-    public Workout reorderExercisesInDay(WorkoutDayId dayId, List<WorkoutExerciseId> orderedExerciseIds) {
-        return new WorkoutBuilder(this)
-                .withDays(transformDay(dayId, day -> day.reorderExercises(orderedExerciseIds)))
-                .build();
-    }
-
     private List<WorkoutDay> transformDay(WorkoutDayId id, Function<WorkoutDay, WorkoutDay> transformer) {
         if (this.days.stream().noneMatch(day -> day.getId().equals(id))) {
             throw new IllegalArgumentException("Workout day not found: " + id.value());
@@ -154,9 +212,30 @@ public final class Workout extends AggregateRoot {
                 .toList();
     }
 
-    private static void validateNotEmpty(List<?> list, String context) {
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("Must provide at least one " + context);
-        }
+    private Set<WorkoutDayId> getDayIds() {
+        return this.days.stream()
+                .map(WorkoutDay::getId)
+                .collect(Collectors.toSet());
+    }
+
+    private void validateDayIdsExist(List<WorkoutDayId> ids) {
+        ids.stream()
+                .filter(id -> !getDayIds().contains(id))
+                .findFirst()
+                .ifPresent(id -> {
+                    throw new IllegalArgumentException("Day with id '" + id.value() + "' not found");
+                });
+    }
+
+    private void validateNoDuplicateNames(List<String> names) {
+        names.stream()
+                .collect(Collectors.groupingBy(name -> name, Collectors.counting()))
+                .values()
+                .stream()
+                .filter(count -> count > 1)
+                .findFirst()
+                .ifPresent(count -> {
+                    throw new IllegalArgumentException("Duplicate day name in the list");
+                });
     }
 }
