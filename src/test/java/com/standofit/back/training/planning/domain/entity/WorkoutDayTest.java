@@ -1,6 +1,5 @@
 package com.standofit.back.training.planning.domain.entity;
 
-import com.standofit.back.training.planning.domain.WorkoutDayException;
 import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -66,7 +65,7 @@ class WorkoutDayTest {
             var existingExercise = day.getExercises().get(0);
 
             assertThatThrownBy(() -> day.addExercises(List.of(existingExercise)))
-                    .isInstanceOf(WorkoutDayException.class)
+                    .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("already exists");
         }
     }
@@ -93,7 +92,7 @@ class WorkoutDayTest {
             var nonExistentId = WorkoutExerciseMother.aWorkoutExercise().getId();
 
             assertThatThrownBy(() -> day.removeExercises(List.of(nonExistentId)))
-                    .isInstanceOf(WorkoutDayException.class)
+                    .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("not found");
         }
     }
@@ -124,7 +123,7 @@ class WorkoutDayTest {
             WorkoutExercise nonExistentExercise = WorkoutExerciseMother.aWorkoutExercise();
 
             assertThatThrownBy(() -> day.updateExercises(List.of(nonExistentExercise)))
-                    .isInstanceOf(WorkoutDayException.class)
+                    .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("not found");
         }
     }

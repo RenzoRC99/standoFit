@@ -1,11 +1,10 @@
 package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.aggregate.AggregateRoot;
+import com.standofit.back.shared.domain.utils.CollectionUtils;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
-import com.standofit.back.training.planning.domain.WorkoutErrors;
-import com.standofit.back.training.planning.domain.WorkoutException;
 import com.standofit.back.training.planning.domain.vo.*;
 
 import java.util.ArrayList;
@@ -40,9 +39,8 @@ public final class Workout extends AggregateRoot {
             WorkoutName name,
             List<WorkoutDay> days
     ) {
-        validateDaysNotEmpty(days);
-        return new WorkoutBuilder
-                (description, name, days)
+        CollectionUtils.requireNonEmpty(days, "Days cannot be null or empty");
+        return new WorkoutBuilder(description, name, days)
                 .build();
     }
 
@@ -83,7 +81,7 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout addDays(List<WorkoutDay> newDays) {
-        validateDaysNotEmpty(newDays);
+        CollectionUtils.requireNonEmpty(newDays, "Days cannot be null or empty");
 
         Set<String> existingNames = this.days.stream()
                 .map(day -> day.getName().value().toLowerCase())
@@ -99,7 +97,7 @@ public final class Workout extends AggregateRoot {
                 .filter(existingNames::contains)
                 .findFirst()
                 .ifPresent(name -> {
-                    throw new WorkoutException(WorkoutErrors.DAY_NAME_ALREADY_EXISTS, name);
+                    throw new IllegalArgumentException("Day name already exists: " + name);
                 });
 
         List<WorkoutDay> updatedDays = new ArrayList<>(this.days);
@@ -111,8 +109,7 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout removeDays(List<WorkoutDayId> dayIds) {
-        validateDayIdsNotEmpty(dayIds);
-
+        CollectionUtils.requireNonEmpty(dayIds, "Day IDs cannot be null or empty");
         validateDayIdsExist(dayIds);
 
         List<WorkoutDay> updatedDays = this.days.stream()
@@ -126,8 +123,7 @@ public final class Workout extends AggregateRoot {
 
     public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
         List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
-        validateDayIdsToRenameNotEmpty(ids);
-
+        CollectionUtils.requireNonEmpty(ids, "Day IDs to rename cannot be null or empty");
         validateDayIdsExist(ids);
 
         List<String> names = dayNames.values().stream()
@@ -148,7 +144,7 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout addExercisesToDay(WorkoutDayId dayId, List<WorkoutExercise> newExercises) {
-        validateExercisesNotEmpty(newExercises);
+        CollectionUtils.requireNonEmpty(newExercises, "Exercises cannot be null or empty");
 
         return new WorkoutBuilder(this)
                 .withDays(transformDay(dayId, day -> day.addExercises(newExercises)))
@@ -156,7 +152,7 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout updateExercisesInDay(WorkoutDayId dayId, List<WorkoutExercise> updatedExercises) {
-        validateUpdatedExercisesNotEmpty(updatedExercises);
+        CollectionUtils.requireNonEmpty(updatedExercises, "Updated exercises cannot be null or empty");
 
         return new WorkoutBuilder(this)
                 .withDays(transformDay(dayId, day -> day.updateExercises(updatedExercises)))
@@ -164,7 +160,7 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout removeExercisesFromDay(WorkoutDayId dayId, List<WorkoutExerciseId> exerciseIds) {
-        validateExerciseIdsNotEmpty(exerciseIds);
+        CollectionUtils.requireNonEmpty(exerciseIds, "Exercise IDs cannot be null or empty");
 
         return new WorkoutBuilder(this)
                 .withDays(transformDay(dayId, day -> day.removeExercises(exerciseIds)))
@@ -172,25 +168,24 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout reorderDays(List<WorkoutDayId> orderedIds) {
-        validateDayIdsToReorderNotEmpty(orderedIds);
+        CollectionUtils.requireNonEmpty(orderedIds, "Day IDs to reorder cannot be null or empty");
 
         List<String> ids = orderedIds.stream()
                 .map(id -> id.value().toString())
                 .toList();
 
         validateNoDuplicateNames(ids);
-
         validateDayIdsExist(orderedIds);
 
         if (orderedIds.size() != this.days.size()) {
-            throw new WorkoutException(WorkoutErrors.DAYS_COUNT_MISMATCH);
+            throw new IllegalArgumentException("Days count mismatch. Expected: " + this.days.size() + ", got: " + orderedIds.size());
         }
 
         List<WorkoutDay> reordered = orderedIds.stream()
                 .map(id -> this.days.stream()
                         .filter(day -> day.getId().equals(id))
                         .findFirst()
-                        .orElseThrow(() -> new WorkoutException(WorkoutErrors.DAY_ID_NOT_FOUND, id.value().toString())))
+                        .orElseThrow(() -> new IllegalArgumentException("Day not found: " + id.value())))
                 .toList();
 
         return new WorkoutBuilder(this)
@@ -200,7 +195,7 @@ public final class Workout extends AggregateRoot {
 
     private List<WorkoutDay> transformDay(WorkoutDayId id, Function<WorkoutDay, WorkoutDay> transformer) {
         if (this.days.stream().noneMatch(day -> day.getId().equals(id))) {
-            throw new WorkoutException(WorkoutErrors.DAY_ID_NOT_FOUND, id.value().toString());
+            throw new IllegalArgumentException("Day not found: " + id.value());
         }
 
         return this.days.stream()
@@ -219,7 +214,7 @@ public final class Workout extends AggregateRoot {
                 .filter(id -> !getDayIds().contains(id))
                 .findFirst()
                 .ifPresent(id -> {
-                    throw new WorkoutException(WorkoutErrors.DAY_ID_NOT_FOUND, id.value().toString());
+                    throw new IllegalArgumentException("Day ID not found: " + id.value());
                 });
     }
 
@@ -231,49 +226,7 @@ public final class Workout extends AggregateRoot {
                 .filter(count -> count > 1)
                 .findFirst()
                 .ifPresent(count -> {
-                    throw new WorkoutException(WorkoutErrors.DUPLICATE_DAY_NAME);
+                    throw new IllegalArgumentException("Duplicate day names found");
                 });
-    }
-
-    private static void validateDaysNotEmpty(List<WorkoutDay> days) {
-        if (days == null || days.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.DAYS_NOT_EMPTY);
-        }
-    }
-
-    private static void validateDayIdsNotEmpty(List<WorkoutDayId> ids) {
-        if (ids == null || ids.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.DAY_IDS_NOT_EMPTY);
-        }
-    }
-
-    private static void validateDayIdsToRenameNotEmpty(List<WorkoutDayId> ids) {
-        if (ids == null || ids.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.DAY_IDS_TO_RENAME_NOT_EMPTY);
-        }
-    }
-
-    private static void validateDayIdsToReorderNotEmpty(List<WorkoutDayId> ids) {
-        if (ids == null || ids.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.DAY_IDS_TO_REORDER_NOT_EMPTY);
-        }
-    }
-
-    private static void validateExercisesNotEmpty(List<WorkoutExercise> exercises) {
-        if (exercises == null || exercises.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.EXERCISES_NOT_EMPTY);
-        }
-    }
-
-    private static void validateUpdatedExercisesNotEmpty(List<WorkoutExercise> exercises) {
-        if (exercises == null || exercises.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.UPDATED_EXERCISES_NOT_EMPTY);
-        }
-    }
-
-    private static void validateExerciseIdsNotEmpty(List<WorkoutExerciseId> ids) {
-        if (ids == null || ids.isEmpty()) {
-            throw new WorkoutException(WorkoutErrors.EXERCISE_IDS_NOT_EMPTY);
-        }
     }
 }
