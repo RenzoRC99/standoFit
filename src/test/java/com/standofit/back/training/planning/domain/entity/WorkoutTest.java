@@ -2,6 +2,7 @@ package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
+import com.standofit.back.training.planning.domain.WorkoutException;
 import com.standofit.back.training.planning.domain.vo.WorkoutDescription;
 import com.standofit.back.training.planning.domain.vo.WorkoutExerciseReps;
 import com.standofit.back.training.planning.domain.vo.WorkoutExerciseRest;
@@ -49,7 +50,7 @@ class WorkoutTest {
         @DisplayName("should fail when creating workout with no days")
         void shouldFailWhenCreatingWithNoDays() {
             assertThatThrownBy(WorkoutMother::aWorkoutWithNoDays)
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("Must provide at least one");
         }
     }
@@ -123,7 +124,7 @@ class WorkoutTest {
             Workout original = WorkoutMother.aWorkout();
 
             assertThatThrownBy(() -> original.addDays(List.of()))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(WorkoutException.class);
         }
 
         @Test
@@ -148,7 +149,7 @@ class WorkoutTest {
             var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
 
             assertThatThrownBy(() -> workout.removeDays(List.of(nonExistentId)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("not found");
         }
 
@@ -248,7 +249,7 @@ class WorkoutTest {
             ));
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(workout.getDays().get(0).getId())))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("number of IDs must match");
         }
 
@@ -260,7 +261,7 @@ class WorkoutTest {
             Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(day1.getId(), day1.getId())))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("Duplicate day name");
         }
 
@@ -273,7 +274,7 @@ class WorkoutTest {
             var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(nonExistentId)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("not found");
         }
     }
@@ -291,7 +292,7 @@ class WorkoutTest {
             WorkoutDay duplicateDay = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Upper Body"));
 
             assertThatThrownBy(() -> workout.addDays(List.of(duplicateDay)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("already exists");
         }
 
@@ -304,7 +305,7 @@ class WorkoutTest {
             WorkoutDay duplicateDay = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("upper body"));
 
             assertThatThrownBy(() -> workout.addDays(List.of(duplicateDay)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("already exists");
         }
 
@@ -318,7 +319,7 @@ class WorkoutTest {
             WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day A"));
 
             assertThatThrownBy(() -> workout.addDays(List.of(day1, day2)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("Duplicate day name");
         }
 
@@ -335,7 +336,7 @@ class WorkoutTest {
                             day2.getId(), new WorkoutDayName("Same Name")
                     )
             ))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("Duplicate day name");
         }
 
@@ -350,7 +351,7 @@ class WorkoutTest {
             assertThatThrownBy(() -> workout.renameDays(
                     Map.of(nonExistentId, new WorkoutDayName("New Name"))
             ))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("not found");
         }
 
@@ -367,7 +368,7 @@ class WorkoutTest {
                             day2.getId(), new WorkoutDayName("same")
                     )
             ))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutException.class)
                     .hasMessageContaining("Duplicate day name");
         }
 

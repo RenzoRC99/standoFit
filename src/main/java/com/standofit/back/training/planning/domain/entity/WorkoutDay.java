@@ -2,6 +2,8 @@ package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
+import com.standofit.back.training.planning.domain.WorkoutDayErrors;
+import com.standofit.back.training.planning.domain.WorkoutDayException;
 import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 
 import java.util.ArrayList;
@@ -96,7 +98,7 @@ public final class WorkoutDay {
                 .filter(id -> !getExerciseIds().contains(id))
                 .findFirst()
                 .ifPresent(id -> {
-                    throw new IllegalArgumentException("Exercise with id '" + id.value() + "' not found");
+                    throw new WorkoutDayException(WorkoutDayErrors.EXERCISE_ID_NOT_FOUND, id.value().toString());
                 });
     }
 
@@ -105,7 +107,7 @@ public final class WorkoutDay {
                 .filter(getExerciseIds()::contains)
                 .findFirst()
                 .ifPresent(id -> {
-                    throw new IllegalArgumentException("Exercise with id '" + id.value() + "' already exists");
+                    throw new WorkoutDayException(WorkoutDayErrors.EXERCISE_ID_ALREADY_EXISTS, id.value().toString());
                 });
     }
 }
