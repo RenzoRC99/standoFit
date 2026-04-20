@@ -40,41 +40,27 @@ class WorkoutExerciseTest {
     }
 
     @Nested
-    @DisplayName("Update")
-    class Update {
+    @DisplayName("Copy")
+    class Copy {
 
         @Test
-        @DisplayName("should update workout exercise")
-        void shouldUpdateWorkoutExercise() {
+        @DisplayName("should copy workout exercise with new values")
+        void shouldCopyWorkoutExerciseWithNewValues() {
             WorkoutExercise exercise = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
 
-            WorkoutExercise updated = exercise.update(
+            WorkoutExercise copied = exercise.copy(
+                    exercise.getId(),
+                    exercise.getExerciseId(),
                     new WorkoutExerciseSets(5),
                     new WorkoutExerciseReps(8),
                     new WorkoutExerciseRest(90)
             );
 
-            assertEquals(5, updated.getSets().value());
-            assertEquals(8, updated.getReps().value());
-            assertEquals(90, updated.getRestSeconds().value());
-            assertEquals(exercise.getId(), updated.getId());
-            assertEquals(exercise.getExerciseId(), updated.getExerciseId());
-        }
-
-        @Test
-        @DisplayName("should keep other values unchanged when updating only sets")
-        void shouldKeepOtherValuesUnchangedWhenUpdatingSets() {
-            WorkoutExercise exercise = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
-
-            WorkoutExercise updated = exercise.update(
-                    new WorkoutExerciseSets(5),
-                    exercise.getReps(),
-                    exercise.getRestSeconds()
-            );
-
-            assertEquals(5, updated.getSets().value());
-            assertEquals(10, updated.getReps().value());
-            assertEquals(60, updated.getRestSeconds().value());
+            assertEquals(5, copied.getSets().value());
+            assertEquals(8, copied.getReps().value());
+            assertEquals(90, copied.getRestSeconds().value());
+            assertEquals(exercise.getId(), copied.getId());
+            assertEquals(exercise.getExerciseId(), copied.getExerciseId());
         }
     }
 }

@@ -1,18 +1,20 @@
 package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.aggregate.AggregateRoot;
-import com.standofit.back.shared.domain.utils.CollectionUtils;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 import com.standofit.back.training.planning.domain.vo.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.standofit.back.shared.domain.utils.CollectionUtils.isNullOrEmpty;
 
 public final class Workout extends AggregateRoot {
 
@@ -26,22 +28,45 @@ public final class Workout extends AggregateRoot {
     Workout(WorkoutId id, WorkoutName name, WorkoutDescription description,
             List<WorkoutDay> days,
             WorkoutCreatedAt createdAt, WorkoutUpdatedAt updatedAt) {
+
+        if (id == null) throw new IllegalArgumentException("Workout ID cannot be null");
+        if (name == null) throw new IllegalArgumentException("Workout Name cannot be null");
+
+        if (isNullOrEmpty(days)) {
+            throw new IllegalArgumentException("A Workout must have at least one day");
+        }
+
+        ensureNoDuplicateDayNames(days);
+
         this.id = id;
         this.name = name;
         this.description = description;
-        this.days = days;
+        this.days = List.copyOf(days);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static Workout create(
-            WorkoutDescription description,
-            WorkoutName name,
-            List<WorkoutDay> days
-    ) {
-        CollectionUtils.requireNonEmpty(days, "Days cannot be null or empty");
-        return new WorkoutBuilder(description, name, days)
-                .build();
+    public static Workout create(WorkoutId id, WorkoutDescription description, WorkoutName name, List<WorkoutDay> days) {
+        if (isNullOrEmpty(days)) throw new IllegalArgumentException("Days cannot be null or empty");
+        return new Workout(
+                id,
+                name,
+                description,
+                days,
+                new WorkoutCreatedAt(Instant.now()),
+                new WorkoutUpdatedAt(Instant.now())
+        );
+    }
+
+    public Workout copy(WorkoutId id, WorkoutName name, WorkoutDescription description, List<WorkoutDay> days) {
+        return new Workout(
+                id,
+                name,
+                description,
+                days,
+                this.createdAt,
+                new WorkoutUpdatedAt(Instant.now())
+        );
     }
 
     public WorkoutId getId() {
@@ -69,128 +94,83 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout renameWorkout(WorkoutName name) {
-        return new WorkoutBuilder(this)
-                .withName(name)
-                .build();
+        return copy(this.id, name, this.description, this.days);
     }
 
     public Workout changeDescription(WorkoutDescription description) {
-        return new WorkoutBuilder(this)
-                .withDescription(description)
-                .build();
+        return copy(this.id, this.name, description, this.days);
     }
 
     public Workout addDays(List<WorkoutDay> newDays) {
-        CollectionUtils.requireNonEmpty(newDays, "Days cannot be null or empty");
-
-        Set<String> existingNames = this.days.stream()
-                .map(day -> day.getName().value().toLowerCase())
-                .collect(Collectors.toSet());
-
-        List<String> newNames = newDays.stream()
-                .map(day -> day.getName().value().toLowerCase())
-                .toList();
-
-        validateNoDuplicateNames(newNames);
-
-        newNames.stream()
-                .filter(existingNames::contains)
-                .findFirst()
-                .ifPresent(name -> {
-                    throw new IllegalArgumentException("Day name already exists: " + name);
-                });
+        if (isNullOrEmpty(newDays)) throw new IllegalArgumentException("Days cannot be null or empty");
 
         List<WorkoutDay> updatedDays = new ArrayList<>(this.days);
         updatedDays.addAll(newDays);
 
-        return new WorkoutBuilder(this)
-                .withDays(updatedDays)
-                .build();
+        return copy(this.id, this.name, this.description, updatedDays);
     }
 
     public Workout removeDays(List<WorkoutDayId> dayIds) {
-        CollectionUtils.requireNonEmpty(dayIds, "Day IDs cannot be null or empty");
+        if (isNullOrEmpty(dayIds)) throw new IllegalArgumentException("Day IDs cannot be null or empty");
         validateDayIdsExist(dayIds);
 
         List<WorkoutDay> updatedDays = this.days.stream()
                 .filter(day -> !dayIds.contains(day.getId()))
                 .toList();
 
-        return new WorkoutBuilder(this)
-                .withDays(updatedDays)
-                .build();
+        return copy(this.id, this.name, this.description, updatedDays);
     }
 
     public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
         List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
-        CollectionUtils.requireNonEmpty(ids, "Day IDs to rename cannot be null or empty");
+        if (isNullOrEmpty(ids)) throw new IllegalArgumentException("Day IDs to rename cannot be null or empty");
         validateDayIdsExist(ids);
-
-        List<String> names = dayNames.values().stream()
-                .map(vo -> vo.value().toLowerCase())
-                .toList();
-
-        validateNoDuplicateNames(names);
-
+        
         List<WorkoutDay> updatedDays = this.days.stream()
                 .map(day -> dayNames.containsKey(day.getId())
                         ? day.rename(dayNames.get(day.getId()))
                         : day)
                 .toList();
 
-        return new WorkoutBuilder(this)
-                .withDays(updatedDays)
-                .build();
+        return copy(this.id, this.name, this.description, updatedDays);
     }
 
     public Workout addExercisesToDay(WorkoutDayId dayId, List<WorkoutExercise> newExercises) {
-        CollectionUtils.requireNonEmpty(newExercises, "Exercises cannot be null or empty");
+        if (isNullOrEmpty(newExercises)) throw new IllegalArgumentException("Exercises cannot be null or empty");
 
-        return new WorkoutBuilder(this)
-                .withDays(transformDay(dayId, day -> day.addExercises(newExercises)))
-                .build();
+        return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.addExercises(newExercises)));
     }
 
     public Workout updateExercisesInDay(WorkoutDayId dayId, List<WorkoutExercise> updatedExercises) {
-        CollectionUtils.requireNonEmpty(updatedExercises, "Updated exercises cannot be null or empty");
+        if (isNullOrEmpty(updatedExercises))
+            throw new IllegalArgumentException("Updated exercises cannot be null or empty");
 
-        return new WorkoutBuilder(this)
-                .withDays(transformDay(dayId, day -> day.updateExercises(updatedExercises)))
-                .build();
+        return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.updateExercises(updatedExercises)));
     }
 
     public Workout removeExercisesFromDay(WorkoutDayId dayId, List<WorkoutExerciseId> exerciseIds) {
-        CollectionUtils.requireNonEmpty(exerciseIds, "Exercise IDs cannot be null or empty");
+        if (isNullOrEmpty(exerciseIds)) throw new IllegalArgumentException("Exercise IDs cannot be null or empty");
 
-        return new WorkoutBuilder(this)
-                .withDays(transformDay(dayId, day -> day.removeExercises(exerciseIds)))
-                .build();
+        return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.removeExercises(exerciseIds)));
     }
 
     public Workout reorderDays(List<WorkoutDayId> orderedIds) {
-        CollectionUtils.requireNonEmpty(orderedIds, "Day IDs to reorder cannot be null or empty");
+        if (isNullOrEmpty(orderedIds)) throw new IllegalArgumentException("Day IDs to reorder cannot be null or empty");
 
-        List<String> ids = orderedIds.stream()
-                .map(id -> id.value().toString())
-                .toList();
-
-        validateNoDuplicateNames(ids);
         validateDayIdsExist(orderedIds);
 
         if (orderedIds.size() != this.days.size()) {
             throw new IllegalArgumentException("Days count mismatch. Expected: " + this.days.size() + ", got: " + orderedIds.size());
         }
 
+        Map<WorkoutDayId, WorkoutDay> daysById = this.days.stream()
+                .collect(Collectors.toMap(WorkoutDay::getId, Function.identity()));
+
         List<WorkoutDay> reordered = orderedIds.stream()
-                .map(id -> this.days.stream()
-                        .filter(day -> day.getId().equals(id))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Day not found: " + id.value())))
+                .map(daysById::get)
                 .toList();
 
-        return new WorkoutBuilder(this)
-                .withDays(reordered)
-                .build();
+        return copy(this.id, this.name, this.description, reordered);
     }
 
     private List<WorkoutDay> transformDay(WorkoutDayId id, Function<WorkoutDay, WorkoutDay> transformer) {
@@ -218,15 +198,14 @@ public final class Workout extends AggregateRoot {
                 });
     }
 
-    private void validateNoDuplicateNames(List<String> names) {
-        names.stream()
-                .collect(Collectors.groupingBy(name -> name, Collectors.counting()))
-                .values()
-                .stream()
-                .filter(count -> count > 1)
-                .findFirst()
-                .ifPresent(count -> {
-                    throw new IllegalArgumentException("Duplicate day names found");
-                });
+    private void ensureNoDuplicateDayNames(List<WorkoutDay> days) {
+        long uniqueNamesCount = days.stream()
+                .map(day -> day.getName().value().toLowerCase().trim())
+                .distinct()
+                .count();
+
+        if (uniqueNamesCount != days.size()) {
+            throw new IllegalArgumentException("Workout days cannot have duplicate names");
+        }
     }
 }

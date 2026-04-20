@@ -14,7 +14,7 @@ public final class WorkoutExercise {
     private final WorkoutExerciseRest restSeconds;
 
     WorkoutExercise(WorkoutExerciseId id, ExerciseId exerciseId, WorkoutExerciseSets sets,
-                   WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
+                    WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
         this.id = id;
         this.exerciseId = exerciseId;
         this.sets = sets;
@@ -22,22 +22,45 @@ public final class WorkoutExercise {
         this.restSeconds = restSeconds;
     }
 
-    public WorkoutExerciseId getId() { return id; }
-    public ExerciseId getExerciseId() { return exerciseId; }
-    public WorkoutExerciseSets getSets() { return sets; }
-    public WorkoutExerciseReps getReps() { return reps; }
-    public WorkoutExerciseRest getRestSeconds() { return restSeconds; }
-
-    static WorkoutExercise create(ExerciseId exerciseId, WorkoutExerciseSets sets,
-                                  WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
-        return new WorkoutExerciseBuilder(exerciseId, sets, reps, restSeconds).build();
+    public static WorkoutExercise create(WorkoutExerciseId id, ExerciseId exerciseId, WorkoutExerciseSets sets,
+                                         WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
+        return new WorkoutExercise(
+                id,
+                exerciseId,
+                sets,
+                reps,
+                restSeconds
+        );
     }
 
-    WorkoutExercise update(WorkoutExerciseSets sets, WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
-        return new WorkoutExerciseBuilder(this)
-                .withSets(sets)
-                .withReps(reps)
-                .withRestSeconds(restSeconds)
-                .build();
+    public WorkoutExercise copy(WorkoutExerciseId id, ExerciseId exerciseId, WorkoutExerciseSets sets,
+                                WorkoutExerciseReps reps, WorkoutExerciseRest restSeconds) {
+        return new WorkoutExercise(
+                id,
+                exerciseId,
+                sets,
+                reps,
+                restSeconds
+        );
+    }
+
+    public WorkoutExerciseId getId() {
+        return id;
+    }
+
+    public ExerciseId getExerciseId() {
+        return exerciseId;
+    }
+
+    public WorkoutExerciseSets getSets() {
+        return sets;
+    }
+
+    public WorkoutExerciseReps getReps() {
+        return reps;
+    }
+
+    public WorkoutExerciseRest getRestSeconds() {
+        return restSeconds;
     }
 }

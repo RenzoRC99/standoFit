@@ -189,12 +189,14 @@ class WorkoutTest {
         @Test
         @DisplayName("should update exercises in a day")
         void shouldUpdateExercisesInDay() {
-            WorkoutExercise original = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
+            WorkoutExercise exercise = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
             Workout workout = WorkoutMother.aWorkoutWithDays(List.of(
-                    WorkoutDayMother.aWorkoutDayWithExercises(List.of(original))
+                    WorkoutDayMother.aWorkoutDayWithExercises(List.of(exercise))
             ));
             var dayId = workout.getDays().get(0).getId();
-            WorkoutExercise updatedExercise = original.update(
+            WorkoutExercise updatedExercise = exercise.copy(
+                    exercise.getId(),
+                    exercise.getExerciseId(),
                     new WorkoutExerciseSets(5),
                     new WorkoutExerciseReps(8),
                     new WorkoutExerciseRest(90)

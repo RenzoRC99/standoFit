@@ -105,7 +105,10 @@ class WorkoutDayTest {
         @DisplayName("should update exercises in workout day")
         void shouldUpdateExercises() {
             WorkoutDay day = WorkoutDayMother.aWorkoutDay();
-            WorkoutExercise updatedExercise = day.getExercises().get(0).update(
+            var originalExercise = day.getExercises().get(0);
+            WorkoutExercise updatedExercise = originalExercise.copy(
+                    originalExercise.getId(),
+                    originalExercise.getExerciseId(),
                     new com.standofit.back.training.planning.domain.vo.WorkoutExerciseSets(5),
                     new com.standofit.back.training.planning.domain.vo.WorkoutExerciseReps(8),
                     new com.standofit.back.training.planning.domain.vo.WorkoutExerciseRest(90)

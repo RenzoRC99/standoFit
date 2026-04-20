@@ -6,8 +6,12 @@ import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.standofit.back.shared.domain.utils.CollectionUtils.isNullOrEmpty;
 
 public final class WorkoutDay {
 
@@ -16,13 +20,28 @@ public final class WorkoutDay {
     private final List<WorkoutExercise> exercises;
 
     WorkoutDay(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
+
+        ensureNoDuplicateExerciseIds(exercises);
+
         this.id = id;
         this.name = name;
         this.exercises = (exercises != null) ? List.copyOf(exercises) : List.of();
     }
 
-    static WorkoutDay create(WorkoutDayName name, List<WorkoutExercise> exercises) {
-        return new WorkoutDayBuilder(name, exercises).build();
+    public static WorkoutDay create(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
+        return new WorkoutDay(
+                id,
+                name,
+                isNullOrEmpty(exercises) ? List.of() : exercises
+        );
+    }
+
+    public WorkoutDay copy(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
+        return new WorkoutDay(
+                id,
+                name,
+                exercises
+        );
     }
 
     public WorkoutDayId getId() {
@@ -38,51 +57,47 @@ public final class WorkoutDay {
     }
 
     WorkoutDay rename(WorkoutDayName name) {
-        return new WorkoutDayBuilder(this)
-                .withName(name)
-                .build();
+        return copy(this.id, name, this.exercises);
     }
 
     WorkoutDay addExercises(List<WorkoutExercise> newExercises) {
-        validateIdsNotExist(newExercises.stream()
-                .map(WorkoutExercise::getId)
-                .toList());
+        if (isNullOrEmpty(newExercises)) throw new IllegalArgumentException("New exercises cannot be null or empty");
 
         List<WorkoutExercise> updated = new ArrayList<>(this.exercises);
         updated.addAll(newExercises);
 
-        return new WorkoutDayBuilder(this)
-                .withExercises(updated)
-                .build();
+        return copy(this.id, this.name, updated);
     }
 
     WorkoutDay removeExercises(List<WorkoutExerciseId> idsToRemove) {
+
+        if (isNullOrEmpty(idsToRemove))
+            throw new IllegalArgumentException("Exercise IDs to remove cannot be null or empty");
+
         validateIdsExist(idsToRemove);
 
         List<WorkoutExercise> updated = this.exercises.stream()
                 .filter(ex -> !idsToRemove.contains(ex.getId()))
                 .toList();
 
-        return new WorkoutDayBuilder(this)
-                .withExercises(updated)
-                .build();
+        return copy(this.id, this.name, updated);
     }
 
     WorkoutDay updateExercises(List<WorkoutExercise> updatedExercises) {
-        validateIdsExist(updatedExercises.stream()
-                .map(WorkoutExercise::getId)
-                .toList());
+        if (isNullOrEmpty(updatedExercises))
+            throw new IllegalArgumentException("Exercises to update cannot be null or empty");
 
-        var updatesById = updatedExercises.stream()
-                .collect(Collectors.toMap(WorkoutExercise::getId, ex -> ex));
+        List<WorkoutExerciseId> idsToUpdate = updatedExercises.stream().map(WorkoutExercise::getId).toList();
+        validateIdsExist(idsToUpdate);
+
+        Map<WorkoutExerciseId, WorkoutExercise> updatesById = updatedExercises.stream()
+                .collect(Collectors.toMap(WorkoutExercise::getId, Function.identity()));
 
         List<WorkoutExercise> newExercises = this.exercises.stream()
                 .map(currentEx -> updatesById.getOrDefault(currentEx.getId(), currentEx))
                 .toList();
 
-        return new WorkoutDayBuilder(this)
-                .withExercises(newExercises)
-                .build();
+        return copy(this.id, this.name, newExercises);
     }
 
     private Set<WorkoutExerciseId> getExerciseIds() {
@@ -100,12 +115,16 @@ public final class WorkoutDay {
                 });
     }
 
-    private void validateIdsNotExist(List<WorkoutExerciseId> ids) {
-        ids.stream()
-                .filter(getExerciseIds()::contains)
-                .findFirst()
-                .ifPresent(id -> {
-                    throw new IllegalArgumentException("Exercise ID already exists: " + id.value());
-                });
+    private void ensureNoDuplicateExerciseIds(List<WorkoutExercise> exercises) {
+        if (exercises == null) return;
+
+        long uniqueIds = exercises.stream()
+                .map(WorkoutExercise::getId)
+                .distinct()
+                .count();
+
+        if (uniqueIds != exercises.size()) {
+            throw new IllegalArgumentException("A WorkoutDay cannot have duplicate exercise instances (WorkoutExerciseId)");
+        }
     }
 }

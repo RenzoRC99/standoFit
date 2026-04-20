@@ -1,6 +1,7 @@
 package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
+import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.training.planning.domain.vo.*;
 
 import java.util.UUID;
@@ -8,6 +9,10 @@ import java.util.UUID;
 public final class WorkoutExerciseMother {
 
     private WorkoutExerciseMother() {}
+
+    public static WorkoutExerciseId aWorkoutExerciseId() {
+        return new WorkoutExerciseId(UUID.randomUUID());
+    }
 
     public static ExerciseId anExerciseId() {
         return new ExerciseId(UUID.randomUUID());
@@ -27,6 +32,7 @@ public final class WorkoutExerciseMother {
 
     public static WorkoutExercise aWorkoutExercise() {
         return WorkoutExercise.create(
+                aWorkoutExerciseId(),
                 anExerciseId(),
                 defaultSets(),
                 defaultReps(),
@@ -36,6 +42,7 @@ public final class WorkoutExerciseMother {
 
     public static WorkoutExercise aWorkoutExerciseWith(int sets, int reps, int rest) {
         return WorkoutExercise.create(
+                aWorkoutExerciseId(),
                 anExerciseId(),
                 new WorkoutExerciseSets(sets),
                 new WorkoutExerciseReps(reps),

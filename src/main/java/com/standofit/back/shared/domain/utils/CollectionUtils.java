@@ -10,10 +10,5 @@ public final class CollectionUtils {
     public static boolean isNullOrEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
-
-    public static void requireNonEmpty(Collection<?> collection, String message) {
-        if (isNullOrEmpty(collection)) {
-            throw new IllegalArgumentException(message);
-        }
-    }
+    
 }
