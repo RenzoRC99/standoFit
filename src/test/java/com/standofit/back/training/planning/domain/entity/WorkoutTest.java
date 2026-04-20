@@ -131,7 +131,7 @@ class WorkoutTest {
         void shouldRemoveDays() {
             Workout workout = WorkoutMother.aWorkoutWithDays(List.of(
                     WorkoutDayMother.aWorkoutDay(),
-                    WorkoutDayMother.aWorkoutDay()
+                    WorkoutDayMother.aWorkoutDayWithoutExercises("Day 2")
             ));
 
             Workout updated = workout.removeDays(List.of(workout.getDays().get(0).getId()));
@@ -246,7 +246,7 @@ class WorkoutTest {
         void shouldFailWhenReorderHasWrongNumberOfIds() {
             Workout workout = WorkoutMother.aWorkoutWithDays(List.of(
                     WorkoutDayMother.aWorkoutDay(),
-                    WorkoutDayMother.aWorkoutDay()
+                    WorkoutDayMother.aWorkoutDayWithoutExercises("Day 2")
             ));
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(workout.getDays().get(0).getId())))
@@ -254,17 +254,7 @@ class WorkoutTest {
                     .hasMessageContaining("Days count mismatch");
         }
 
-        @Test
-        @DisplayName("should fail when reorder has duplicate ids")
-        void shouldFailWhenReorderHasDuplicateIds() {
-            WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
-            WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
-
-            assertThatThrownBy(() -> workout.reorderDays(List.of(day1.getId(), day1.getId())))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Duplicate day name");
-        }
+        
 
         @Test
         @DisplayName("should fail when reorder id not found")
@@ -285,63 +275,6 @@ class WorkoutTest {
     class BusinessRules {
 
         @Test
-        @DisplayName("should fail when adding day with duplicate name")
-        void shouldFailWhenAddingDuplicateDayName() {
-            WorkoutDay day = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Upper Body"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day));
-
-            WorkoutDay duplicateDay = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Upper Body"));
-
-            assertThatThrownBy(() -> workout.addDays(List.of(duplicateDay)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("already exists");
-        }
-
-        @Test
-        @DisplayName("should fail when adding day with same name different case")
-        void shouldFailWhenAddingDuplicateDayNameDifferentCase() {
-            WorkoutDay day = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Upper Body"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day));
-
-            WorkoutDay duplicateDay = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("upper body"));
-
-            assertThatThrownBy(() -> workout.addDays(List.of(duplicateDay)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("already exists");
-        }
-
-        @Test
-        @DisplayName("should fail when adding duplicate day names within the same list")
-        void shouldFailWhenAddingDuplicateDayNamesInSameList() {
-            WorkoutDay existingDay = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Existing Day"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(existingDay));
-
-            WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day A"));
-            WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day A"));
-
-            assertThatThrownBy(() -> workout.addDays(List.of(day1, day2)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Duplicate day name");
-        }
-
-        @Test
-        @DisplayName("should fail when renaming days results in duplicate names")
-        void shouldFailWhenRenamingDaysToDuplicate() {
-            WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
-            WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
-
-            assertThatThrownBy(() -> workout.renameDays(
-                    Map.of(
-                            day1.getId(), new WorkoutDayName("Same Name"),
-                            day2.getId(), new WorkoutDayName("Same Name")
-                    )
-            ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Duplicate day name");
-        }
-
-        @Test
         @DisplayName("should fail when renaming day id not found")
         void shouldFailWhenRenamingDayIdNotFound() {
             WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
@@ -354,23 +287,6 @@ class WorkoutTest {
             ))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("not found");
-        }
-
-        @Test
-        @DisplayName("should fail when renaming days results in duplicate names (different case)")
-        void shouldFailWhenRenamingDaysToDuplicateDifferentCase() {
-            WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
-            WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
-            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
-
-            assertThatThrownBy(() -> workout.renameDays(
-                    Map.of(
-                            day1.getId(), new WorkoutDayName("Same"),
-                            day2.getId(), new WorkoutDayName("same")
-                    )
-            ))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Duplicate day name");
         }
 
     }

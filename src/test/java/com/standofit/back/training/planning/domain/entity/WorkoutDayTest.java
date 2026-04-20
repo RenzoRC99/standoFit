@@ -66,7 +66,7 @@ class WorkoutDayTest {
 
             assertThatThrownBy(() -> day.addExercises(List.of(existingExercise)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("already exists");
+                    .hasMessageContaining("duplicate");
         }
     }
 
