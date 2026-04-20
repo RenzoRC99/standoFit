@@ -1,12 +1,7 @@
 package com.standofit.back.training.planning.domain.entity;
 
-import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
-import com.standofit.back.training.planning.domain.vo.WorkoutDescription;
-import com.standofit.back.training.planning.domain.vo.WorkoutExerciseReps;
-import com.standofit.back.training.planning.domain.vo.WorkoutExerciseRest;
-import com.standofit.back.training.planning.domain.vo.WorkoutExerciseSets;
-import com.standofit.back.training.planning.domain.vo.WorkoutName;
+import com.standofit.back.training.planning.domain.vo.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Workout Domain Tests")
@@ -254,7 +249,6 @@ class WorkoutTest {
                     .hasMessageContaining("Days count mismatch");
         }
 
-        
 
         @Test
         @DisplayName("should fail when reorder id not found")
