@@ -1,6 +1,7 @@
 package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
+import com.standofit.back.training.planning.domain.WorkoutDomainException;
 import com.standofit.back.training.planning.domain.vo.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,7 +45,7 @@ class WorkoutTest {
         @DisplayName("should fail when creating workout with no days")
         void shouldFailWhenCreatingWithNoDays() {
             assertThatThrownBy(WorkoutMother::aWorkoutWithNoDays)
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutDomainException.class)
                     .hasMessageContaining("Days cannot be null or empty");
         }
     }
@@ -118,7 +119,7 @@ class WorkoutTest {
             Workout original = WorkoutMother.aWorkout();
 
             assertThatThrownBy(() -> original.addDays(List.of()))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(WorkoutDomainException.class);
         }
 
         @Test
@@ -143,7 +144,7 @@ class WorkoutTest {
             var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
 
             assertThatThrownBy(() -> workout.removeDays(List.of(nonExistentId)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutDomainException.class)
                     .hasMessageContaining("not found");
         }
 
@@ -245,7 +246,7 @@ class WorkoutTest {
             ));
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(workout.getDays().get(0).getId())))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutDomainException.class)
                     .hasMessageContaining("Days count mismatch");
         }
 
@@ -259,7 +260,7 @@ class WorkoutTest {
             var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
 
             assertThatThrownBy(() -> workout.reorderDays(List.of(nonExistentId)))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutDomainException.class)
                     .hasMessageContaining("not found");
         }
     }
@@ -279,7 +280,7 @@ class WorkoutTest {
             assertThatThrownBy(() -> workout.renameDays(
                     Map.of(nonExistentId, new WorkoutDayName("New Name"))
             ))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(WorkoutDomainException.class)
                     .hasMessageContaining("not found");
         }
 

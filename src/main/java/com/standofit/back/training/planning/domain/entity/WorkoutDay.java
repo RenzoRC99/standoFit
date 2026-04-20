@@ -2,6 +2,8 @@ package com.standofit.back.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
+import com.standofit.back.training.planning.domain.WorkoutDomainErrors;
+import com.standofit.back.training.planning.domain.WorkoutDomainException;
 import com.standofit.back.training.planning.domain.vo.WorkoutDayName;
 
 import java.util.ArrayList;
@@ -61,7 +63,7 @@ public final class WorkoutDay {
     }
 
     WorkoutDay addExercises(List<WorkoutExercise> newExercises) {
-        if (isNullOrEmpty(newExercises)) throw new IllegalArgumentException("New exercises cannot be null or empty");
+        if (isNullOrEmpty(newExercises)) throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISES_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         List<WorkoutExercise> updated = new ArrayList<>(this.exercises);
         updated.addAll(newExercises);
@@ -72,7 +74,7 @@ public final class WorkoutDay {
     WorkoutDay removeExercises(List<WorkoutExerciseId> idsToRemove) {
 
         if (isNullOrEmpty(idsToRemove))
-            throw new IllegalArgumentException("Exercise IDs to remove cannot be null or empty");
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISE_ID_NOT_FOUND.getMessage());
 
         validateIdsExist(idsToRemove);
 
@@ -85,7 +87,7 @@ public final class WorkoutDay {
 
     WorkoutDay updateExercises(List<WorkoutExercise> updatedExercises) {
         if (isNullOrEmpty(updatedExercises))
-            throw new IllegalArgumentException("Exercises to update cannot be null or empty");
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISES_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         List<WorkoutExerciseId> idsToUpdate = updatedExercises.stream().map(WorkoutExercise::getId).toList();
         validateIdsExist(idsToUpdate);
@@ -111,7 +113,7 @@ public final class WorkoutDay {
                 .filter(id -> !getExerciseIds().contains(id))
                 .findFirst()
                 .ifPresent(id -> {
-                    throw new IllegalArgumentException("Exercise ID not found: " + id.value());
+                    throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISE_ID_NOT_FOUND.getMessage());
                 });
     }
 
@@ -124,7 +126,7 @@ public final class WorkoutDay {
                 .count();
 
         if (uniqueIds != exercises.size()) {
-            throw new IllegalArgumentException("A WorkoutDay cannot have duplicate exercise instances (WorkoutExerciseId)");
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISE_ID_ALREADY_EXISTS.getMessage());
         }
     }
 }

@@ -4,6 +4,8 @@ import com.standofit.back.shared.domain.aggregate.AggregateRoot;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
+import com.standofit.back.training.planning.domain.WorkoutDomainErrors;
+import com.standofit.back.training.planning.domain.WorkoutDomainException;
 import com.standofit.back.training.planning.domain.vo.*;
 
 import java.time.Instant;
@@ -29,11 +31,8 @@ public final class Workout extends AggregateRoot {
             List<WorkoutDay> days,
             WorkoutCreatedAt createdAt, WorkoutUpdatedAt updatedAt) {
 
-        if (id == null) throw new IllegalArgumentException("Workout ID cannot be null");
-        if (name == null) throw new IllegalArgumentException("Workout Name cannot be null");
-
         if (isNullOrEmpty(days)) {
-            throw new IllegalArgumentException("A Workout must have at least one day");
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAYS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
         }
 
         ensureNoDuplicateDayNames(days);
@@ -47,7 +46,8 @@ public final class Workout extends AggregateRoot {
     }
 
     public static Workout create(WorkoutId id, WorkoutDescription description, WorkoutName name, List<WorkoutDay> days) {
-        if (isNullOrEmpty(days)) throw new IllegalArgumentException("Days cannot be null or empty");
+        if (isNullOrEmpty(days))
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAYS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
         return new Workout(
                 id,
                 name,
@@ -102,7 +102,8 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout addDays(List<WorkoutDay> newDays) {
-        if (isNullOrEmpty(newDays)) throw new IllegalArgumentException("Days cannot be null or empty");
+        if (isNullOrEmpty(newDays))
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAYS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         List<WorkoutDay> updatedDays = new ArrayList<>(this.days);
         updatedDays.addAll(newDays);
@@ -111,7 +112,8 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout removeDays(List<WorkoutDayId> dayIds) {
-        if (isNullOrEmpty(dayIds)) throw new IllegalArgumentException("Day IDs cannot be null or empty");
+        if (isNullOrEmpty(dayIds))
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAY_IDS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
         validateDayIdsExist(dayIds);
 
         List<WorkoutDay> updatedDays = this.days.stream()
@@ -123,9 +125,10 @@ public final class Workout extends AggregateRoot {
 
     public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
         List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
-        if (isNullOrEmpty(ids)) throw new IllegalArgumentException("Day IDs to rename cannot be null or empty");
+        if (isNullOrEmpty(ids))
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAY_IDS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
         validateDayIdsExist(ids);
-        
+
         List<WorkoutDay> updatedDays = this.days.stream()
                 .map(day -> dayNames.containsKey(day.getId())
                         ? day.rename(dayNames.get(day.getId()))
@@ -136,31 +139,34 @@ public final class Workout extends AggregateRoot {
     }
 
     public Workout addExercisesToDay(WorkoutDayId dayId, List<WorkoutExercise> newExercises) {
-        if (isNullOrEmpty(newExercises)) throw new IllegalArgumentException("Exercises cannot be null or empty");
+        if (isNullOrEmpty(newExercises))
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISES_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.addExercises(newExercises)));
     }
 
     public Workout updateExercisesInDay(WorkoutDayId dayId, List<WorkoutExercise> updatedExercises) {
         if (isNullOrEmpty(updatedExercises))
-            throw new IllegalArgumentException("Updated exercises cannot be null or empty");
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISES_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.updateExercises(updatedExercises)));
     }
 
     public Workout removeExercisesFromDay(WorkoutDayId dayId, List<WorkoutExerciseId> exerciseIds) {
-        if (isNullOrEmpty(exerciseIds)) throw new IllegalArgumentException("Exercise IDs cannot be null or empty");
+        if (isNullOrEmpty(exerciseIds))
+            throw new WorkoutDomainException(WorkoutDomainErrors.EXERCISE_ID_NOT_FOUND.getMessage());
 
         return copy(this.id, this.name, this.description, transformDay(dayId, day -> day.removeExercises(exerciseIds)));
     }
 
     public Workout reorderDays(List<WorkoutDayId> orderedIds) {
-        if (isNullOrEmpty(orderedIds)) throw new IllegalArgumentException("Day IDs to reorder cannot be null or empty");
+        if (isNullOrEmpty(orderedIds))
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAY_IDS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
 
         validateDayIdsExist(orderedIds);
 
         if (orderedIds.size() != this.days.size()) {
-            throw new IllegalArgumentException("Days count mismatch. Expected: " + this.days.size() + ", got: " + orderedIds.size());
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAYS_COUNT_MISMATCH.getMessage());
         }
 
         Map<WorkoutDayId, WorkoutDay> daysById = this.days.stream()
@@ -175,7 +181,7 @@ public final class Workout extends AggregateRoot {
 
     private List<WorkoutDay> transformDay(WorkoutDayId id, Function<WorkoutDay, WorkoutDay> transformer) {
         if (this.days.stream().noneMatch(day -> day.getId().equals(id))) {
-            throw new IllegalArgumentException("Day not found: " + id.value());
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAY_ID_NOT_FOUND.getMessage());
         }
 
         return this.days.stream()
@@ -194,7 +200,7 @@ public final class Workout extends AggregateRoot {
                 .filter(id -> !getDayIds().contains(id))
                 .findFirst()
                 .ifPresent(id -> {
-                    throw new IllegalArgumentException("Day ID not found: " + id.value());
+                    throw new WorkoutDomainException(WorkoutDomainErrors.DAY_ID_NOT_FOUND.getMessage());
                 });
     }
 
@@ -205,7 +211,7 @@ public final class Workout extends AggregateRoot {
                 .count();
 
         if (uniqueNamesCount != days.size()) {
-            throw new IllegalArgumentException("Workout days cannot have duplicate names");
+            throw new WorkoutDomainException(WorkoutDomainErrors.DAY_NAME_ALREADY_EXISTS.getMessage());
         }
     }
 }

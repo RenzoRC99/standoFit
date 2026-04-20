@@ -5,7 +5,7 @@ public abstract class BaseException extends RuntimeException{
 
     protected BaseException(Class<?> clazz, String message) {
         super(message);
-        this.context = clazz.getSimpleName();
+        this.context = clazz != null ? clazz.getSimpleName() : "Unknown";
     }
 
     @Override
