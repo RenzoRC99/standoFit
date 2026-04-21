@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 @Disabled("Requires database configuration")
 class StandoFitApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
-
+  @Test
+  void contextLoads() {}
 }

@@ -11,94 +11,77 @@ import com.standofit.back.training.planning.domain.vo.*;
 import com.standofit.back.training.planning.infrastructure.entity.WorkoutDayJpaEntity;
 import com.standofit.back.training.planning.infrastructure.entity.WorkoutExerciseJpaEntity;
 import com.standofit.back.training.planning.infrastructure.entity.WorkoutJpaEntity;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
 @Component
 public class WorkoutMapper {
 
-    public WorkoutJpaEntity toEntity(Workout workout) {
-        Instant now = Instant.now();
-        WorkoutJpaEntity entity = new WorkoutJpaEntity(
-                workout.getId().value(),
-                workout.getName().value(),
-                workout.getDescription() != null ? workout.getDescription().value() : null,
-                now,
-                now
-        );
+  public WorkoutJpaEntity toEntity(Workout workout) {
+    Instant now = Instant.now();
+    WorkoutJpaEntity entity =
+        new WorkoutJpaEntity(
+            workout.getId().value(),
+            workout.getName().value(),
+            workout.getDescription() != null ? workout.getDescription().value() : null,
+            now,
+            now);
 
-        for (WorkoutDay day : workout.getDays()) {
-            entity.addDay(toEntity(day));
-        }
-
-        return entity;
+    for (WorkoutDay day : workout.getDays()) {
+      entity.addDay(toEntity(day));
     }
 
-    public WorkoutDayJpaEntity toEntity(WorkoutDay day) {
-        WorkoutDayJpaEntity entity = new WorkoutDayJpaEntity(
-                day.getId().value(),
-                day.getName().value()
-        );
+    return entity;
+  }
 
-        for (WorkoutExercise exercise : day.getExercises()) {
-            entity.addExercise(toEntity(exercise));
-        }
+  public WorkoutDayJpaEntity toEntity(WorkoutDay day) {
+    WorkoutDayJpaEntity entity =
+        new WorkoutDayJpaEntity(day.getId().value(), day.getName().value());
 
-        return entity;
+    for (WorkoutExercise exercise : day.getExercises()) {
+      entity.addExercise(toEntity(exercise));
     }
 
-    public WorkoutExerciseJpaEntity toEntity(WorkoutExercise exercise) {
-        return new WorkoutExerciseJpaEntity(
-                exercise.getId().value(),
-                exercise.getExerciseId().value(),
-                exercise.getSets().value(),
-                exercise.getReps().value(),
-                exercise.getRestSeconds().value()
-        );
-    }
+    return entity;
+  }
 
-    public Workout toDomain(WorkoutJpaEntity entity) {
-        WorkoutName name = new WorkoutName(entity.getName());
-        WorkoutDescription description = entity.getDescription() != null
-                ? new WorkoutDescription(entity.getDescription())
-                : null;
+  public WorkoutExerciseJpaEntity toEntity(WorkoutExercise exercise) {
+    return new WorkoutExerciseJpaEntity(
+        exercise.getId().value(),
+        exercise.getExerciseId().value(),
+        exercise.getSets().value(),
+        exercise.getReps().value(),
+        exercise.getRestSeconds().value());
+  }
 
-        List<WorkoutDay> days = entity.getDays().stream()
-                .map(this::toDomain)
-                .collect(Collectors.toList());
+  public Workout toDomain(WorkoutJpaEntity entity) {
+    WorkoutName name = new WorkoutName(entity.getName());
+    WorkoutDescription description =
+        entity.getDescription() != null ? new WorkoutDescription(entity.getDescription()) : null;
 
-        return Workout.create(
-                new WorkoutId(entity.getId()),
-                description,
-                name,
-                days
-        );
-    }
+    List<WorkoutDay> days =
+        entity.getDays().stream().map(this::toDomain).collect(Collectors.toList());
 
-    public WorkoutDay toDomain(WorkoutDayJpaEntity entity) {
-        WorkoutDayName name = new WorkoutDayName(entity.getName());
+    return Workout.create(new WorkoutId(entity.getId()), description, name, days);
+  }
 
-        List<WorkoutExercise> exercises = entity.getExercises().stream()
-                .map(this::toDomain)
-                .collect(Collectors.toList());
+  public WorkoutDay toDomain(WorkoutDayJpaEntity entity) {
+    WorkoutDayName name = new WorkoutDayName(entity.getName());
 
-        return WorkoutDay.create(
-                new WorkoutDayId(entity.getId()),
-                name,
-                exercises
-        );
-    }
+    List<WorkoutExercise> exercises =
+        entity.getExercises().stream().map(this::toDomain).collect(Collectors.toList());
 
-    public WorkoutExercise toDomain(WorkoutExerciseJpaEntity entity) {
-        return WorkoutExercise.create(
-                new WorkoutExerciseId(entity.getId()),
-                new ExerciseId(entity.getExerciseId()),
-                new WorkoutExerciseSets(entity.getSets()),
-                new WorkoutExerciseReps(entity.getReps()),
-                new WorkoutExerciseRest(entity.getRestSeconds())
-        );
-    }
+    return WorkoutDay.create(new WorkoutDayId(entity.getId()), name, exercises);
+  }
+
+  public WorkoutExercise toDomain(WorkoutExerciseJpaEntity entity) {
+    return WorkoutExercise.create(
+        new WorkoutExerciseId(entity.getId()),
+        new ExerciseId(entity.getExerciseId()),
+        new WorkoutExerciseSets(entity.getSets()),
+        new WorkoutExerciseReps(entity.getReps()),
+        new WorkoutExerciseRest(entity.getRestSeconds()));
+  }
 }

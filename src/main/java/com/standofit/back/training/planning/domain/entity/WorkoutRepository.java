@@ -5,10 +5,9 @@ import java.util.UUID;
 
 public interface WorkoutRepository {
 
-    Workout save(Workout workout);
+  Workout save(Workout workout);
 
-    Optional<Workout> findById(UUID id);
+  Optional<Workout> findById(UUID id);
 
-    void deleteById(UUID id);
-
+  void deleteById(UUID id);
 }

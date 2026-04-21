@@ -1,4 +1,3 @@
 package com.standofit.back.shared.domain.bus.command;
 
-public interface CommandHandler {
-}
+public interface CommandHandler {}

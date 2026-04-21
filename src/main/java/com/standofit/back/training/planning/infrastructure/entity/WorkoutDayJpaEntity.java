@@ -1,7 +1,6 @@
 package com.standofit.back.training.planning.infrastructure.entity;
 
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,67 +9,70 @@ import java.util.UUID;
 @Table(name = "workout_days")
 public class WorkoutDayJpaEntity {
 
-    @Id
-    @Column(name = "id", columnDefinition = "uuid")
-    private UUID id;
+  @Id
+  @Column(name = "id", columnDefinition = "uuid")
+  private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @OneToMany(mappedBy = "workoutDay", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<WorkoutExerciseJpaEntity> exercises = new ArrayList<>();
+  @OneToMany(
+      mappedBy = "workoutDay",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  private List<WorkoutExerciseJpaEntity> exercises = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "workout_id")
-    private WorkoutJpaEntity workout;
+  @ManyToOne
+  @JoinColumn(name = "workout_id")
+  private WorkoutJpaEntity workout;
 
-    public WorkoutDayJpaEntity() {
-    }
+  public WorkoutDayJpaEntity() {}
 
-    public WorkoutDayJpaEntity(UUID id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+  public WorkoutDayJpaEntity(UUID id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public List<WorkoutExerciseJpaEntity> getExercises() {
-        return exercises;
-    }
+  public List<WorkoutExerciseJpaEntity> getExercises() {
+    return exercises;
+  }
 
-    public void setExercises(List<WorkoutExerciseJpaEntity> exercises) {
-        this.exercises = exercises;
-    }
+  public void setExercises(List<WorkoutExerciseJpaEntity> exercises) {
+    this.exercises = exercises;
+  }
 
-    public void addExercise(WorkoutExerciseJpaEntity exercise) {
-        exercises.add(exercise);
-        exercise.setWorkoutDay(this);
-    }
+  public void addExercise(WorkoutExerciseJpaEntity exercise) {
+    exercises.add(exercise);
+    exercise.setWorkoutDay(this);
+  }
 
-    public void removeExercise(WorkoutExerciseJpaEntity exercise) {
-        exercises.remove(exercise);
-        exercise.setWorkoutDay(null);
-    }
+  public void removeExercise(WorkoutExerciseJpaEntity exercise) {
+    exercises.remove(exercise);
+    exercise.setWorkoutDay(null);
+  }
 
-    public WorkoutJpaEntity getWorkout() {
-        return workout;
-    }
+  public WorkoutJpaEntity getWorkout() {
+    return workout;
+  }
 
-    public void setWorkout(WorkoutJpaEntity workout) {
-        this.workout = workout;
-    }
+  public void setWorkout(WorkoutJpaEntity workout) {
+    this.workout = workout;
+  }
 }
