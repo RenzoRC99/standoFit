@@ -1,8 +1,8 @@
-package com.standofit.back.training.planning.application.query;
+package com.standofit.back.training.planning.application.mapper;
 
-import com.standofit.back.training.planning.application.query.dto.WorkoutDayDto;
-import com.standofit.back.training.planning.application.query.dto.WorkoutDto;
-import com.standofit.back.training.planning.application.query.dto.WorkoutExerciseDto;
+import com.standofit.back.training.planning.application.dto.WorkoutDayDto;
+import com.standofit.back.training.planning.application.dto.WorkoutDto;
+import com.standofit.back.training.planning.application.dto.WorkoutExerciseDto;
 import com.standofit.back.training.planning.domain.entity.Workout;
 import com.standofit.back.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.training.planning.domain.entity.WorkoutExercise;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class WorkoutQueryMapper {
+public class WorkoutDtoMapper {
 
     public WorkoutDto toDto(Workout workout) {
         List<WorkoutDayDto> days = workout.getDays().stream()

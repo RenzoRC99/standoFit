@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.application.query;
+package com.standofit.back.training.planning.application.query.get_workout_by_id;
 
 import com.standofit.back.shared.domain.bus.query.Query;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
