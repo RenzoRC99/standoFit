@@ -1,22 +1,27 @@
 package com.standofit.back.training.planning.application;
 
-import com.standofit.back.training.planning.application.query.GetWorkoutByIdQuery;
-import com.standofit.back.training.planning.application.query.GetWorkoutByIdHandler;
+import com.standofit.back.training.planning.application.query.WorkoutQueryMapper;
 import com.standofit.back.training.planning.application.query.dto.WorkoutDto;
+import com.standofit.back.training.planning.domain.entity.Workout;
+import com.standofit.back.training.planning.domain.entity.WorkoutRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class WorkoutFinder {
 
-    private final GetWorkoutByIdHandler getWorkoutByIdHandler;
+    private final WorkoutRepository repository;
+    private final WorkoutQueryMapper mapper;
 
-    public WorkoutFinder(GetWorkoutByIdHandler getWorkoutByIdHandler) {
-        this.getWorkoutByIdHandler = getWorkoutByIdHandler;
+    public WorkoutFinder(WorkoutRepository repository, WorkoutQueryMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     public WorkoutDto findById(UUID id) {
-        return getWorkoutByIdHandler.handle(new GetWorkoutByIdQuery(id));
+        Optional<Workout> workout = repository.findById(id);
+        return workout.map(mapper::toDto).orElse(null);
     }
 }
