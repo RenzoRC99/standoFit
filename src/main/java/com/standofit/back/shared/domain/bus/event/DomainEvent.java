@@ -4,13 +4,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 public abstract class DomainEvent {
-    private final UUID eventId;
-    private final Instant ocurredOn;
+  private final UUID eventId;
+  private final Instant ocurredOn;
 
-    protected DomainEvent() {
-        this.eventId = UUID.randomUUID();
-        this.ocurredOn = Instant.now();
-    }
+  protected DomainEvent() {
+    this.eventId = UUID.randomUUID();
+    this.ocurredOn = Instant.now();
+  }
 
-    public abstract String  StringName();
+  public abstract String StringName();
 }
