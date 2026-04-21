@@ -8,5 +8,4 @@ import java.util.UUID;
 
 @Repository
 public interface WorkoutJpaRepository extends JpaRepository<WorkoutJpaEntity, UUID> {
-    
 }

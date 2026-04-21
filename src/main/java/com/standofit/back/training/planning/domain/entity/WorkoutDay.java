@@ -22,12 +22,10 @@ public final class WorkoutDay {
     private final List<WorkoutExercise> exercises;
 
     WorkoutDay(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
-
         ensureNoDuplicateExerciseIds(exercises);
-
         this.id = id;
         this.name = name;
-        this.exercises = (exercises != null) ? List.copyOf(exercises) : List.of();
+        this.exercises = isNullOrEmpty(exercises) ? List.of() : List.copyOf(exercises);
     }
 
     public static WorkoutDay create(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {

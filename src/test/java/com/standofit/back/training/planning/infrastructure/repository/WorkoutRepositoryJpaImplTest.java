@@ -7,7 +7,6 @@ import com.standofit.back.training.planning.domain.entity.Workout;
 import com.standofit.back.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.training.planning.domain.vo.*;
-import com.standofit.back.training.planning.infrastructure.WorkoutInfrastructureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Workout Repository Tests")
 @Transactional
 @Rollback(false)
-class WorkoutRepositoryJpaTest {
+class WorkoutRepositoryJpaImplTest {
 
     @Autowired
-    private WorkoutRepositoryJpa repository;
+    private WorkoutRepositoryJpaImpl repository;
 
     @Autowired
     private WorkoutJpaRepository jpaRepository;
@@ -150,9 +149,9 @@ class WorkoutRepositoryJpaTest {
         }
 
         @Test
-        @DisplayName("should throw exception when workout not found")
-        void shouldThrowExceptionWhenWorkoutNotFound() {
-            assertThrows(WorkoutInfrastructureException.class, () ->
+        @DisplayName("should not throw when id not found")
+        void shouldNotThrowWhenIdNotFound() {
+            assertDoesNotThrow(() ->
                     repository.deleteById(UUID.randomUUID()));
         }
     }

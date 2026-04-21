@@ -30,13 +30,10 @@ public final class Workout extends AggregateRoot {
     Workout(WorkoutId id, WorkoutName name, WorkoutDescription description,
             List<WorkoutDay> days,
             WorkoutCreatedAt createdAt, WorkoutUpdatedAt updatedAt) {
-
         if (isNullOrEmpty(days)) {
             throw new WorkoutDomainException(WorkoutDomainErrors.DAYS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
         }
-
         ensureNoDuplicateDayNames(days);
-
         this.id = id;
         this.name = name;
         this.description = description;
