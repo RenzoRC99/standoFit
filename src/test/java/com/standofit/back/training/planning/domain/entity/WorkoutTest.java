@@ -193,6 +193,20 @@ class WorkoutTest {
         }
 
         @Test
+        @DisplayName("should rename only specified days")
+        void shouldRenameOnlySpecifiedDays() {
+            WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
+            WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
+            Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
+            WorkoutDayName newName = new WorkoutDayName("Renamed");
+
+            Workout updated = workout.renameDays(java.util.Map.of(day1.getId(), newName));
+
+            assertEquals("Renamed", updated.getDays().get(0).getName().value());
+            assertEquals("Day 2", updated.getDays().get(1).getName().value());
+        }
+
+        @Test
         @DisplayName("should fail when renaming with null map")
         void shouldFailWhenRenamingWithNullMap() {
             Workout workout = WorkoutMother.aWorkout();
@@ -248,6 +262,21 @@ class WorkoutTest {
             Workout updated = workout.updateExercisesInDay(dayId, List.of(updatedExercise));
 
             assertEquals(5, updated.getDays().get(0).getExercises().get(0).getSets().value());
+        }
+
+        @Test
+        @DisplayName("should add exercises to existing day")
+        void shouldAddExercisesToExistingDay() {
+            WorkoutExercise existing = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
+            WorkoutExercise newExercise = WorkoutExerciseMother.aWorkoutExerciseWith(4, 8, 90);
+            Workout workout =
+                    WorkoutMother.aWorkoutWithDays(
+                            List.of(WorkoutDayMother.aWorkoutDayWithExercises(List.of(existing))));
+            var dayId = workout.getDays().get(0).getId();
+
+            Workout updated = workout.addExercisesToDay(dayId, List.of(newExercise));
+
+            assertEquals(2, updated.getDays().get(0).getExercises().size());
         }
 
         @Test
