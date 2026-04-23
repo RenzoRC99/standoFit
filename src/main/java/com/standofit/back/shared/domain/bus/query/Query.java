@@ -8,7 +8,7 @@ package com.standofit.back.shared.domain.bus.query;
  *
  * Example:
  * <pre>
- * public class GetWorkoutByIdQuery implements Query {
+ * public class GetWorkoutByIdQuery implements Query<WorkoutDto> {
  *     private final WorkoutId workoutId;
  *
  *     public GetWorkoutByIdQuery(UUID id) {
@@ -21,7 +21,8 @@ package com.standofit.back.shared.domain.bus.query;
  * }
  * </pre>
  *
+ * @param <R> the return type of the query result
  * @author standofit
  * @version 1.0
  */
-public interface Query {}
+public interface Query<R> {}

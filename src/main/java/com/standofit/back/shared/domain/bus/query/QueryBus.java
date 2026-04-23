@@ -2,14 +2,14 @@ package com.standofit.back.shared.domain.bus.query;
 
 /**
  * Contract for the query bus in the application.
- *
+ * <p>
  * The QueryBus is responsible for dispatching queries to their appropriate handlers.
  * It acts as a central coordinator that routes queries to the correct QueryHandler.
- *
+ * <p>
  * Implementation note:
  * The QueryBus should be implemented as a singleton Spring bean that all controllers
  * can inject to execute queries.
- *
+ * <p>
  * Example usage:
  * <pre>
  * &#64;RestController
@@ -33,10 +33,10 @@ public interface QueryBus {
     /**
      * Dispatches a query to its corresponding handler and returns the result.
      *
-     * @param <R> the type of result expected
+     * @param <R>   the type of result expected
      * @param query the query to execute
      * @return the result of the query execution
      * @throws IllegalStateException if no handler is registered for the query type
      */
-    <R> R ask(Query query);
+    <R> R ask(Query<R> query);
 }
