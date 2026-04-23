@@ -8,10 +8,11 @@ Backend API para gestión de planes de entrenamiento físico (fitness/gimnasio).
 
 ### 1. TIPO DE PROYECTO
 
-**Framework**: Spring Boot 4.0.4 (versión con soporte de largo plazo)  
+**Framework**: Spring Boot 3.3.0  
 **Lenguaje**: Java 21  
 **Sistema de Build**: Gradle 9.4.0  
-**Arquitectura**: Domain-Driven Design (DDD)  
+**Arquitectura**: Domain-Driven Design (DDD) con Arquitectura Hexagonal  
+**Testing**: JUnit 5 + AssertJ + MockMvc  
 
 ---
 
@@ -19,208 +20,222 @@ Backend API para gestión de planes de entrenamiento físico (fitness/gimnasio).
 
 ```
 standoFit/
-├── src/
-│   ├── main/
-│   │   ├── java/com/standofit/back/
-│   │   │   ├── training/planning/
-│   │   │   │   └── domain/
-│   │   │   │       ├── entity/          # Entidades del dominio
-│   │   │   │       └── vo/              # Value Objects del dominio
-│   │   │   └── shared/
-│   │   │       └── domain/
-│   │   │           ├── aggregate/       # Base AggregateRoot
-│   │   │           ├── bus/             # Command Bus y Event Bus
-│   │   │           │   ├── command/      # Command/CommandHandler/CommandBus
-│   │   │           │   └── event/        # DomainEvent
-│   │   │           └── valueobjects/
-│   │   │               ├── ids/          # Identificadores (UUID)
-│   │   │               ├── errors/       # Errores y excepciones
-│   │   │               └── BaseVO, StringVO, IntegerVO, DateTimeVO, Id
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-│       └── java/com/standofit/back/
-├── build.gradle                          # Configuración de dependencias
-├── settings.gradle                       # Nombre del proyecto
-├── gradlew / gradlew.bat                 # Wrapper de Gradle
-├── .idea/                                # Configuración IntelliJ IDEA
-├── .gradle/                              # Caché de Gradle
-├── build/                               # Archivos compilados
-└── bin/                                 # Archivos compilados (Eclipse)
+├── src/main/java/com/standofit/back/
+│   ├── modules/                          # Módulos DDD
+│   │   └── training/
+│   │       └── planning/
+│   │           ├── domain/             # Domain Layer
+│   │           │   ├── entity/         # Workout, WorkoutDay, WorkoutExercise
+│   │           │   ├── vo/           # WorkoutName, WorkoutDayName, etc.
+│   │           │   └── WorkoutDomainErrors.java
+│   │           ├── application/        # Application Layer (CQRS)
+│   │           │   ├── command/       # 9 Commands
+│   │           │   └── query/        # 2 Queries
+│   │           ├── infrastructure/    # Infrastructure Layer
+│   │           │   ├── bus/         # InMemoryCommandBus, InMemoryQueryBus
+│   │           │   ├── entity/       # JPA Entities
+│   │           │   ├── mapper/       # WorkoutMapper
+│   │           │   ├── repository/   # WorkoutRepositoryJpaImpl
+│   │           │   └── WorkoutInfrastructureErrors.java
+│   │           └── presentation/    # Presentation Layer
+│   │               ├── controller/ # REST API
+│   │               └── dto/       # Request/Response DTOs
+│   ├── configuration/                # Configuración global
+│   │   └── bus/                    # ApplicationBus
+│   └── shared/                      # Código compartido
+│       └── domain/
+│           ├── bus/                 # Command/Query interfaces
+│           ├── criteria/            # Criteria pattern (Filter, Order, Page)
+│           ├── utils/               # CollectionUtils
+│           └── valueobjects/         # BaseVO, IDs, Errors
+├── src/test/
+│   └── java/com/standofit/back/
+│       └── training/
+│           └── planning/
+│               ├── domain/entity/  # Domain tests (94% coverage)
+│               ├── infrastructure/ # Repository tests
+│               └── presentation/  # Integration tests
+├── build.gradle
+└── README.md
 ```
 
 ---
 
-### 3. ARCHIVOS PRINCIPALES DE CONFIGURACIÓN
+### 3. ARQUITECTURA HEXAGONAL IMPLEMENTADA
 
-| Archivo | Propósito |
-|---------|-----------|
-| `build.gradle` | Definición de plugins (Spring Boot, Java), dependencias y configuración del toolchain Java 21 |
-| `settings.gradle` | Nombre del proyecto raíz (`standoFit`) |
-| `application.properties` | Configuración mínima de Spring (solo nombre de aplicación) |
-| `gradle/wrapper/gradle-wrapper.properties` | Define Gradle 9.4.0 |
-| `.project`, `.classpath` | Configuración de proyecto Eclipse/Buildship |
-| `.idea/workspace.xml` | Configuración específica de IntelliJ IDEA |
+#### Domain Layer (`domain/`)
+- **Entidades**: Workout (Aggregate Root), WorkoutDay, WorkoutExercise
+- **Value Objects**: WorkoutName, WorkoutDescription, WorkoutDayName, etc.
+- **Errores**: WorkoutDomainErrors
 
----
+**Características:**
+- Inmutabilidad total
+- Validación en constructores
+- Métodos de dominio que retornan nuevas instancias (patrón Copy)
+- Errors centralizados en enums
 
-### 4. MÓDULOS/COMPONENTES PRINCIPALES
+#### Application Layer (`application/`)
+Implementa **CQRS** con 9 Commands + 2 Queries:
 
-#### A. **Dominio de Training Planning** (`com.standofit.back.training.planning`)
+**Commands:**
+| Command | Propósito |
+|---------|----------|
+| `PlanWorkoutCommand` | Crear nuevo workout |
+| `RenameWorkoutCommand` | Renombrar workout |
+| `ChangeWorkoutDescriptionCommand` | Cambiar descripción |
+| `DeleteWorkoutCommand` | Eliminar workout |
+| `AddDayToWorkoutCommand` | Añadir día |
+| `RemoveDayFromWorkoutCommand` | Quitar día |
+| `DuplicateWorkoutCommand` | Duplicar workout |
+| `ArchiveWorkoutCommand` | Archivar workout |
+| `ReorderDaysCommand` | Reordenar días |
 
-##### Entidades:
+**Queries:**
+| Query | Propósito |
+|-------|----------|
+| `GetWorkoutByIdQuery` | Obtener workout por ID |
+| `SearchWorkoutsQuery` | Búsqueda con criterios |
 
-1. **Workout** (Agregado Raíz)
-   - Representa un plan de entrenamiento completo
-   - Campos: id, name, description, days (lista de WorkoutDay), version, createdAt, updatedAt
-   - Patrón Builder para construcción inmutable
-   - Métodos: `create()`, `renameWorkout()`
+#### Infrastructure Layer (`infrastructure/`)
+- **Buses**: InMemoryCommandBus, InMemoryQueryBus (registro automático via Spring)
+- **Entities**: WorkoutJpaEntity, WorkoutDayJpaEntity, WorkoutExerciseJpaEntity
+- **Repository**: WorkoutRepositoryJpaImpl con JPA
+- **Mappers**: WorkoutMapper (domain ↔ JPA)
+- **Errores**: WorkoutInfrastructureErrors
 
-2. **WorkoutDay** (Entidad)
-   - Representa un día de entrenamiento dentro de un Workout
-   - Campos: id, name, exercises (lista de WorkoutExercise)
+**Características:**
+- `orderIndex` en WorkoutDayJpaEntity para mantener orden de días
+- `@OrderBy("orderIndex ASC")` para recuperar en orden
+- Errores centralizados con WorkoutInfrastructureException
 
-3. **WorkoutExercise** (Entidad)
-   - Representa un ejercicio individual con sus parámetros
-   - Campos: sets, reps, restSeconds
-
-4. **WorkoutBuilder** (Clase interna/Builder)
-   - Implementa el patrón Builder para crear/inmutar Workout
-   - Permite modificar campos individuales manteniendo inmutabilidad
-
-##### Value Objects (VO):
-
-| Value Object | Tipo Base | Validación |
-|--------------|-----------|------------|
-| `WorkoutName` | StringVO | No vacío/blank |
-| `WorkoutDescription` | StringVO | Ninguna específica |
-| `WorkoutDayName` | StringVO | No vacío/blank |
-| `WorkoutExerciseSets` | IntegerVO | <= 100 |
-| `WorkoutExerciseReps` | IntegerVO | <= 1000 |
-| `WorkoutExerciseRest` | IntegerVO | <= 3600 (segundos) |
-| `WorkoutVersion` | IntegerVO | Ninguna |
-| `WorkoutCreatedAt` | DateTimeVO | Instante de creación |
-| `WorkoutUpdatedAt` | DateTimeVO | Instante de última actualización |
-
-#### B. **Capa Compartida** (`com.standofit.back.shared`)
-
-##### Value Objects Base:
-
-1. **BaseVO<T>** - Clase base abstracta para todos los VO
-   - Almacena el valor inmutable
-   - Proporciona validación `validateNotNull()`
-
-2. **StringVO** - Extiende BaseVO<String>
-   - Validaciones: longitud (min-max), no vacío
-
-3. **IntegerVO** - Extiende BaseVO<Integer>
-   - Validaciones: no mayor que un valor máximo
-
-4. **DateTimeVO** - Extiende BaseVO<Instant>
-   - Manejo de timestamps
-
-5. **Id** - Extiende BaseVO<UUID>
-   - Para identificadores únicos
-
-##### IDs Específicos:
-- `WorkoutId`
-- `WorkoutDayId`
-- `ExerciseId`
-
-##### Sistema de Errores:
-- **EnumContract** - Interface para enumeraciones de errores
-- **ValueobjectErrors** - Enum con mensajes predefinidos:
-  - NULL_VALUE
-  - INVALID_LENGTH_RANGE
-  - NOT_EMPTY
-  - INT_BIGGER_THAN
-
-##### Excepciones:
-- **BaseException** - Clase base abstracta para excepciones con contexto
-- **ValueObjectException** - Excepción para errores en Value Objects
-
-##### Bus de Comandos (CQRS Pattern):
-- **Command** - Interfaz marcadora vacía
-- **CommandHandler** - Interfaz marcadora vacía
-- **CommandBus** - Interfaz con método `dispatch(Command)`
-
-##### Bus de Eventos:
-- **DomainEvent** - Clase base abstracta para eventos de dominio
-  - Genera UUID y timestamp automáticamente
-  - Método abstracto `StringName()`
-
-##### Aggregate Root:
-- **AggregateRoot** - Clase base vacía para entidades raíz
+#### Presentation Layer (`presentation/`)
+- **Controller**: WorkoutController con REST endpoints
+- **DTOs**: Request/Response objects
 
 ---
 
-### 5. DEPENDENCIAS EXTERNAS
+### 4. DECISIONES ARQUITECTÓNICAS
 
-| Dependencia | Versión | Propósito |
-|-------------|---------|-----------|
-| `spring-boot-starter` | 4.0.4 | Núcleo de Spring Boot |
-| `spring-boot-devtools` | 4.0.4 | Herramientas de desarrollo (hot reload) |
-| `spring-boot-starter-test` | 4.0.4 | Testing con JUnit, Mockito |
-| `junit-platform-launcher` | (managed) | Lanzador de tests JUnit |
+#### 4.1 CQRS Pattern
+Separación estricta entre Commands (escritura) y Queries (lectura):
+- Cada command representa un caso de uso específico de dominio
+- No Commands genéricos (Create/Update/Delete)
+- Queries usan Criteria pattern para búsquedas flexibles
 
----
+#### 4.2 Criteria Pattern
+Implementado en `com.standofit.back.shared.domain.criteria`:
+- `Filter`: campo, operador, valor
+- `Order`: campo, dirección
+- `PageInfo`: página, tamaño
+- `PagedResult`: resultados paginados
+- Implementación JPA Specification para filtrado en BD
 
-### 6. CONVENCIONES Y PATRONES IDENTIFICADOS
+#### 4.3 Errores Centralizados
+- **Domain**: WorkoutDomainErrors (enum)
+- **Infrastructure**: WorkoutInfrastructureErrors (enum)
 
-1. **Inmutabilidad**: Los Value Objects y Entidades son inmutables
-2. **Patrón Builder**: Utilizado para crear entidades (WorkoutBuilder)
-3. **Herencia jerárquica**: BaseVO -> StringVO/IntegerVO/DateTimeVO/Id
-4. **Interfaces marcadoras**: Command, CommandHandler, CommandBus, DomainEvent, AggregateRoot
-5. **Validación en constructores**: Los VO validan en su construcción
-6. **Naming conventions**: 
-   - Paquetes en minúsculas: `domain`, `entity`, `vo`, `valueobjects`
-   - Clases con PascalCase
-   - Value Objects con sufijo descriptivo (Name, Description, Sets, etc.)
-
----
-
-### 7. PROPÓSITO DEL PROYECTO
-
-**StandoFit** es una **API backend para gestión de planes de entrenamiento físico (fitness/gimnasio)**.
-
-El dominio modela:
-- **Workout** (Plan de entrenamiento): Nombre, descripción, días de entrenamiento
-- **WorkoutDay** (Día de entrenamiento): Nombre del día, lista de ejercicios
-- **WorkoutExercise** (Ejercicio): Series, repeticiones, tiempo de descanso
-
-La arquitectura DDD está preparada para escalar hacia una aplicación más compleja con:
-- Persistencia (repositorios no implementados aún)
-- Casos de uso (Commands/CommandHandlers no implementados)
-- APIs REST (no hay controllers)
-- Eventos de dominio para comunicar cambios
-
-**Estado actual**: Proyecto en fase inicial de modelado de dominio (estilo "clean domain" o "hexagonal"), sin lógica de aplicación, persistencia ni endpoints HTTP implementados. Es un esqueleto DDD funcional que demuestra las convenciones y patrones elegidos para el desarrollo.
-
----
-
-### 8. RUTAS DE ARCHIVOS PRINCIPALES
-
+Ejemplo de uso:
+```java
+throw new WorkoutInfrastructureException(
+    WorkoutInfrastructureErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(commandClass)
+);
 ```
-/home/rromero/Documents/openCodePruebas/standoFit/build.gradle
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/StandoFitApplication.java
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/training/planning/domain/entity/Workout.java
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/training/planning/domain/entity/WorkoutDay.java
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/training/planning/domain/entity/WorkoutExercise.java
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/shared/domain/aggregate/AggregateRoot.java
-/home/rromero/Documents/openCodePruebas/standoFit/src/main/java/com/standofit/back/shared/domain/valueobjects/BaseVO.java
+
+#### 4.4 Value Objects
+-Herencia: BaseVO → StringVO/IntegerVO/DateTimeVO
+- Validación en construcción
+- Inmutabilidad
+
+#### 4.5 CollectionUtils
+```java
+isNullOrEmpty(Collection)      // Funciona para List, Set, etc.
+isNullOrEmptyForMap(Map)  // Para Map
 ```
+
+---
+
+### 5. COVERAGE DE TESTS
+
+| Capa | Coverage |
+|------|----------|
+| **Domain** | 94% |
+| **Domain VO** | 100% |
+| **Application** | 84% |
+| **Infrastructure** | 59% (probado por integración) |
+| **Presentation** | 87% |
+| **Total** | 77% |
+
+**Tipos de tests:**
+- **Unit tests**: Domain entities, handlers
+- **Integration tests**: REST API con MockMvc
+- **Repository tests**: WorkoutRepositoryJpaImpl
+
+---
+
+### 6. API REST
+
+| Método | Endpoint | Command/Query |
+|--------|----------|-------------|
+| POST | `/api/workouts` | PlanWorkout |
+| GET | `/api/workouts` | SearchWorkouts |
+| GET | `/api/workouts/{id}` | GetWorkoutById |
+| PUT | `/api/workouts/{id}/name` | RenameWorkout |
+| PUT | `/api/workouts/{id}/description` | ChangeWorkoutDescription |
+| DELETE | `/api/workouts/{id}` | DeleteWorkout |
+| POST | `/api/workouts/{id}/days` | AddDayToWorkout |
+| DELETE | `/api/workouts/{id}/days/{dayId}` | RemoveDayFromWorkout |
+| PUT | `/api/workouts/{id}/days/reorder` | ReorderDays |
+| POST | `/api/workouts/{id}/duplicate` | DuplicateWorkout |
+| POST | `/api/workouts/{id}/archive` | ArchiveWorkout |
+
+---
+
+### 7. PATRONES UTILIZADOS
+
+1. **Aggregate Root**: Workout (mantiene consistencia)
+2. **Value Objects**: Tipos inmutables con validación
+3. **Factory Methods**: `Workout.create()`, `WorkoutDay.create()`
+4. **Copy Pattern**: Métodos que retornan nuevas instancias
+5. **CQRS**: Separación Commands/Queries
+6. **Criteria Pattern**: Búsquedas dinámicas
+7. **Errors Enum**: Errores centralizados
+
+---
+
+### 8. ESTADO ACTUAL
+
+✅ Proyecto completo con:
+- Dominio funcional
+- CQRS implementado
+- Repository con JPA
+- REST API completa
+- Tests con coverage 77%
+
+⏳ Pendiente:
+- Domain Events (publicación de eventos)
 
 ---
 
 ## Getting Started
 
-### Reference Documentation
+```bash
+./gradlew bootRun
+```
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.4/gradle-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.4/gradle-plugin/packaging-oci-image.html)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.4/reference/using/devtools.html)
+### Run tests
+```bash
+./gradlew test
+```
 
-### Additional Links
+### Generate coverage report
+```bash
+./gradlew jacocoTestReport
+```
 
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
+---
+
+## Reference Documentation
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Gradle](https://gradle.org)
+- [JaCoCo](https://www.jacoco.org)
