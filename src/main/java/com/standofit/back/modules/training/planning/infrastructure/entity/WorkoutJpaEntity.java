@@ -26,6 +26,7 @@ public class WorkoutJpaEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.LAZY)
+    @OrderBy("orderIndex ASC")
     private List<WorkoutDayJpaEntity> days = new ArrayList<>();
 
     @Column(name = "created_at")

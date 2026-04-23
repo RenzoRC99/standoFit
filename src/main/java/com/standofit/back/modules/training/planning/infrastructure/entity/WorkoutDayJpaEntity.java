@@ -17,6 +17,9 @@ public class WorkoutDayJpaEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "order_index")
+    private int orderIndex;
+
     @OneToMany(
             mappedBy = "workoutDay",
             cascade = CascadeType.ALL,
@@ -31,9 +34,10 @@ public class WorkoutDayJpaEntity {
     public WorkoutDayJpaEntity() {
     }
 
-    public WorkoutDayJpaEntity(UUID id, String name) {
+    public WorkoutDayJpaEntity(UUID id, String name, int orderIndex) {
         this.id = id;
         this.name = name;
+        this.orderIndex = orderIndex;
     }
 
     public UUID getId() {
@@ -50,6 +54,14 @@ public class WorkoutDayJpaEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
     }
 
     public List<WorkoutExerciseJpaEntity> getExercises() {

@@ -1,5 +1,7 @@
 package com.standofit.back.modules.training.planning.infrastructure.bus;
 
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
@@ -21,8 +23,8 @@ public class InMemoryCommandBus implements CommandBus {
             Class<?> type = handler.commandType();
 
             if (this.handlers.containsKey(type)) {
-                throw new IllegalStateException(
-                        "Duplicate handler for " + type.getSimpleName()
+                throw new WorkoutInfrastructureException(
+                        WorkoutInfrastructureErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName())
                 );
             }
 
@@ -38,8 +40,8 @@ public class InMemoryCommandBus implements CommandBus {
                 (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
 
         if (handler == null) {
-            throw new IllegalStateException(
-                    "No handler for command " + command.getClass().getSimpleName()
+            throw new WorkoutInfrastructureException(
+                    WorkoutInfrastructureErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(command.getClass().getSimpleName())
             );
         }
 

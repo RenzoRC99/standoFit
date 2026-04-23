@@ -30,16 +30,17 @@ public class WorkoutMapper {
                         now,
                         now);
 
+        int orderIndex = 0;
         for (WorkoutDay day : workout.getDays()) {
-            entity.addDay(toEntity(day));
+            entity.addDay(toEntity(day, orderIndex++));
         }
 
         return entity;
     }
 
-    public WorkoutDayJpaEntity toEntity(WorkoutDay day) {
+    public WorkoutDayJpaEntity toEntity(WorkoutDay day, int orderIndex) {
         WorkoutDayJpaEntity entity =
-                new WorkoutDayJpaEntity(day.getId().value(), day.getName().value());
+                new WorkoutDayJpaEntity(day.getId().value(), day.getName().value(), orderIndex);
 
         for (WorkoutExercise exercise : day.getExercises()) {
             entity.addExercise(toEntity(exercise));

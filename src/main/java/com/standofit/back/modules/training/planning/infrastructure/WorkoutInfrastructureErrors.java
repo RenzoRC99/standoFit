@@ -3,6 +3,14 @@ package com.standofit.back.modules.training.planning.infrastructure;
 import com.standofit.back.shared.utils.EnumContract;
 
 public enum WorkoutInfrastructureErrors implements EnumContract {
+
+    // == Bus errors ==
+    DUPLICATE_COMMAND_HANDLER("Duplicate handler registered for command: %s"),
+    DUPLICATE_QUERY_HANDLER("Duplicate handler registered for query: %s"),
+    COMMAND_HANDLER_NOT_FOUND("No handler found for command: %s"),
+    QUERY_HANDLER_NOT_FOUND("No handler found for query: %s"),
+
+    // == Repository errors ==
     SAVE_FAILED("Failed to save workout"),
     FIND_FAILED("Failed to find workout"),
     DELETE_FAILED("Failed to delete workout"),
@@ -26,6 +34,10 @@ public enum WorkoutInfrastructureErrors implements EnumContract {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    public String getMessage(Object... args) {
+        return args.length > 0 ? String.format(message, args) : message;
     }
 
     public String getSqlState() {

@@ -69,6 +69,16 @@ class WorkoutTest {
             assertEquals(original.getName(), updated.getName());
             assertEquals(original.getDays().size(), updated.getDays().size());
         }
+
+        @Test
+        @DisplayName("should change description to new value")
+        void shouldChangeDescriptionToNewValue() {
+            Workout workout = WorkoutMother.aWorkout();
+
+            Workout updated = workout.changeDescription(new WorkoutDescription("New Desc"));
+
+            assertEquals("New Desc", updated.getDescription().value());
+        }
     }
 
     @Nested
@@ -126,6 +136,15 @@ class WorkoutTest {
         }
 
         @Test
+        @DisplayName("should fail when adding null days list")
+        void shouldFailWhenAddingNullDaysList() {
+            Workout original = WorkoutMother.aWorkout();
+
+            assertThatThrownBy(() -> original.addDays(null))
+                    .isInstanceOf(WorkoutDomainException.class);
+        }
+
+        @Test
         @DisplayName("should remove days from workout")
         void shouldRemoveDays() {
             Workout workout =
@@ -153,6 +172,15 @@ class WorkoutTest {
         }
 
         @Test
+        @DisplayName("should fail when removing with null day ids")
+        void shouldFailWhenRemovingWithNullDayIds() {
+            Workout workout = WorkoutMother.aWorkout();
+
+            assertThatThrownBy(() -> workout.removeDays(null))
+                    .isInstanceOf(WorkoutDomainException.class);
+        }
+
+        @Test
         @DisplayName("should rename days")
         void shouldRenameDays() {
             Workout workout = WorkoutMother.aWorkoutWithDays(List.of(WorkoutDayMother.aWorkoutDay()));
@@ -162,6 +190,15 @@ class WorkoutTest {
                     workout.renameDays(java.util.Map.of(workout.getDays().get(0).getId(), newName));
 
             assertEquals(newName, updated.getDays().get(0).getName());
+        }
+
+        @Test
+        @DisplayName("should fail when renaming with null map")
+        void shouldFailWhenRenamingWithNullMap() {
+            Workout workout = WorkoutMother.aWorkout();
+
+            assertThatThrownBy(() -> workout.renameDays(null))
+                    .isInstanceOf(WorkoutDomainException.class);
         }
     }
 
@@ -181,6 +218,15 @@ class WorkoutTest {
             Workout updated = workout.addExercisesToDay(dayId, List.of(newExercise));
 
             assertEquals(1, updated.getDays().get(0).getExercises().size());
+        }
+
+        @Test
+        @DisplayName("should fail when adding exercises with null day id")
+        void shouldFailWhenAddingExercisesWithNullDayId() {
+            Workout workout = WorkoutMother.aWorkout();
+
+            assertThatThrownBy(() -> workout.addExercisesToDay(null, List.of()))
+                    .isInstanceOf(WorkoutDomainException.class);
         }
 
         @Test
@@ -234,6 +280,15 @@ class WorkoutTest {
 
             assertEquals("Day 2", reordered.getDays().get(0).getName().value());
             assertEquals("Day 1", reordered.getDays().get(1).getName().value());
+        }
+
+        @Test
+        @DisplayName("should fail when reorder with null list")
+        void shouldFailWhenReorderWithNullList() {
+            Workout workout = WorkoutMother.aWorkout();
+
+            assertThatThrownBy(() -> workout.reorderDays(null))
+                    .isInstanceOf(WorkoutDomainException.class);
         }
 
         @Test

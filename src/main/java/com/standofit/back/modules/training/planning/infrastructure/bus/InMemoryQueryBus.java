@@ -1,5 +1,7 @@
 package com.standofit.back.modules.training.planning.infrastructure.bus;
 
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.query.Query;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
 import com.standofit.back.shared.domain.bus.query.QueryHandler;
@@ -21,8 +23,8 @@ public class InMemoryQueryBus implements QueryBus {
             Class<?> type = handler.queryType();
 
             if (this.handlers.containsKey(type)) {
-                throw new IllegalStateException(
-                        "Duplicate handler for " + type.getSimpleName()
+                throw new WorkoutInfrastructureException(
+                        WorkoutInfrastructureErrors.DUPLICATE_QUERY_HANDLER.getMessage(type.getSimpleName())
                 );
             }
 
@@ -39,8 +41,8 @@ public class InMemoryQueryBus implements QueryBus {
                 (QueryHandler<Query<R>, R>) handlers.get(query.getClass());
 
         if (handler == null) {
-            throw new IllegalStateException(
-                    "No handler registered for query: " + query.getClass().getSimpleName()
+            throw new WorkoutInfrastructureException(
+                    WorkoutInfrastructureErrors.QUERY_HANDLER_NOT_FOUND.getMessage(query.getClass().getSimpleName())
             );
         }
 
