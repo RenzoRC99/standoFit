@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "StandoFit API",
+    "description": "API de StandoFit para testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Workouts",
+      "item": [
+        {
+          "name": "Listar workouts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/workouts"
+          }
+        },
+        {
+          "name": "Get workout by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/workouts/11111111-1111-1111-1111-111111111111"
+          }
+        },
+        {
+          "name": "Crear workout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/workouts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nuevo Workout\",\n  \"description\": \"Descripción\",\n  \"days\": [\n    {\n      \"name\": \"Día 1\",\n      \"exercises\": []\n    }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Listar sessions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/sessions"
+          }
+        },
+        {
+          "name": "Get session by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/sessions/cccccccc-cccc-cccc-cccc-cccccccccccc"
+          }
+        },
+        {
+          "name": "Start session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/sessions/start",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayId\": \"44444444-4444-4444-4444-444444444444\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Finish session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/sessions/dddddddd-dddd-dddd-dddd-dddddddddddd/finish"
+          }
+        },
+        {
+          "name": "Cancel session",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/sessions/dddddddd-dddd-dddd-dddd-dddddddddddd/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Listar ejercicios",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/exercises"
+          }
+        }
+      ]
+    }
+  ]
+}
