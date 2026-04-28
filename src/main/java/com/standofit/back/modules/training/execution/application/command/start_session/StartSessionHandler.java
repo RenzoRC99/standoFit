@@ -6,8 +6,10 @@ import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
-public class StartSessionHandler implements CommandHandler<StartSessionCommand, SessionId> {
+public class StartSessionHandler implements CommandHandler<StartSessionCommand, UUID> {
 
     private final SessionRepository repository;
 
@@ -21,11 +23,11 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
     }
 
     @Override
-    public SessionId handle(StartSessionCommand command) {
+    public UUID handle(StartSessionCommand command) {
         Session session = Session.create(
-                new SessionId(java.util.UUID.randomUUID()),
+                new SessionId(UUID.randomUUID()),
                 command.dayId()
         );
-        return repository.save(session).getId();
+        return repository.save(session).getId().value();
     }
 }

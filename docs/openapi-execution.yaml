@@ -1,0 +1,554 @@
+openapi: 3.0.3
+info:
+  title: StandoFit - Training Execution API
+  description: API para gestión de sesiones de entrenamiento
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local
+
+paths:
+  /api/sessions:
+    get:
+      summary: Listar todas las sesiones
+      operationId: getAllSessions
+      tags:
+        - Sessions
+      responses:
+        '200':
+          description: Lista de sesiones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListDTO'
+        '204':
+          description: No hay sesiones
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+    post:
+      summary: Iniciar una nueva sesión
+      operationId: startSession
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartSessionRequest'
+            example:
+              dayId: "30000000-0000-0000-0000-000000000003"
+      responses:
+        '201':
+          description: Sesión creada
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URL de la sesión creada
+
+  /api/sessions/{sessionId}:
+    get:
+      summary: Obtener sesión por ID
+      operationId: getSessionById
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+      responses:
+        '200':
+          description: Sesión encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDTO'
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+    delete:
+      summary: Eliminar sesión
+      operationId: deleteSession
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Sesión eliminada
+
+  /api/sessions/{sessionId}/finish:
+    post:
+      summary: Finalizar sesión
+      operationId: finishSession
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000002"
+      responses:
+        '204':
+          description: Sesión finalizada
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/cancel:
+    post:
+      summary: Cancelar sesión
+      operationId: cancelSession
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000002"
+      responses:
+        '204':
+          description: Sesión cancelada
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/logs:
+    post:
+      summary: Añadir ejercicio a la sesión
+      operationId: addExerciseLog
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000002"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddExerciseLogRequest'
+            example:
+              exerciseId: "10000000-0000-0000-0000-000000000001"
+              sets: 3
+              reps: 10
+              weight: 50
+      responses:
+        '201':
+          description: Ejercicio añadido
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+    get:
+      summary: Listar ejercicios de una sesión
+      operationId: getExerciseLogs
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+      responses:
+        '200':
+          description: Lista de ejercicios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseLogDTO'
+        '204':
+          description: No hay ejercicios
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/logs/{logId}:
+    delete:
+      summary: Eliminar ejercicio de la sesión
+      operationId: removeExerciseLog
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "60000000-0000-0000-0000-000000000001"
+      responses:
+        '204':
+          description: Ejercicio eliminado
+        '404':
+          description: Sesión o ejercicio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/logs/{logId}/sets:
+    patch:
+      summary: Actualizar series de un ejercicio
+      operationId: updateExerciseLogSets
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "60000000-0000-0000-0000-000000000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSetsRequest'
+            example:
+              sets: 4
+      responses:
+        '204':
+          description: Series actualizadas
+        '404':
+          description: Sesión o ejercicio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/logs/{logId}/reps:
+    patch:
+      summary: Actualizar repeticiones de un ejercicio
+      operationId: updateExerciseLogReps
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "60000000-0000-0000-0000-000000000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRepsRequest'
+            example:
+              reps: 12
+      responses:
+        '204':
+          description: Repeticiones actualizadas
+        '404':
+          description: Sesión o ejercicio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/logs/{logId}/weight:
+    patch:
+      summary: Actualizar peso de un ejercicio
+      operationId: updateExerciseLogWeight
+      tags:
+        - Exercise Logs
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "60000000-0000-0000-0000-000000000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWeightRequest'
+            example:
+              weight: 60
+      responses:
+        '204':
+          description: Peso actualizado
+        '404':
+          description: Sesión o ejercicio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /api/sessions/{sessionId}/notes:
+    put:
+      summary: Actualizar notas de la sesión
+      operationId: updateSessionNotes
+      tags:
+        - Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "50000000-0000-0000-0000-000000000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNotesRequest'
+            example:
+              notes: "Nueva nota de la sesión"
+      responses:
+        '204':
+          description: Notas actualizadas
+        '404':
+          description: Sesión no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+components:
+  schemas:
+    ErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ResponseDTO:
+      type: object
+      properties:
+        payload:
+          type: object
+        error:
+          $ref: '#/components/schemas/ErrorDTO'
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        dayId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - COMPLETED
+            - CANCELLED
+        notes:
+          type: string
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseLogDTO'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SessionDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        dayId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - COMPLETED
+            - CANCELLED
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SessionListDTO:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionDTO'
+
+    ExerciseLogDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        exerciseId:
+          type: string
+          format: uuid
+        sets:
+          type: integer
+        reps:
+          type: integer
+        weight:
+          type: integer
+
+    StartSessionRequest:
+      type: object
+      required:
+        - dayId
+      properties:
+        dayId:
+          type: string
+          format: uuid
+
+    AddExerciseLogRequest:
+      type: object
+      required:
+        - exerciseId
+        - sets
+        - reps
+        - weight
+      properties:
+        logId:
+          type: string
+          format: uuid
+        exerciseId:
+          type: string
+          format: uuid
+        sets:
+          type: integer
+        reps:
+          type: integer
+        weight:
+          type: integer
+
+    UpdateSetsRequest:
+      type: object
+      required:
+        - sets
+      properties:
+        sets:
+          type: integer
+
+    UpdateRepsRequest:
+      type: object
+      required:
+        - reps
+      properties:
+        reps:
+          type: integer
+
+    UpdateWeightRequest:
+      type: object
+      required:
+        - weight
+      properties:
+        weight:
+          type: integer
+
+    UpdateNotesRequest:
+      type: object
+      required:
+        - notes
+      properties:
+        notes:
+          type: string

@@ -9,6 +9,8 @@ import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class SessionRepositoryJpaImpl implements SessionRepository {
 
@@ -24,6 +26,7 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
         this.mapper = mapper;
         this.exceptionMapper = exceptionMapper;
     }
+
 
     @Override
     public Session save(Session session) {
@@ -53,5 +56,10 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
         } catch (Exception e) {
             throw exceptionMapper.map(e, SessionInfrastructureErrors.DELETE_FAILED);
         }
+    }
+
+    @Override
+    public List<Session> getAll() {
+        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
     }
 }
