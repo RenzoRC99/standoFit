@@ -7,6 +7,6 @@ package com.standofit.back.shared.domain.criteria;
  * @version 1.0
  */
 public enum Order {
-    ASC,
-    DESC
+  ASC,
+  DESC
 }

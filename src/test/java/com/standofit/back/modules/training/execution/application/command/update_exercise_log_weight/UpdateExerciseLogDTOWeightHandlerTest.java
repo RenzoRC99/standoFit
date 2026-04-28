@@ -1,9 +1,10 @@
 package com.standofit.back.modules.training.execution.application.command.update_exercise_log_weight;
 
+import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
+import com.standofit.back.modules.training.execution.domain.vo.*;
+import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +37,13 @@ class UpdateExerciseLogDTOWeightHandlerTest {
         SessionDayId dayId = new SessionDayId(UUID.randomUUID());
         ExerciseLogId logId = new ExerciseLogId(UUID.randomUUID());
         ExerciseLogWeight weight = new ExerciseLogWeight(60);
-        UpdateExerciseLogWeightCommand command = new UpdateExerciseLogWeightCommand(sessionId, logId, weight);
+        UpdateExerciseLogWeightCommand command =
+                new UpdateExerciseLogWeightCommand(sessionId, logId, weight);
 
-        Session session = Session.create(sessionId, dayId);
-        when(repository.findById(sessionId)).thenReturn(session);
+    Session session = Session.create(sessionId, dayId);
+    ExerciseLog log = ExerciseLog.create(logId, new ExerciseId(UUID.randomUUID()), new ExerciseLogSets(3), new ExerciseLogReps(10), new ExerciseLogWeight(50));
+    session = session.addLog(log);
+    when(repository.findById(sessionId)).thenReturn(session);
         when(repository.save(any(Session.class))).thenReturn(session);
 
         handler.handle(command);

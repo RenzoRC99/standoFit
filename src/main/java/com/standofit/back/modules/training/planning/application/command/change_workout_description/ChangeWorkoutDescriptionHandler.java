@@ -7,30 +7,35 @@ import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChangeWorkoutDescriptionHandler implements CommandHandler<ChangeWorkoutDescriptionCommand, Void> {
+public class ChangeWorkoutDescriptionHandler
+    implements CommandHandler<ChangeWorkoutDescriptionCommand, Void> {
 
-    private final WorkoutRepository repository;
+  private final WorkoutRepository repository;
 
-    public ChangeWorkoutDescriptionHandler(WorkoutRepository repository) {
-        this.repository = repository;
-    }
+  public ChangeWorkoutDescriptionHandler(WorkoutRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<ChangeWorkoutDescriptionCommand> commandType() {
-        return ChangeWorkoutDescriptionCommand.class;
-    }
+  @Override
+  public Class<ChangeWorkoutDescriptionCommand> commandType() {
+    return ChangeWorkoutDescriptionCommand.class;
+  }
 
-    @Override
-    public Void handle(ChangeWorkoutDescriptionCommand command) {
-        Workout workout = repository.findById(command.workoutId())
-                .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+  @Override
+  public Void handle(ChangeWorkoutDescriptionCommand command) {
+    Workout workout =
+        repository
+            .findById(command.workoutId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
 
-        Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
+    Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
 
-        // TODO: Publish WorkoutDescriptionChangedEvent
-        // eventBus.publish(new WorkoutDescriptionChangedEvent(command.workoutId(), command.description()));
+    // TODO: Publish WorkoutDescriptionChangedEvent
+    // eventBus.publish(new WorkoutDescriptionChangedEvent(command.workoutId(),
+    // command.description()));
 
-        repository.save(updated);
-        return null;
-    }
+    repository.save(updated);
+    return null;
+  }
 }

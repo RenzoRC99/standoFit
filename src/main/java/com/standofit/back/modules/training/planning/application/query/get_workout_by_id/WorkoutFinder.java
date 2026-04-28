@@ -2,21 +2,20 @@ package com.standofit.back.modules.training.planning.application.query.get_worko
 
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class WorkoutFinder {
 
-    private final WorkoutRepository repository;
+  private final WorkoutRepository repository;
 
-    public WorkoutFinder(WorkoutRepository repository) {
-        this.repository = repository;
-    }
+  public WorkoutFinder(WorkoutRepository repository) {
+    this.repository = repository;
+  }
 
-    public Optional<Workout> findById(UUID id) {
-        return repository.findById(id);
-    }
+  public Optional<Workout> findById(UUID id) {
+    return repository.findById(id);
+  }
 }

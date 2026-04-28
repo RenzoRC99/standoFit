@@ -1,6 +1,8 @@
 package com.standofit.back.exercises;
 
-import com.standofit.back.modules.exercises.Exercise;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.standofit.back.modules.exercises.repository.ExerciseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,68 +15,64 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("Exercise REST API Integration Tests")
 class ExerciseRestApiIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
-    @BeforeEach
-    void setUp() {
-        exerciseRepository.deleteAll();
-    }
+  @BeforeEach
+  void setUp() {
+    exerciseRepository.deleteAll();
+  }
 
-    @Nested
-    @DisplayName("POST /api/exercises")
-    class CreateExercise {
+  @Nested
+  @DisplayName("POST /api/exercises")
+  class CreateExercise {
 
-        @Test
-        @DisplayName("should create exercise")
-        void shouldCreateExercise() throws Exception {
-            mockMvc.perform(post("/api/exercises")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("""
+    @Test
+    @DisplayName("should create exercise")
+    void shouldCreateExercise() throws Exception {
+      mockMvc
+          .perform(
+              post("/api/exercises")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(
+                      """
                             {
                                 "name": "Bench Press",
                                 "description": "Chest exercise",
                                 "muscleGroup": "CHEST"
                             }
                             """))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.name").value("Bench Press"));
-        }
+          .andExpect(status().isCreated())
+          .andExpect(jsonPath("$.name").value("Bench Press"));
     }
+  }
 
-    @Nested
-    @DisplayName("GET /api/exercises")
-    class GetExercises {
+  @Nested
+  @DisplayName("GET /api/exercises")
+  class GetExercises {
 
-        @Test
-        @DisplayName("should get all exercises")
-        void shouldGetAllExercises() throws Exception {
-            mockMvc.perform(get("/api/exercises"))
-                    .andExpect(status().isOk());
-        }
+    @Test
+    @DisplayName("should get all exercises")
+    void shouldGetAllExercises() throws Exception {
+      mockMvc.perform(get("/api/exercises")).andExpect(status().isOk());
     }
+  }
 
-    @Nested
-    @DisplayName("GET /api/exercises/{id}")
-    class GetById {
+  @Nested
+  @DisplayName("GET /api/exercises/{id}")
+  class GetById {
 
-        @Test
-        @DisplayName("should return 404 when not found")
-        void shouldReturn404WhenNotFound() throws Exception {
-            mockMvc.perform(get("/api/exercises/123"))
-                    .andExpect(status().isNotFound());
-        }
+    @Test
+    @DisplayName("should return 404 when not found")
+    void shouldReturn404WhenNotFound() throws Exception {
+      mockMvc.perform(get("/api/exercises/123")).andExpect(status().isNotFound());
     }
+  }
 }

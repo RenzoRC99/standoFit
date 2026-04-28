@@ -12,56 +12,56 @@ import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCommand, Void> {
 
-    private final WorkoutRepository repository;
+  private final WorkoutRepository repository;
 
-    public AddDayToWorkoutHandler(WorkoutRepository repository) {
-        this.repository = repository;
+  public AddDayToWorkoutHandler(WorkoutRepository repository) {
+    this.repository = repository;
+  }
+
+  @Override
+  public Class<AddDayToWorkoutCommand> commandType() {
+    return AddDayToWorkoutCommand.class;
+  }
+
+  @Override
+  public Void handle(AddDayToWorkoutCommand command) {
+    Workout workout =
+        repository
+            .findById(command.workoutId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+
+    List<WorkoutExercise> exercises = new ArrayList<>();
+    for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
+      WorkoutExercise exercise =
+          WorkoutExercise.create(
+              new WorkoutExerciseId(UUID.randomUUID()),
+              new ExerciseId(exInput.exerciseId()),
+              new WorkoutExerciseSets(exInput.sets()),
+              new WorkoutExerciseReps(exInput.reps()),
+              new WorkoutExerciseRest(exInput.restSeconds()));
+      exercises.add(exercise);
     }
 
-    @Override
-    public Class<AddDayToWorkoutCommand> commandType() {
-        return AddDayToWorkoutCommand.class;
-    }
+    WorkoutDay newDay =
+        WorkoutDay.create(
+            new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName(command.dayName()), exercises);
 
-    @Override
-    public Void handle(AddDayToWorkoutCommand command) {
-        Workout workout = repository.findById(command.workoutId())
-                .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+    Workout updatedWorkout = workout.addDays(List.of(newDay));
 
-        List<WorkoutExercise> exercises = new ArrayList<>();
-        for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
-            WorkoutExercise exercise = WorkoutExercise.create(
-                    new WorkoutExerciseId(UUID.randomUUID()),
-                    new ExerciseId(exInput.exerciseId()),
-                    new WorkoutExerciseSets(exInput.sets()),
-                    new WorkoutExerciseReps(exInput.reps()),
-                    new WorkoutExerciseRest(exInput.restSeconds())
-            );
-            exercises.add(exercise);
-        }
+    // TODO: Publish DayAddedToWorkoutEvent
+    // eventBus.publish(new DayAddedToWorkoutEvent(workout.getId(), newDay.getId()));
 
-        WorkoutDay newDay = WorkoutDay.create(
-                new WorkoutDayId(UUID.randomUUID()),
-                new WorkoutDayName(command.dayName()),
-                exercises
-        );
+    repository.save(updatedWorkout);
 
-        Workout updatedWorkout = workout.addDays(List.of(newDay));
-
-        // TODO: Publish DayAddedToWorkoutEvent
-        // eventBus.publish(new DayAddedToWorkoutEvent(workout.getId(), newDay.getId()));
-
-        repository.save(updatedWorkout);
-
-        return null;
-    }
+    return null;
+  }
 }

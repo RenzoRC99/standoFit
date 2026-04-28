@@ -5,5 +5,4 @@ import com.standofit.back.shared.domain.bus.query.Query;
 import com.standofit.back.shared.domain.criteria.Criteria;
 import com.standofit.back.shared.domain.criteria.PagedResult;
 
-public record SearchWorkoutsQuery(Criteria criteria) implements Query<PagedResult<WorkoutDto>> {
-}
+public record SearchWorkoutsQuery(Criteria criteria) implements Query<PagedResult<WorkoutDto>> {}

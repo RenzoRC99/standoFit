@@ -9,28 +9,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand, Void> {
 
-    private final WorkoutRepository repository;
+  private final WorkoutRepository repository;
 
-    public RenameWorkoutHandler(WorkoutRepository repository) {
-        this.repository = repository;
-    }
+  public RenameWorkoutHandler(WorkoutRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<RenameWorkoutCommand> commandType() {
-        return RenameWorkoutCommand.class;
-    }
+  @Override
+  public Class<RenameWorkoutCommand> commandType() {
+    return RenameWorkoutCommand.class;
+  }
 
-    @Override
-    public Void handle(RenameWorkoutCommand command) {
-        Workout workout = repository.findById(command.workoutId())
-                .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+  @Override
+  public Void handle(RenameWorkoutCommand command) {
+    Workout workout =
+        repository
+            .findById(command.workoutId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
 
-        Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
+    Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
 
-        // TODO: Publish WorkoutRenamedEvent
-        // eventBus.publish(new WorkoutRenamedEvent(command.workoutId(), command.newName()));
+    // TODO: Publish WorkoutRenamedEvent
+    // eventBus.publish(new WorkoutRenamedEvent(command.workoutId(), command.newName()));
 
-        repository.save(renamed);
-        return null;
-    }
+    repository.save(renamed);
+    return null;
+  }
 }
