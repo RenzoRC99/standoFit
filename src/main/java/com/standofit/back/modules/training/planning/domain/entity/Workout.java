@@ -62,7 +62,7 @@ public final class Workout extends AggregateRoot {
                 new WorkoutUpdatedAt(Instant.now()));
     }
 
-    public Workout copy(
+    Workout copy(
             WorkoutId id, WorkoutName name, WorkoutDescription description, List<WorkoutDay> days) {
         return new Workout(
                 id, name, description, days, this.createdAt, new WorkoutUpdatedAt(Instant.now()));
