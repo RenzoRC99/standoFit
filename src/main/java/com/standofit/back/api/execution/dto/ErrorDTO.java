@@ -1,26 +1,20 @@
 package com.standofit.back.api.execution.dto;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.time.OffsetDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
+import java.time.OffsetDateTime;
 import java.util.*;
-import jakarta.annotation.Generated;
+import java.util.Objects;
+import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * ErrorDTO
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+/** ErrorDTO */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]",
+    comments = "Generator version: 7.10.0")
 public class ErrorDTO {
 
   private String code;
@@ -34,9 +28,7 @@ public class ErrorDTO {
     super();
   }
 
-  /**
-   * Constructor with only required parameters
-   */
+  /** Constructor with only required parameters */
   public ErrorDTO(String code, String message) {
     this.code = code;
     this.message = message;
@@ -49,9 +41,10 @@ public class ErrorDTO {
 
   /**
    * Get code
+   *
    * @return code
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "code", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("code")
   public String getCode() {
@@ -69,9 +62,10 @@ public class ErrorDTO {
 
   /**
    * Get message
+   *
    * @return message
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "message", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("message")
   public String getMessage() {
@@ -89,9 +83,10 @@ public class ErrorDTO {
 
   /**
    * Get timestamp
+   *
    * @return timestamp
    */
-  @Valid 
+  @Valid
   @Schema(name = "timestamp", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("timestamp")
   public OffsetDateTime getTimestamp() {
@@ -111,9 +106,9 @@ public class ErrorDTO {
       return false;
     }
     ErrorDTO errorDTO = (ErrorDTO) o;
-    return Objects.equals(this.code, errorDTO.code) &&
-        Objects.equals(this.message, errorDTO.message) &&
-        Objects.equals(this.timestamp, errorDTO.timestamp);
+    return Objects.equals(this.code, errorDTO.code)
+        && Objects.equals(this.message, errorDTO.message)
+        && Objects.equals(this.timestamp, errorDTO.timestamp);
   }
 
   @Override
@@ -133,8 +128,7 @@ public class ErrorDTO {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -143,4 +137,3 @@ public class ErrorDTO {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

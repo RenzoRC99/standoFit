@@ -6,8 +6,7 @@
 package com.standofit.back.api.execution;
 
 import com.standofit.back.api.execution.dto.AddExerciseLogRequest;
-import com.standofit.back.api.execution.dto.ExerciseLogDTO;
-import com.standofit.back.api.execution.dto.ResponseDTO;
+import com.standofit.back.api.execution.dto.ErrorDTO;
 import com.standofit.back.api.execution.dto.SessionDTO;
 import com.standofit.back.api.execution.dto.SessionListDTO;
 import com.standofit.back.api.execution.dto.StartSessionRequest;
@@ -43,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T13:35:26.515198142+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-28T12:44:52.539832104+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "Exercise Logs", description = "the Exercise Logs API")
 public interface ApiApi {
@@ -67,7 +66,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "201", description = "Ejercicio añadido"),
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -85,7 +84,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -110,7 +109,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Sesión cancelada"),
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -126,7 +125,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -178,7 +177,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Sesión finalizada"),
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -194,7 +193,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -222,7 +221,7 @@ public interface ApiApi {
             }),
             @ApiResponse(responseCode = "204", description = "No hay sesiones"),
             @ApiResponse(responseCode = "400", description = "Error", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -243,57 +242,7 @@ public interface ApiApi {
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /api/sessions/{sessionId}/logs : Listar ejercicios de una sesión
-     *
-     * @param sessionId  (required)
-     * @return Lista de ejercicios (status code 200)
-     *         or No hay ejercicios (status code 204)
-     *         or Sesión no encontrada (status code 404)
-     */
-    @Operation(
-        operationId = "getExerciseLogs",
-        summary = "Listar ejercicios de una sesión",
-        tags = { "Exercise Logs" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de ejercicios", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ExerciseLogDTO.class)))
-            }),
-            @ApiResponse(responseCode = "204", description = "No hay ejercicios"),
-            @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/api/sessions/{sessionId}/logs",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<ExerciseLogDTO>> getExerciseLogs(
-        @Parameter(name = "sessionId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("sessionId") UUID sessionId
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"reps\" : 6, \"exerciseId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"sets\" : 0, \"weight\" : 1, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\" }, { \"reps\" : 6, \"exerciseId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"sets\" : 0, \"weight\" : 1, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\" } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -320,7 +269,7 @@ public interface ApiApi {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = SessionDTO.class))
             }),
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -341,7 +290,7 @@ public interface ApiApi {
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -367,7 +316,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Ejercicio eliminado"),
             @ApiResponse(responseCode = "404", description = "Sesión o ejercicio no encontrado", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -384,7 +333,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -439,7 +388,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Repeticiones actualizadas"),
             @ApiResponse(responseCode = "404", description = "Sesión o ejercicio no encontrado", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -458,7 +407,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -485,7 +434,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Series actualizadas"),
             @ApiResponse(responseCode = "404", description = "Sesión o ejercicio no encontrado", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -504,7 +453,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -531,7 +480,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Peso actualizado"),
             @ApiResponse(responseCode = "404", description = "Sesión o ejercicio no encontrado", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -550,7 +499,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -576,7 +525,7 @@ public interface ApiApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Notas actualizadas"),
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
             })
         }
     )
@@ -594,7 +543,7 @@ public interface ApiApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"payload\" : \"{}\", \"error\" : { \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" } }";
+                    String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\", \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

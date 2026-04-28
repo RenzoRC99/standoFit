@@ -8,21 +8,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLogCommand, Void> {
 
-    private final SessionRepository repository;
+  private final SessionRepository repository;
 
-    public RemoveExerciseLogHandler(SessionRepository repository) {
-        this.repository = repository;
-    }
+  public RemoveExerciseLogHandler(SessionRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<RemoveExerciseLogCommand> commandType() {
-        return RemoveExerciseLogCommand.class;
-    }
+  @Override
+  public Class<RemoveExerciseLogCommand> commandType() {
+    return RemoveExerciseLogCommand.class;
+  }
 
-    @Override
-    public Void handle(RemoveExerciseLogCommand command) {
-        Session session = repository.findById(command.sessionId());
-        repository.save(session.removeLog(command.logId()));
-        return null;
-    }
+  @Override
+  public Void handle(RemoveExerciseLogCommand command) {
+    Session session = repository.findById(command.sessionId());
+    repository.save(session.removeLog(command.logId()));
+    return null;
+  }
 }

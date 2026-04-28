@@ -1,25 +1,19 @@
 package com.standofit.back.api.execution.dto;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
 import java.util.*;
-import jakarta.annotation.Generated;
+import java.util.Objects;
+import java.util.UUID;
 
-/**
- * AddExerciseLogRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+/** AddExerciseLogRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]",
+    comments = "Generator version: 7.10.0")
 public class AddExerciseLogRequest {
 
   private UUID logId;
@@ -36,9 +30,7 @@ public class AddExerciseLogRequest {
     super();
   }
 
-  /**
-   * Constructor with only required parameters
-   */
+  /** Constructor with only required parameters */
   public AddExerciseLogRequest(UUID exerciseId, Integer sets, Integer reps, Integer weight) {
     this.exerciseId = exerciseId;
     this.sets = sets;
@@ -53,9 +45,10 @@ public class AddExerciseLogRequest {
 
   /**
    * Get logId
+   *
    * @return logId
    */
-  @Valid 
+  @Valid
   @Schema(name = "logId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("logId")
   public UUID getLogId() {
@@ -73,9 +66,11 @@ public class AddExerciseLogRequest {
 
   /**
    * Get exerciseId
+   *
    * @return exerciseId
    */
-  @NotNull @Valid 
+  @NotNull
+  @Valid
   @Schema(name = "exerciseId", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("exerciseId")
   public UUID getExerciseId() {
@@ -93,9 +88,10 @@ public class AddExerciseLogRequest {
 
   /**
    * Get sets
+   *
    * @return sets
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "sets", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("sets")
   public Integer getSets() {
@@ -113,9 +109,10 @@ public class AddExerciseLogRequest {
 
   /**
    * Get reps
+   *
    * @return reps
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "reps", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("reps")
   public Integer getReps() {
@@ -133,9 +130,10 @@ public class AddExerciseLogRequest {
 
   /**
    * Get weight
+   *
    * @return weight
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "weight", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("weight")
   public Integer getWeight() {
@@ -155,11 +153,11 @@ public class AddExerciseLogRequest {
       return false;
     }
     AddExerciseLogRequest addExerciseLogRequest = (AddExerciseLogRequest) o;
-    return Objects.equals(this.logId, addExerciseLogRequest.logId) &&
-        Objects.equals(this.exerciseId, addExerciseLogRequest.exerciseId) &&
-        Objects.equals(this.sets, addExerciseLogRequest.sets) &&
-        Objects.equals(this.reps, addExerciseLogRequest.reps) &&
-        Objects.equals(this.weight, addExerciseLogRequest.weight);
+    return Objects.equals(this.logId, addExerciseLogRequest.logId)
+        && Objects.equals(this.exerciseId, addExerciseLogRequest.exerciseId)
+        && Objects.equals(this.sets, addExerciseLogRequest.sets)
+        && Objects.equals(this.reps, addExerciseLogRequest.reps)
+        && Objects.equals(this.weight, addExerciseLogRequest.weight);
   }
 
   @Override
@@ -181,8 +179,7 @@ public class AddExerciseLogRequest {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -191,4 +188,3 @@ public class AddExerciseLogRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

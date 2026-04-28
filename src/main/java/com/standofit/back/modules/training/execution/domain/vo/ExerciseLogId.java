@@ -4,7 +4,7 @@ import com.standofit.back.shared.domain.valueobjects.Id;
 import java.util.UUID;
 
 public class ExerciseLogId extends Id {
-    public ExerciseLogId(UUID value) {
-        super(value);
-    }
+  public ExerciseLogId(UUID value) {
+    super(value);
+  }
 }

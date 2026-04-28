@@ -9,28 +9,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogCommand, Void> {
 
-    private final SessionRepository repository;
+  private final SessionRepository repository;
 
-    public AddExerciseLogHandler(SessionRepository repository) {
-        this.repository = repository;
-    }
+  public AddExerciseLogHandler(SessionRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<AddExerciseLogCommand> commandType() {
-        return AddExerciseLogCommand.class;
-    }
+  @Override
+  public Class<AddExerciseLogCommand> commandType() {
+    return AddExerciseLogCommand.class;
+  }
 
-    @Override
-    public Void handle(AddExerciseLogCommand command) {
-        Session session = repository.findById(command.sessionId());
-        ExerciseLog log = ExerciseLog.create(
-                command.logId(),
-                command.exerciseId(),
-                command.sets(),
-                command.reps(),
-                command.weight()
-        );
-        repository.save(session.addLog(log));
-        return null;
-    }
+  @Override
+  public Void handle(AddExerciseLogCommand command) {
+    Session session = repository.findById(command.sessionId());
+    ExerciseLog log =
+        ExerciseLog.create(
+            command.logId(),
+            command.exerciseId(),
+            command.sets(),
+            command.reps(),
+            command.weight());
+    repository.save(session.addLog(log));
+    return null;
+  }
 }

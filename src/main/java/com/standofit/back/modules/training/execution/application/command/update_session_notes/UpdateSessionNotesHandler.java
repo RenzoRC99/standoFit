@@ -8,21 +8,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNotesCommand, Void> {
 
-    private final SessionRepository repository;
+  private final SessionRepository repository;
 
-    public UpdateSessionNotesHandler(SessionRepository repository) {
-        this.repository = repository;
-    }
+  public UpdateSessionNotesHandler(SessionRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<UpdateSessionNotesCommand> commandType() {
-        return UpdateSessionNotesCommand.class;
-    }
+  @Override
+  public Class<UpdateSessionNotesCommand> commandType() {
+    return UpdateSessionNotesCommand.class;
+  }
 
-    @Override
-    public Void handle(UpdateSessionNotesCommand command) {
-        Session session = repository.findById(command.sessionId());
-        repository.save(session.changeNotes(command.notes()));
-        return null;
-    }
+  @Override
+  public Void handle(UpdateSessionNotesCommand command) {
+    Session session = repository.findById(command.sessionId());
+    repository.save(session.changeNotes(command.notes()));
+    return null;
+  }
 }

@@ -1,25 +1,19 @@
 package com.standofit.back.api.execution.dto;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
 import java.util.*;
-import jakarta.annotation.Generated;
+import java.util.Objects;
+import java.util.UUID;
 
-/**
- * StartSessionRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+/** StartSessionRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]",
+    comments = "Generator version: 7.10.0")
 public class StartSessionRequest {
 
   private UUID dayId;
@@ -28,9 +22,7 @@ public class StartSessionRequest {
     super();
   }
 
-  /**
-   * Constructor with only required parameters
-   */
+  /** Constructor with only required parameters */
   public StartSessionRequest(UUID dayId) {
     this.dayId = dayId;
   }
@@ -42,9 +34,11 @@ public class StartSessionRequest {
 
   /**
    * Get dayId
+   *
    * @return dayId
    */
-  @NotNull @Valid 
+  @NotNull
+  @Valid
   @Schema(name = "dayId", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("dayId")
   public UUID getDayId() {
@@ -82,8 +76,7 @@ public class StartSessionRequest {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -92,4 +85,3 @@ public class StartSessionRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

@@ -6,23 +6,24 @@ import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UpdateExerciseLogSetsHandler implements CommandHandler<UpdateExerciseLogSetsCommand, Void> {
+public class UpdateExerciseLogSetsHandler
+    implements CommandHandler<UpdateExerciseLogSetsCommand, Void> {
 
-    private final SessionRepository repository;
+  private final SessionRepository repository;
 
-    public UpdateExerciseLogSetsHandler(SessionRepository repository) {
-        this.repository = repository;
-    }
+  public UpdateExerciseLogSetsHandler(SessionRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<UpdateExerciseLogSetsCommand> commandType() {
-        return UpdateExerciseLogSetsCommand.class;
-    }
+  @Override
+  public Class<UpdateExerciseLogSetsCommand> commandType() {
+    return UpdateExerciseLogSetsCommand.class;
+  }
 
-    @Override
-    public Void handle(UpdateExerciseLogSetsCommand command) {
-        Session session = repository.findById(command.sessionId());
-        repository.save(session.updateLogSets(command.logId(), command.sets()));
-        return null;
-    }
+  @Override
+  public Void handle(UpdateExerciseLogSetsCommand command) {
+    Session session = repository.findById(command.sessionId());
+    repository.save(session.updateLogSets(command.logId(), command.sets()));
+    return null;
+  }
 }

@@ -1,25 +1,18 @@
 package com.standofit.back.api.execution.dto;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.standofit.back.api.execution.dto.ErrorDTO;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
 import java.util.*;
-import jakarta.annotation.Generated;
+import java.util.Objects;
 
-/**
- * ResponseDTO
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+/** ResponseDTO */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2026-04-27T11:22:34.370993867+02:00[Europe/Madrid]",
+    comments = "Generator version: 7.10.0")
 public class ResponseDTO {
 
   private Object payload;
@@ -33,9 +26,9 @@ public class ResponseDTO {
 
   /**
    * Get payload
+   *
    * @return payload
    */
-  
   @Schema(name = "payload", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("payload")
   public Object getPayload() {
@@ -53,9 +46,10 @@ public class ResponseDTO {
 
   /**
    * Get error
+   *
    * @return error
    */
-  @Valid 
+  @Valid
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("error")
   public ErrorDTO getError() {
@@ -75,8 +69,8 @@ public class ResponseDTO {
       return false;
     }
     ResponseDTO responseDTO = (ResponseDTO) o;
-    return Objects.equals(this.payload, responseDTO.payload) &&
-        Objects.equals(this.error, responseDTO.error);
+    return Objects.equals(this.payload, responseDTO.payload)
+        && Objects.equals(this.error, responseDTO.error);
   }
 
   @Override
@@ -95,8 +89,7 @@ public class ResponseDTO {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -105,4 +98,3 @@ public class ResponseDTO {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
