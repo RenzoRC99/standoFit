@@ -14,12 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateExerciseLogRepsHandlerTest {
+class UpdateExerciseLogDTORepsHandlerTest {
 
     @Mock
     private SessionRepository repository;

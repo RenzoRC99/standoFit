@@ -1,9 +1,8 @@
-package com.standofit.back.modules.training.execution.application.command.update_exercise_log_weight;
+package com.standofit.back.modules.training.execution.application.command.remove_exercise_log;
 
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,30 +13,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateExerciseLogWeightHandlerTest {
+class RemoveExerciseLogDTOHandlerTest {
 
     @Mock
     private SessionRepository repository;
 
-    private UpdateExerciseLogWeightHandler handler;
+    private RemoveExerciseLogHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new UpdateExerciseLogWeightHandler(repository);
+        handler = new RemoveExerciseLogHandler(repository);
     }
 
     @Test
-    void should_call_repository_to_update_weight() {
+    void should_call_repository_to_remove_log() {
         SessionId sessionId = new SessionId(UUID.randomUUID());
         SessionDayId dayId = new SessionDayId(UUID.randomUUID());
         ExerciseLogId logId = new ExerciseLogId(UUID.randomUUID());
-        ExerciseLogWeight weight = new ExerciseLogWeight(60);
-        UpdateExerciseLogWeightCommand command = new UpdateExerciseLogWeightCommand(sessionId, logId, weight);
+        RemoveExerciseLogCommand command = new RemoveExerciseLogCommand(sessionId, logId);
 
         Session session = Session.create(sessionId, dayId);
         when(repository.findById(sessionId)).thenReturn(session);

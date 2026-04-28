@@ -3,11 +3,9 @@ package com.standofit.back.modules.training.execution.application.command.add_ex
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
-import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureErrors;
-import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureException;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
@@ -19,12 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AddExerciseLogHandlerTest {
+class AddExerciseLogDTOHandlerTest {
 
     @Mock
     private SessionRepository repository;

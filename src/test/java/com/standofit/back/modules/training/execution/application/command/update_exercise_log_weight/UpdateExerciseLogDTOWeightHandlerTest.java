@@ -1,9 +1,9 @@
-package com.standofit.back.modules.training.execution.application.command.update_exercise_log_sets;
+package com.standofit.back.modules.training.execution.application.command.update_exercise_log_weight;
 
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,34 +14,37 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateExerciseLogSetsHandlerTest {
+class UpdateExerciseLogDTOWeightHandlerTest {
 
     @Mock
     private SessionRepository repository;
 
-    private UpdateExerciseLogSetsHandler handler;
+    private UpdateExerciseLogWeightHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new UpdateExerciseLogSetsHandler(repository);
+        handler = new UpdateExerciseLogWeightHandler(repository);
     }
 
     @Test
-    void should_call_repository_to_update_sets_when_log_exists() {
+    void should_call_repository_to_update_weight() {
         SessionId sessionId = new SessionId(UUID.randomUUID());
         SessionDayId dayId = new SessionDayId(UUID.randomUUID());
         ExerciseLogId logId = new ExerciseLogId(UUID.randomUUID());
-        ExerciseLogSets sets = new ExerciseLogSets(4);
-        UpdateExerciseLogSetsCommand command = new UpdateExerciseLogSetsCommand(sessionId, logId, sets);
+        ExerciseLogWeight weight = new ExerciseLogWeight(60);
+        UpdateExerciseLogWeightCommand command = new UpdateExerciseLogWeightCommand(sessionId, logId, weight);
 
         Session session = Session.create(sessionId, dayId);
         when(repository.findById(sessionId)).thenReturn(session);
+        when(repository.save(any(Session.class))).thenReturn(session);
 
         handler.handle(command);
+
+        verify(repository, times(1)).findById(sessionId);
+        verify(repository, times(1)).save(any(Session.class));
     }
 }

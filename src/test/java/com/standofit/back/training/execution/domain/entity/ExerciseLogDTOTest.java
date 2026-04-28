@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ExerciseLogTest {
+class ExerciseLogDTOTest {
 
     @Test
     void should_create_exercise_log() {
