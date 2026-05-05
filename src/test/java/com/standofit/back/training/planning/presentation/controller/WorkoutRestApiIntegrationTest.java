@@ -38,8 +38,13 @@ class WorkoutRestApiIntegrationTest {
 
   private String createWorkout(String name) throws Exception {
     var request =
-        new PlanWorkoutRequest(
-            name, "Description", List.of(new PlanWorkoutRequest.DayRequest("Day 1", List.of())));
+        new com.standofit.back.api.planning.dto.PlanWorkoutRequest()
+            .name(name)
+            .description("Description")
+            .days(List.of(
+                new com.standofit.back.api.planning.dto.DayInputDTO()
+                    .name("Day 1")
+                    .exercises(List.of())));
 
     return mockMvc
         .perform(
@@ -55,10 +60,13 @@ class WorkoutRestApiIntegrationTest {
 
   private String createWorkoutWithDays(String name, List<String> dayNames) throws Exception {
     var request =
-        new PlanWorkoutRequest(
-            name,
-            "Description",
-            dayNames.stream().map(d -> new PlanWorkoutRequest.DayRequest(d, List.of())).toList());
+        new com.standofit.back.api.planning.dto.PlanWorkoutRequest()
+            .name(name)
+            .description("Description")
+            .days(dayNames.stream().map(d -> 
+                new com.standofit.back.api.planning.dto.DayInputDTO()
+                    .name(d)
+                    .exercises(List.of())).toList());
 
     return mockMvc
         .perform(
@@ -72,12 +80,6 @@ class WorkoutRestApiIntegrationTest {
         .replace("\"", "");
   }
 
-  record PlanWorkoutRequest(String name, String description, List<DayRequest> days) {
-    public record DayRequest(String name, List<ExerciseRequest> exercises) {}
-
-    public record ExerciseRequest(UUID exerciseId, int sets, int reps, int restSeconds) {}
-  }
-
   @Nested
   @DisplayName("POST /api/workouts - Plan Workout")
   class PlanWorkout {
@@ -85,19 +87,7 @@ class WorkoutRestApiIntegrationTest {
     @Test
     @DisplayName("should create workout and return id")
     void shouldCreateWorkoutAndReturnId() throws Exception {
-      var request =
-          new PlanWorkoutRequest(
-              "Test Workout",
-              "Description",
-              List.of(new PlanWorkoutRequest.DayRequest("Monday", List.of())));
-
-      mockMvc
-          .perform(
-              post("/api/workouts")
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(request)))
-          .andExpect(status().isCreated())
-          .andExpect(jsonPath("$").isString());
+      createWorkout("Test Workout");
     }
   }
 
@@ -132,11 +122,13 @@ class WorkoutRestApiIntegrationTest {
     void shouldRenameWorkout() throws Exception {
       String workoutId = createWorkout("Old Name");
 
+      var renameRequest = new com.standofit.back.api.planning.dto.RenameRequest();
+      renameRequest.setName("New Name");
       mockMvc
           .perform(
               put("/api/workouts/" + workoutId + "/name")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content("{\"name\": \"New Name\"}"))
+                  .content(objectMapper.writeValueAsString(renameRequest)))
           .andExpect(status().isNoContent());
 
       mockMvc
@@ -169,17 +161,14 @@ class WorkoutRestApiIntegrationTest {
     void shouldAddDayToWorkout() throws Exception {
       String workoutId = createWorkout("Test Workout");
 
+      var addDayRequest = new com.standofit.back.api.planning.dto.AddDayRequest();
+      addDayRequest.setDayName("New Day");
+      addDayRequest.setExercises(List.of());
       mockMvc
           .perform(
               post("/api/workouts/" + workoutId + "/days")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(
-                      """
-                                    {
-                                        "dayName": "New Day",
-                                        "exercises": []
-                                    }
-                                    """))
+                  .content(objectMapper.writeValueAsString(addDayRequest)))
           .andExpect(status().isCreated());
 
       mockMvc
@@ -226,12 +215,14 @@ class WorkoutRestApiIntegrationTest {
     void shouldDuplicateWorkout() throws Exception {
       String workoutId = createWorkout("Original");
 
+      var duplicateRequest = new com.standofit.back.api.planning.dto.DuplicateWorkoutRequest();
+      duplicateRequest.setNewName("Copy");
       String newId =
           mockMvc
               .perform(
                   post("/api/workouts/" + workoutId + "/duplicate")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content("{\"newName\": \"Copy\"}"))
+                      .content(objectMapper.writeValueAsString(duplicateRequest)))
               .andExpect(status().isCreated())
               .andReturn()
               .getResponse()
@@ -268,12 +259,14 @@ class WorkoutRestApiIntegrationTest {
     void shouldDuplicateWithDaysAndExercises() throws Exception {
       String workoutId = createWorkoutWithDays("Original", List.of("Day 1"));
 
+      var duplicateRequest = new com.standofit.back.api.planning.dto.DuplicateWorkoutRequest();
+      duplicateRequest.setNewName("Copy");
       String newId =
           mockMvc
               .perform(
                   post("/api/workouts/" + workoutId + "/duplicate")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content("{\"newName\": \"Copy\"}"))
+                      .content(objectMapper.writeValueAsString(duplicateRequest)))
               .andExpect(status().isCreated())
               .andReturn()
               .getResponse()
@@ -311,11 +304,13 @@ class WorkoutRestApiIntegrationTest {
     void shouldChangeDescription() throws Exception {
       String workoutId = createWorkout("Test");
 
+      var descRequest = new com.standofit.back.api.planning.dto.DescriptionRequest();
+      descRequest.setDescription("New Description");
       mockMvc
           .perform(
               put("/api/workouts/" + workoutId + "/description")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content("{\"description\": \"New Description\"}"))
+                  .content(objectMapper.writeValueAsString(descRequest)))
           .andExpect(status().isNoContent());
 
       mockMvc
@@ -339,11 +334,13 @@ class WorkoutRestApiIntegrationTest {
       String day1Id = body.get("days").get(0).get("id").asText();
       String day2Id = body.get("days").get(1).get("id").asText();
 
+      var reorderRequest = new com.standofit.back.api.planning.dto.ReorderDaysRequest();
+      reorderRequest.setDayIds(List.of(UUID.fromString(day2Id), UUID.fromString(day1Id)));
       mockMvc
           .perform(
               put("/api/workouts/" + workoutId + "/days/reorder")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content("{\"dayIds\": [\"" + day2Id + "\", \"" + day1Id + "\"]}"))
+                  .content(objectMapper.writeValueAsString(reorderRequest)))
           .andExpect(status().isNoContent());
 
       mockMvc

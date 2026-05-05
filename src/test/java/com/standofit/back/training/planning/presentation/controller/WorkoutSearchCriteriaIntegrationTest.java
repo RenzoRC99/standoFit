@@ -51,8 +51,8 @@ class WorkoutSearchCriteriaIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(searchAll)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.total").value(3))
-        .andExpect(jsonPath("$.items.length()").value(3));
+        .andExpect(jsonPath("$.totalElements").value(3))
+        .andExpect(jsonPath("$.content.length()").value(3));
 
     // Search with LIKE filter "full" - should return 2
     var searchFull =
@@ -64,9 +64,9 @@ class WorkoutSearchCriteriaIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(searchFull)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.total").value(2))
-        .andExpect(jsonPath("$.items[0].name").value("Full Body Workout"))
-        .andExpect(jsonPath("$.items[1].name").value("Full Leg Day"));
+        .andExpect(jsonPath("$.totalElements").value(2))
+        .andExpect(jsonPath("$.content[0].name").value("Full Body Workout"))
+        .andExpect(jsonPath("$.content[1].name").value("Full Leg Day"));
 
     // Search with pagination - page 0, size 2
     var searchPage = new SearchRequest(null, "createdAt", "DESC", 0, 2);
@@ -76,9 +76,9 @@ class WorkoutSearchCriteriaIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(searchPage)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.total").value(3))
-        .andExpect(jsonPath("$.items.length()").value(2))
-        .andExpect(jsonPath("$.page").value(0))
+        .andExpect(jsonPath("$.totalElements").value(3))
+        .andExpect(jsonPath("$.content.length()").value(2))
+        .andExpect(jsonPath("$.pageNumber").value(0))
         .andExpect(jsonPath("$.pageSize").value(2));
   }
 
@@ -101,8 +101,8 @@ class WorkoutSearchCriteriaIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(search)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.total").value(0))
-        .andExpect(jsonPath("$.items.length()").value(0));
+        .andExpect(jsonPath("$.totalElements").value(0))
+        .andExpect(jsonPath("$.content.length()").value(0));
   }
 
   private void createWorkout(String name) throws Exception {

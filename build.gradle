@@ -70,17 +70,69 @@ openApiGenerate {
     invokerPackage = "com.standofit.back.api.execution"
 }
 
-tasks.register('fixApiImports', Exec) {
-    dependsOn 'openApiGenerate'
-    workingDir '.'
-    commandLine 'echo', 'copying ApiApi...'
+task openApiGeneratePlanning(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    inputSpec = "$projectDir/docs/openapi-planning.yaml".toString()
+    outputDir = "$projectDir/build/generated".toString()
+    generatorName = "spring"
+    apiPackage = "com.standofit.back.api.planning"
+    modelPackage = "com.standofit.back.api.planning.dto"
+    invokerPackage = "com.standofit.back.api.planning"
+}
+
+tasks.register('fixApiImports') {
+    dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
     doLast {
-        def src = file("build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java")
-        def content = src.text
-        content = content.replace('javax.validation', 'jakarta.validation')
-        content = content.replace('javax.annotation', 'jakarta.annotation')
-        def dest = file("src/main/java/com/standofit/back/api/execution/ApiApi.java")
-        dest.write(content)
+        // Fix and copy execution API
+        def srcExec = file("build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java")
+        if (srcExec.exists()) {
+            def contentExec = srcExec.text
+            contentExec = contentExec.replace('javax.validation', 'jakarta.validation')
+            contentExec = contentExec.replace('javax.annotation', 'jakarta.annotation')
+            contentExec = contentExec.replace('javax.servlet', 'jakarta.servlet')
+            def destExec = file("src/main/java/com/standofit/back/api/execution/ApiApi.java")
+            destExec.write(contentExec)
+        }
+
+        // Fix and copy planning API
+        def srcPlanning = file("build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java")
+        if (srcPlanning.exists()) {
+            def contentPlanning = srcPlanning.text
+            contentPlanning = contentPlanning.replace('javax.validation', 'jakarta.validation')
+            contentPlanning = contentPlanning.replace('javax.annotation', 'jakarta.annotation')
+            contentPlanning = contentPlanning.replace('javax.servlet', 'jakarta.servlet')
+            contentPlanning = contentPlanning.replaceAll('@Validated', '')
+            def destPlanning = file("src/main/java/com/standofit/back/api/planning/ApiApi.java")
+            destPlanning.write(contentPlanning)
+        }
+
+        // Copy and fix ApiUtil for both packages
+        ['execution', 'planning'].each { pkg ->
+            def srcUtil = file("build/generated/src/main/java/com/standofit/back/api/${pkg}/ApiUtil.java")
+            if (srcUtil.exists()) {
+                def contentUtil = srcUtil.text
+                contentUtil = contentUtil.replace('javax.validation', 'jakarta.validation')
+                contentUtil = contentUtil.replace('javax.annotation', 'jakarta.annotation')
+                contentUtil = contentUtil.replace('javax.servlet', 'jakarta.servlet')
+                def destUtil = file("src/main/java/com/standofit/back/api/${pkg}/ApiUtil.java")
+                destUtil.write(contentUtil)
+            }
+        }
+
+        // Copy and fix DTOs for planning
+        def dtoSrcDir = file("build/generated/src/main/java/com/standofit/back/api/planning/dto")
+        def dtoDestDir = file("src/main/java/com/standofit/back/api/planning/dto")
+        if (dtoSrcDir.exists()) {
+            dtoDestDir.mkdirs()
+            dtoSrcDir.eachFile { f ->
+                if (f.name.endsWith('.java')) {
+                    def content = f.text
+                    content = content.replace('javax.validation', 'jakarta.validation')
+                    content = content.replace('javax.annotation', 'jakarta.annotation')
+                    content = content.replace('javax.servlet', 'jakarta.servlet')
+                    new File(dtoDestDir, f.name).write(content)
+                }
+            }
+        }
     }
 }
 

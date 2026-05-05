@@ -31,4 +31,13 @@ public enum FilterOperator {
   public String symbol() {
     return symbol;
   }
+
+  public static FilterOperator fromString(String value) {
+    for (FilterOperator op : values()) {
+      if (op.symbol.equals(value) || op.name().equalsIgnoreCase(value)) {
+        return op;
+      }
+    }
+    throw new IllegalArgumentException("Unknown filter operator: " + value);
+  }
 }

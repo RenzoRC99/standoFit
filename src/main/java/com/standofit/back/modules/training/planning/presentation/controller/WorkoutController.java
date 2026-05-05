@@ -1,139 +1,129 @@
 package com.standofit.back.modules.training.planning.presentation.controller;
 
-import com.standofit.back.configuration.bus.ApplicationBus;
-import com.standofit.back.modules.training.planning.application.command.add_day_to_workout.AddDayToWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.archive_workout.ArchiveWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.change_workout_description.ChangeWorkoutDescriptionCommand;
-import com.standofit.back.modules.training.planning.application.command.delete_workout.DeleteWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.duplicate_workout.DuplicateWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.plan_workout.PlanWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.remove_day_from_workout.RemoveDayFromWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.rename_workout.RenameWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.reorder_days.ReorderDaysCommand;
+import com.standofit.back.api.planning.ApiApi;
+import com.standofit.back.api.planning.dto.*;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
-import com.standofit.back.modules.training.planning.application.query.get_workout_by_id.GetWorkoutByIdQuery;
 import com.standofit.back.modules.training.planning.application.query.search_workouts.SearchWorkoutsQuery;
-import com.standofit.back.modules.training.planning.presentation.dto.*;
-import com.standofit.back.modules.training.planning.presentation.mapper.PlanWorkoutCommandMapper;
-import com.standofit.back.modules.training.planning.presentation.mapper.SearchWorkoutsRequestMapper;
+import com.standofit.back.modules.training.planning.presentation.mapper.WorkoutCommandMapper;
+import com.standofit.back.modules.training.planning.presentation.mapper.WorkoutDTOMapper;
+import com.standofit.back.modules.training.planning.presentation.mapper.WorkoutQueryMapper;
+import com.standofit.back.shared.domain.bus.command.CommandBus;
+import com.standofit.back.shared.domain.bus.query.QueryBus;
 import com.standofit.back.shared.domain.criteria.Criteria;
 import com.standofit.back.shared.domain.criteria.PagedResult;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/workouts")
-public class WorkoutController {
+public class WorkoutController implements ApiApi {
 
-    private final ApplicationBus bus;
+    private final CommandBus commandBus;
+    private final QueryBus queryBus;
+    private final WorkoutDTOMapper workoutDTOMapper;
+    private final WorkoutCommandMapper commandMapper;
+    private final WorkoutQueryMapper queryMapper;
 
-    private final PlanWorkoutCommandMapper commandMapper;
-    private final SearchWorkoutsRequestMapper searchMapper;
-
-    public WorkoutController(
-            ApplicationBus bus,
-            PlanWorkoutCommandMapper commandMapper,
-            SearchWorkoutsRequestMapper searchMapper) {
-        this.bus = bus;
+    public WorkoutController(CommandBus commandBus, QueryBus queryBus,
+                             WorkoutDTOMapper workoutDTOMapper,
+                             WorkoutCommandMapper commandMapper,
+                             WorkoutQueryMapper queryMapper) {
+        this.commandBus = commandBus;
+        this.queryBus = queryBus;
+        this.workoutDTOMapper = workoutDTOMapper;
         this.commandMapper = commandMapper;
-        this.searchMapper = searchMapper;
+        this.queryMapper = queryMapper;
     }
 
-    @GetMapping
-    public PagedResult<WorkoutDto> getAll() {
-        return bus.ask(new SearchWorkoutsQuery(Criteria.empty()));
+    @Override
+    public ResponseEntity<UUID> addDayToWorkout(UUID workoutId, @RequestBody AddDayRequest addDayRequest) {
+        var command = commandMapper.toAddDayToWorkoutCommand(workoutId, addDayRequest);
+        commandBus.dispatch(command);
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(workoutId);
     }
 
-    @PostMapping("/search")
-    public PagedResult<WorkoutDto> search(@RequestBody SearchWorkoutsRequest request) {
-        var criteria = searchMapper.toCriteria(request);
-        return bus.ask(new SearchWorkoutsQuery(criteria));
+    @Override
+    public ResponseEntity<Void> archiveWorkout(UUID workoutId) {
+        var command = commandMapper.toArchiveWorkoutCommand(workoutId);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{id}")
-    public WorkoutDto getById(@PathVariable UUID id) {
+    @Override
+    public ResponseEntity<Void> changeWorkoutDescription(UUID workoutId, @RequestBody DescriptionRequest descriptionRequest) {
+        var command = commandMapper.toChangeWorkoutDescriptionCommand(workoutId, descriptionRequest);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteWorkout(UUID workoutId) {
+        var command = commandMapper.toDeleteWorkoutCommand(workoutId);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public ResponseEntity<UUID> duplicateWorkout(UUID workoutId, @RequestBody DuplicateWorkoutRequest duplicateWorkoutRequest) {
+        var command = commandMapper.toDuplicateWorkoutCommand(workoutId, duplicateWorkoutRequest);
+        UUID newWorkoutId = commandBus.dispatch(command);
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(newWorkoutId);
+    }
+
+    @Override
+    public ResponseEntity<WorkoutPageDTO> getAllWorkouts() {
+        Criteria criteria = queryMapper.toGetAllWorkoutsCriteria();
+        PagedResult<WorkoutDto> result = queryBus.ask(new SearchWorkoutsQuery(criteria));
+        return ResponseEntity.ok(workoutDTOMapper.toPageDTO(result));
+    }
+
+    @Override
+    public ResponseEntity<WorkoutDTO> getWorkoutById(UUID workoutId) {
         try {
-            return bus.ask(new GetWorkoutByIdQuery(id));
+            var query = queryMapper.toGetWorkoutByIdQuery(workoutId);
+            WorkoutDto workout = queryBus.ask(query);
+            return ResponseEntity.ok(workoutDTOMapper.toDTO(workout));
         } catch (IllegalArgumentException e) {
-            throw new WorkoutNotFoundException(id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UUID plan(@RequestBody PlanWorkoutRequest request) {
-        PlanWorkoutCommand command = commandMapper.toCommand(request);
-        return bus.execute(command);
+    @Override
+    public ResponseEntity<UUID> planWorkout(@RequestBody PlanWorkoutRequest planWorkoutRequest) {
+        var command = commandMapper.toPlanWorkoutCommand(planWorkoutRequest);
+        UUID workoutId = commandBus.dispatch(command);
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(workoutId);
     }
 
-    @PutMapping("/{id}/name")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void rename(@PathVariable UUID id, @RequestBody RenameRequest request) {
-        bus.execute(new RenameWorkoutCommand(id, request.name()));
+    @Override
+    public ResponseEntity<Void> removeDayFromWorkout(UUID workoutId, UUID dayId) {
+        var command = commandMapper.toRemoveDayFromWorkoutCommand(workoutId, dayId);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}/description")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changeDescription(@PathVariable UUID id, @RequestBody DescriptionRequest request) {
-        bus.execute(new ChangeWorkoutDescriptionCommand(id, request.description()));
+    @Override
+    public ResponseEntity<Void> renameWorkout(UUID workoutId, @RequestBody RenameRequest renameRequest) {
+        var command = commandMapper.toRenameWorkoutCommand(workoutId, renameRequest);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        bus.execute(new DeleteWorkoutCommand(id));
+    @Override
+    public ResponseEntity<Void> reorderDays(UUID workoutId, @RequestBody ReorderDaysRequest reorderDaysRequest) {
+        var command = commandMapper.toReorderDaysCommand(workoutId, reorderDaysRequest);
+        commandBus.dispatch(command);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/{id}/days")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void addDay(@PathVariable UUID id, @RequestBody AddDayRequest request) {
-        var command =
-                new AddDayToWorkoutCommand(
-                        id,
-                        request.dayName(),
-                        request.exercises().stream()
-                                .map(
-                                        ex ->
-                                                new AddDayToWorkoutCommand.ExerciseInput(
-                                                        ex.exerciseId(), ex.sets(), ex.reps(), ex.restSeconds()))
-                                .toList());
-        bus.execute(command);
-    }
-
-    @DeleteMapping("/{id}/days/{dayId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeDay(@PathVariable UUID id, @PathVariable UUID dayId) {
-        bus.execute(new RemoveDayFromWorkoutCommand(id, dayId));
-    }
-
-    @PutMapping("/{id}/days/reorder")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void reorderDays(@PathVariable UUID id, @RequestBody ReorderDaysRequest request) {
-        bus.execute(new ReorderDaysCommand(id, request.dayIds()));
-    }
-
-    @PostMapping("/{id}/duplicate")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UUID duplicate(@PathVariable UUID id, @RequestBody DuplicateWorkoutRequest request) {
-        return bus.execute(new DuplicateWorkoutCommand(id, request.newName()));
-    }
-
-    @PostMapping("/{id}/archive")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void archive(@PathVariable UUID id) {
-        bus.execute(new ArchiveWorkoutCommand(id));
-    }
-
-    @ExceptionHandler(WorkoutNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void handleNotFound(WorkoutNotFoundException e) {
-    }
-
-    public static class WorkoutNotFoundException extends RuntimeException {
-        public WorkoutNotFoundException(UUID id) {
-            super("Workout not found: " + id);
-        }
+    @Override
+    public ResponseEntity<WorkoutPageDTO> searchWorkouts(@RequestBody SearchWorkoutsRequest searchWorkoutsRequest) {
+        var query = queryMapper.toSearchWorkoutsQuery(searchWorkoutsRequest);
+        PagedResult<WorkoutDto> result = queryBus.ask(query);
+        return ResponseEntity.ok(workoutDTOMapper.toPageDTO(result));
     }
 }

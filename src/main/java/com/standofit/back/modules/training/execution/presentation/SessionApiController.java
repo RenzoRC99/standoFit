@@ -1,9 +1,8 @@
-package com.standofit.back.modules.training.execution.api;
+package com.standofit.back.modules.training.execution.presentation;
 
 import com.standofit.back.api.execution.ApiApi;
 import com.standofit.back.api.execution.dto.*;
 import com.standofit.back.configuration.bus.ApplicationBus;
-import com.standofit.back.modules.training.execution.api.error.SessionNotFoundException;
 import com.standofit.back.modules.training.execution.application.command.cancel_session.CancelSessionCommand;
 import com.standofit.back.modules.training.execution.application.command.delete_session.DeleteSessionCommand;
 import com.standofit.back.modules.training.execution.application.command.finish_session.FinishSessionCommand;
@@ -16,6 +15,7 @@ import com.standofit.back.modules.training.execution.application.command.update_
 import com.standofit.back.modules.training.execution.application.query.get_all_sessions.GetAllSessionsQuery;
 import com.standofit.back.modules.training.execution.application.query.get_session_by_id.GetSessionByIdQuery;
 import com.standofit.back.modules.training.execution.domain.vo.*;
+import com.standofit.back.modules.training.execution.presentation.error.SessionNotFoundException;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +30,9 @@ import java.util.UUID;
 @RestController
 public class SessionApiController implements ApiApi {
 
-  private final ApplicationBus bus;
+    private final ApplicationBus bus;
 
-  public SessionApiController(ApplicationBus bus) {
+    public SessionApiController(ApplicationBus bus) {
         this.bus = bus;
     }
 
