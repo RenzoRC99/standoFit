@@ -1,16 +1,12 @@
-package com.standofit.back.modules.training.planning.infrastructure.bus;
+package com.standofit.back.configuration.bus;
 
-import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
-import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
-@Component
 public class InMemoryCommandBus implements CommandBus {
 
   private final Map<Class<?>, CommandHandler<?, ?>> handlers;
@@ -22,8 +18,8 @@ public class InMemoryCommandBus implements CommandBus {
       Class<?> type = handler.commandType();
 
       if (this.handlers.containsKey(type)) {
-        throw new WorkoutInfrastructureException(
-            WorkoutInfrastructureErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName()));
+        throw new BusException(
+            BusErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName()));
       }
 
       this.handlers.put(type, handler);
@@ -38,8 +34,8 @@ public class InMemoryCommandBus implements CommandBus {
         (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
 
     if (handler == null) {
-      throw new WorkoutInfrastructureException(
-          WorkoutInfrastructureErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(
+      throw new BusException(
+          BusErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(
               command.getClass().getSimpleName()));
     }
 
