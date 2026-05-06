@@ -43,8 +43,8 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-05T14:22:18.124695369+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
-
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-05T23:40:11.835607988+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+@Validated
 @Tag(name = "Workout Days", description = "the Workout Days API")
 public interface ApiApi {
 

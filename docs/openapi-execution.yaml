@@ -421,12 +421,10 @@ components:
             - CANCELLED
         notes:
           type: string
-        createdAt:
+        startedAt:
           type: string
-          format: date-time
-        updatedAt:
+        finishedAt:
           type: string
-          format: date-time
 
     SessionListDTO:
       type: object

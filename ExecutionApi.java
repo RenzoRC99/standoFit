@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-05T14:22:17.903831185+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-05T23:40:11.378192246+02:00[Europe/Madrid]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "Exercise Logs", description = "the Exercise Logs API")
 public interface ApiApi {

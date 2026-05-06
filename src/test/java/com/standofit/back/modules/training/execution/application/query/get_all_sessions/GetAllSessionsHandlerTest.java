@@ -2,8 +2,8 @@ package com.standofit.back.modules.training.execution.application.query.get_all_
 
 import static org.mockito.Mockito.*;
 
-import com.standofit.back.api.execution.dto.SessionDTO;
-import com.standofit.back.api.execution.dto.SessionListDTO;
+import com.standofit.back.modules.training.execution.application.dto.SessionDto;
+import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
@@ -36,11 +36,19 @@ class GetAllSessionsHandlerTest {
         Session.create(
             new SessionId(UUID.randomUUID()), new SessionDayId(UUID.randomUUID()));
     List<Session> sessions = List.of(session);
-    SessionListDTO dto = new SessionListDTO().sessions(List.of(new SessionDTO()));
+    SessionDto sessionDto = new SessionDto(
+        session.getId().value(),
+        session.getDayId().value(),
+        session.getStatus().name(),
+        List.of(),
+        "",
+        "",
+        "");
+    SessionListDto dto = new SessionListDto(List.of(sessionDto));
     when(repository.getAll()).thenReturn(sessions);
     when(mapper.toListDTO(sessions)).thenReturn(dto);
 
-    SessionListDTO result = handler.handle(new GetAllSessionsQuery());
+    SessionListDto result = handler.handle(new GetAllSessionsQuery());
 
     verify(repository, times(1)).getAll();
     verify(mapper, times(1)).toListDTO(sessions);

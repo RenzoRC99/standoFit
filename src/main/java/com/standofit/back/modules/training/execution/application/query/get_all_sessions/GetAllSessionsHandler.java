@@ -1,6 +1,6 @@
 package com.standofit.back.modules.training.execution.application.query.get_all_sessions;
 
-import com.standofit.back.api.execution.dto.SessionListDTO;
+import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GetAllSessionsHandler implements QueryHandler<GetAllSessionsQuery, SessionListDTO> {
+public class GetAllSessionsHandler implements QueryHandler<GetAllSessionsQuery, SessionListDto> {
 
   private final SessionRepository repository;
   private final SessionDTOMapper mapper;
@@ -25,7 +25,7 @@ public class GetAllSessionsHandler implements QueryHandler<GetAllSessionsQuery, 
   }
 
   @Override
-  public SessionListDTO handle(GetAllSessionsQuery query) {
+  public SessionListDto handle(GetAllSessionsQuery query) {
     List<Session> sessions = repository.getAll();
     return mapper.toListDTO(sessions);
   }

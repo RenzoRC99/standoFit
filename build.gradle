@@ -17,6 +17,19 @@ java {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated/src/main/java'
+            exclude 'org/openapitools/**'
+        }
+    }
+}
+
+compileJava.dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+
+compileJava.mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+
 repositories {
     mavenCentral()
 }
@@ -27,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.21'
+    implementation 'io.swagger.core.v3:swagger-core:2.2.21'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
@@ -67,7 +81,12 @@ openApiGenerate {
     generatorName = "spring"
     apiPackage = "com.standofit.back.api.execution"
     modelPackage = "com.standofit.back.api.execution.dto"
-    invokerPackage = "com.standofit.back.api.execution"
+    invokerPackage = "com.standofit.back.clients.execution"
+    configOptions = [
+        useSpringBoot3: "true",
+        interfaceOnly: "true",
+        interfaceName: "ExecutionApi"
+    ]
 }
 
 task openApiGeneratePlanning(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
@@ -76,66 +95,28 @@ task openApiGeneratePlanning(type: org.openapitools.generator.gradle.plugin.task
     generatorName = "spring"
     apiPackage = "com.standofit.back.api.planning"
     modelPackage = "com.standofit.back.api.planning.dto"
-    invokerPackage = "com.standofit.back.api.planning"
-}
-
-tasks.register('fixApiImports') {
-    dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
-    doLast {
-        // Fix and copy execution API
-        def srcExec = file("build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java")
-        if (srcExec.exists()) {
-            def contentExec = srcExec.text
-            contentExec = contentExec.replace('javax.validation', 'jakarta.validation')
-            contentExec = contentExec.replace('javax.annotation', 'jakarta.annotation')
-            contentExec = contentExec.replace('javax.servlet', 'jakarta.servlet')
-            def destExec = file("src/main/java/com/standofit/back/api/execution/ApiApi.java")
-            destExec.write(contentExec)
-        }
-
-        // Fix and copy planning API
-        def srcPlanning = file("build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java")
-        if (srcPlanning.exists()) {
-            def contentPlanning = srcPlanning.text
-            contentPlanning = contentPlanning.replace('javax.validation', 'jakarta.validation')
-            contentPlanning = contentPlanning.replace('javax.annotation', 'jakarta.annotation')
-            contentPlanning = contentPlanning.replace('javax.servlet', 'jakarta.servlet')
-            contentPlanning = contentPlanning.replaceAll('@Validated', '')
-            def destPlanning = file("src/main/java/com/standofit/back/api/planning/ApiApi.java")
-            destPlanning.write(contentPlanning)
-        }
-
-        // Copy and fix ApiUtil for both packages
-        ['execution', 'planning'].each { pkg ->
-            def srcUtil = file("build/generated/src/main/java/com/standofit/back/api/${pkg}/ApiUtil.java")
-            if (srcUtil.exists()) {
-                def contentUtil = srcUtil.text
-                contentUtil = contentUtil.replace('javax.validation', 'jakarta.validation')
-                contentUtil = contentUtil.replace('javax.annotation', 'jakarta.annotation')
-                contentUtil = contentUtil.replace('javax.servlet', 'jakarta.servlet')
-                def destUtil = file("src/main/java/com/standofit/back/api/${pkg}/ApiUtil.java")
-                destUtil.write(contentUtil)
-            }
-        }
-
-        // Copy and fix DTOs for planning
-        def dtoSrcDir = file("build/generated/src/main/java/com/standofit/back/api/planning/dto")
-        def dtoDestDir = file("src/main/java/com/standofit/back/api/planning/dto")
-        if (dtoSrcDir.exists()) {
-            dtoDestDir.mkdirs()
-            dtoSrcDir.eachFile { f ->
-                if (f.name.endsWith('.java')) {
-                    def content = f.text
-                    content = content.replace('javax.validation', 'jakarta.validation')
-                    content = content.replace('javax.annotation', 'jakarta.annotation')
-                    content = content.replace('javax.servlet', 'jakarta.servlet')
-                    new File(dtoDestDir, f.name).write(content)
-                }
-            }
-        }
-    }
+    invokerPackage = "com.standofit.back.clients.planning"
+    configOptions = [
+        useSpringBoot3: "true",
+        interfaceOnly: "true",
+        interfaceName: "PlanningApi"
+    ]
 }
 
 compileJava {
-    dependsOn fixApiImports
+    doFirst {
+        def execApiSource = new File('build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java')
+        if (execApiSource.exists()) {
+            def execApi = new File('build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java')
+            execApi.write(execApi.text.replace('interface ApiApi', 'interface ExecutionApi'))
+            execApi.renameTo(new File('build/generated/src/main/java/com/standofit/back/api/execution/ExecutionApi.java'))
+        }
+        
+        def planApiSource = new File('build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java')
+        if (planApiSource.exists()) {
+            def planApi = new File('build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java')
+            planApi.write(planApi.text.replace('interface ApiApi', 'interface PlanningApi'))
+            planApi.renameTo(new File('build/generated/src/main/java/com/standofit/back/api/planning/PlanningApi.java'))
+        }
+    }
 }
