@@ -1,6 +1,7 @@
 package com.standofit.back.shared.domain.criteria;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Criteria for building dynamic queries with filters, ordering, and pagination.
@@ -30,6 +31,47 @@ public record Criteria(List<Filter> filters, String orderBy, Order order, PageIn
 
   public static Criteria empty() {
     return EMPTY;
+  }
+
+  /**
+   * Creates a Criteria from raw values — like PHP fromValues.
+   */
+  public static Criteria fromValues(
+      String orderBy,
+      String order,
+      int page,
+      int pageSize,
+      List<Filter> filters
+  ) {
+    var builder = builder();
+    builder.page(page, pageSize);
+
+    if (orderBy != null && !orderBy.isBlank() && order != null) {
+      builder.order(orderBy, Order.fromString(order));
+    }
+
+    if (filters != null && !filters.isEmpty()) {
+      builder.filters(filters);
+    }
+
+    return builder.build();
+  }
+
+  /**
+   * Creates a Criteria from filter maps — like PHP Filters::fromValues.
+   */
+  public static Criteria fromFilterValues(
+      String orderBy,
+      String order,
+      int page,
+      int pageSize,
+      List<Map<String, String>> filterValues
+  ) {
+    var filters = filterValues != null
+        ? filterValues.stream().map(Filter::fromValues).toList()
+        : List.<Filter>of();
+
+    return fromValues(orderBy, order, page, pageSize, filters);
   }
 
   public boolean hasFilters() {
