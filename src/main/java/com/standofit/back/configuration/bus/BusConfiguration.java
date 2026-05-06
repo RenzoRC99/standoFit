@@ -1,5 +1,7 @@
 package com.standofit.back.configuration.bus;
 
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventHandler;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
@@ -19,6 +21,11 @@ public class BusConfiguration {
   @Bean
   public QueryBus queryBus(List<QueryHandler<?, ?>> handlers) {
     return new InMemoryQueryBus(handlers);
+  }
+
+  @Bean
+  public ApplicationEventBus applicationEventBus(List<ApplicationEventHandler<?>> handlers) {
+    return new InMemoryApplicationEventBus(handlers);
   }
 
   @Bean
