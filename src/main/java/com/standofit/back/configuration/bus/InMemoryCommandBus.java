@@ -16,12 +16,10 @@ public class InMemoryCommandBus implements CommandBus {
 
     for (CommandHandler<?, ?> handler : handlers) {
       Class<?> type = handler.commandType();
-
       if (this.handlers.containsKey(type)) {
         throw new BusException(
             BusErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName()));
       }
-
       this.handlers.put(type, handler);
     }
   }
@@ -29,7 +27,6 @@ public class InMemoryCommandBus implements CommandBus {
   @Override
   @SuppressWarnings("unchecked")
   public <R> R dispatch(Command<R> command) {
-
     CommandHandler<Command<R>, R> handler =
         (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
 
