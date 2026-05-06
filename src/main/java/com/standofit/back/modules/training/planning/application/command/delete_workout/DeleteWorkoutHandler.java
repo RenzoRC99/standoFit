@@ -1,16 +1,16 @@
 package com.standofit.back.modules.training.planning.application.command.delete_workout;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class DeleteWorkoutHandler implements CommandHandler<DeleteWorkoutCommand, Void> {
 
-  private final WorkoutRepository repository;
+  private final DeleteWorkoutService service;
 
-  public DeleteWorkoutHandler(WorkoutRepository repository) {
-    this.repository = repository;
+  public DeleteWorkoutHandler(DeleteWorkoutService service) {
+    this.service = service;
   }
 
   @Override
@@ -19,11 +19,9 @@ public class DeleteWorkoutHandler implements CommandHandler<DeleteWorkoutCommand
   }
 
   @Override
+  @Transactional
   public Void handle(DeleteWorkoutCommand command) {
-    // TODO: Publish WorkoutDeletedEvent
-    // eventBus.publish(new WorkoutDeletedEvent(command.workoutId()));
-
-    repository.deleteById(command.workoutId());
+    service.delete(command);
     return null;
   }
 }

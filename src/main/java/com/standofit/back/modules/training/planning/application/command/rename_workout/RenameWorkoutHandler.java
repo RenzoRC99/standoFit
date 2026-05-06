@@ -1,18 +1,16 @@
 package com.standofit.back.modules.training.planning.application.command.rename_workout;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
-import com.standofit.back.modules.training.planning.domain.vo.WorkoutName;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand, Void> {
 
-  private final WorkoutRepository repository;
+  private final RenameWorkoutService service;
 
-  public RenameWorkoutHandler(WorkoutRepository repository) {
-    this.repository = repository;
+  public RenameWorkoutHandler(RenameWorkoutService service) {
+    this.service = service;
   }
 
   @Override
@@ -21,19 +19,9 @@ public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand
   }
 
   @Override
+  @Transactional
   public Void handle(RenameWorkoutCommand command) {
-    Workout workout =
-        repository
-            .findById(command.workoutId())
-            .orElseThrow(
-                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-    Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
-
-    // TODO: Publish WorkoutRenamedEvent
-    // eventBus.publish(new WorkoutRenamedEvent(command.workoutId(), command.newName()));
-
-    repository.save(renamed);
+    service.rename(command);
     return null;
   }
 }

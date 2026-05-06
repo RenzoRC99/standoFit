@@ -1,17 +1,16 @@
 package com.standofit.back.modules.training.planning.application.command.archive_workout;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class ArchiveWorkoutHandler implements CommandHandler<ArchiveWorkoutCommand, Void> {
 
-  private final WorkoutRepository repository;
+  private final ArchiveWorkoutService service;
 
-  public ArchiveWorkoutHandler(WorkoutRepository repository) {
-    this.repository = repository;
+  public ArchiveWorkoutHandler(ArchiveWorkoutService service) {
+    this.service = service;
   }
 
   @Override
@@ -20,21 +19,9 @@ public class ArchiveWorkoutHandler implements CommandHandler<ArchiveWorkoutComma
   }
 
   @Override
+  @Transactional
   public Void handle(ArchiveWorkoutCommand command) {
-    Workout workout =
-        repository
-            .findById(command.workoutId())
-            .orElseThrow(
-                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-    // TODO: Implement archive logic - add archived field to Workout entity
-    // For now, this is a placeholder that marks the intent
-    // workout.archive();
-    // repository.save(workout);
-
-    // TODO: Publish WorkoutArchivedEvent
-    // eventBus.publish(new WorkoutArchivedEvent(command.workoutId()));
-
+    service.archive(command);
     return null;
   }
 }

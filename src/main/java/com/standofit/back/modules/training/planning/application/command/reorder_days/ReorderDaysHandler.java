@@ -1,19 +1,16 @@
 package com.standofit.back.modules.training.planning.application.command.reorder_days;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
-import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Void> {
 
-  private final WorkoutRepository repository;
+  private final ReorderDaysService service;
 
-  public ReorderDaysHandler(WorkoutRepository repository) {
-    this.repository = repository;
+  public ReorderDaysHandler(ReorderDaysService service) {
+    this.service = service;
   }
 
   @Override
@@ -22,21 +19,9 @@ public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Vo
   }
 
   @Override
+  @Transactional
   public Void handle(ReorderDaysCommand command) {
-    Workout workout =
-        repository
-            .findById(command.workoutId())
-            .orElseThrow(
-                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-    List<WorkoutDayId> dayIds = command.dayIds().stream().map(WorkoutDayId::new).toList();
-
-    Workout reordered = workout.reorderDays(dayIds);
-
-    // TODO: Publish DaysReorderedEvent
-    // eventBus.publish(new DaysReorderedEvent(command.workoutId(), command.dayIds()));
-
-    repository.save(reordered);
+    service.reorder(command);
     return null;
   }
 }

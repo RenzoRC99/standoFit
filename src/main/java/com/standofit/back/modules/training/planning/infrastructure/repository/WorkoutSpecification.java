@@ -44,11 +44,11 @@ public class WorkoutSpecification implements Specification<WorkoutJpaEntity> {
   }
 
   private Predicate toPredicate(Root<WorkoutJpaEntity> root, CriteriaBuilder cb, Filter filter) {
-    String field = filter.field();
-    Object value = filter.value();
+    String field = filter.fieldName();
+    Object value = filter.rawValue();
     FilterOperator operator = filter.operator();
 
-    if (value == null
+    if (value == null || "".equals(value)
         && operator != FilterOperator.IS_NULL
         && operator != FilterOperator.IS_NOT_NULL) {
       return cb.conjunction();

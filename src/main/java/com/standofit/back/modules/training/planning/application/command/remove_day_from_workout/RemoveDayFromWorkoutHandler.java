@@ -1,20 +1,17 @@
 package com.standofit.back.modules.training.planning.application.command.remove_day_from_workout;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
-import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class RemoveDayFromWorkoutHandler
     implements CommandHandler<RemoveDayFromWorkoutCommand, Void> {
 
-  private final WorkoutRepository repository;
+  private final RemoveDayFromWorkoutService service;
 
-  public RemoveDayFromWorkoutHandler(WorkoutRepository repository) {
-    this.repository = repository;
+  public RemoveDayFromWorkoutHandler(RemoveDayFromWorkoutService service) {
+    this.service = service;
   }
 
   @Override
@@ -23,19 +20,9 @@ public class RemoveDayFromWorkoutHandler
   }
 
   @Override
+  @Transactional
   public Void handle(RemoveDayFromWorkoutCommand command) {
-    Workout workout =
-        repository
-            .findById(command.workoutId())
-            .orElseThrow(
-                () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-    Workout updated = workout.removeDays(List.of(new WorkoutDayId(command.dayId())));
-
-    // TODO: Publish DayRemovedFromWorkoutEvent
-    // eventBus.publish(new DayRemovedFromWorkoutEvent(command.workoutId(), command.dayId()));
-
-    repository.save(updated);
+    service.removeDay(command);
     return null;
   }
 }
