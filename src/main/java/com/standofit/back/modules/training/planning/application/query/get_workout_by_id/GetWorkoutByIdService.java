@@ -11,19 +11,34 @@ import org.springframework.stereotype.Service;
 @Service
 public class GetWorkoutByIdService extends PlanningUseCase {
 
-  public GetWorkoutByIdService(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
+  public GetWorkoutByIdService(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
     super(repository, mapper, applicationEventBus);
   }
 
   public WorkoutDto findById(GetWorkoutByIdQuery query) {
     try {
-      WorkoutDto dto = repository.findById(query.workoutId().value())
-          .map(mapper::toDto)
-          .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + query.workoutId().value()));
-      publishEvent(PlanningActivityEvent.success("workout.queried", query.workoutId().value().toString(), "Queried workout by ID"));
+      WorkoutDto dto =
+          repository
+              .findById(query.workoutId().value())
+              .map(mapper::toDto)
+              .orElseThrow(
+                  () ->
+                      new IllegalArgumentException(
+                          "Workout not found: " + query.workoutId().value()));
+      publishEvent(
+          PlanningActivityEvent.success(
+              "workout.queried", query.workoutId().value().toString(), "Queried workout by ID"));
       return dto;
     } catch (Exception e) {
-      publishEvent(PlanningActivityEvent.failure("workout.queried", query.workoutId().value().toString(), "Failed to query workout", e.getMessage()));
+      publishEvent(
+          PlanningActivityEvent.failure(
+              "workout.queried",
+              query.workoutId().value().toString(),
+              "Failed to query workout",
+              e.getMessage()));
       throw e;
     }
   }

@@ -48,9 +48,10 @@ public class WorkoutSpecification implements Specification<WorkoutJpaEntity> {
     Object value = filter.rawValue();
     FilterOperator operator = filter.operator();
 
-    if (value == null || "".equals(value)
-        && operator != FilterOperator.IS_NULL
-        && operator != FilterOperator.IS_NOT_NULL) {
+    if (value == null
+        || "".equals(value)
+            && operator != FilterOperator.IS_NULL
+            && operator != FilterOperator.IS_NOT_NULL) {
       return cb.conjunction();
     }
 

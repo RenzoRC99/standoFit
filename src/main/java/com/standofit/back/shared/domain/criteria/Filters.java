@@ -1,7 +1,6 @@
 package com.standofit.back.shared.domain.criteria;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +54,6 @@ public record Filters(List<Filter> items) {
   }
 
   public String serialize() {
-    return items.stream()
-        .map(Filter::serialize)
-        .reduce("", (acc, s) -> acc + "^" + s);
+    return items.stream().map(Filter::serialize).reduce("", (acc, s) -> acc + "^" + s);
   }
 }

@@ -4,8 +4,8 @@ import com.standofit.back.api.planning.dto.WorkoutDTO;
 import com.standofit.back.api.planning.dto.WorkoutDayDTO;
 import com.standofit.back.api.planning.dto.WorkoutExerciseDTO;
 import com.standofit.back.api.planning.dto.WorkoutPageDTO;
-import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDayDto;
+import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutExerciseDto;
 import com.standofit.back.shared.domain.criteria.PagedResult;
 

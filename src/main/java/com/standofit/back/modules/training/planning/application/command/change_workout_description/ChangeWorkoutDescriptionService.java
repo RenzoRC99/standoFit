@@ -12,25 +12,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChangeWorkoutDescriptionService extends PlanningUseCase {
 
-    public ChangeWorkoutDescriptionService(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
-        super(repository, mapper, applicationEventBus);
+  public ChangeWorkoutDescriptionService(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
+    super(repository, mapper, applicationEventBus);
+  }
+
+  public void changeDescription(ChangeWorkoutDescriptionCommand command) {
+    try {
+      Workout workout =
+          repository
+              .findById(command.workoutId())
+              .orElseThrow(
+                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+
+      Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
+
+      repository.save(updated);
+      publishEvent(
+          PlanningActivityEvent.success(
+              "workout.description.changed",
+              command.workoutId().toString(),
+              "Changed description"));
+    } catch (Exception e) {
+      publishEvent(
+          PlanningActivityEvent.failure(
+              "workout.description.changed",
+              command.workoutId().toString(),
+              "Failed to change description",
+              e.getMessage()));
+      throw e;
     }
-
-    public void changeDescription(ChangeWorkoutDescriptionCommand command) {
-        try {
-            Workout workout =
-                    repository
-                            .findById(command.workoutId())
-                            .orElseThrow(
-                                    () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-            Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
-
-            repository.save(updated);
-            publishEvent(PlanningActivityEvent.success("workout.description.changed", command.workoutId().toString(), "Changed description"));
-        } catch (Exception e) {
-            publishEvent(PlanningActivityEvent.failure("workout.description.changed", command.workoutId().toString(), "Failed to change description", e.getMessage()));
-            throw e;
-        }
-    }
+  }
 }

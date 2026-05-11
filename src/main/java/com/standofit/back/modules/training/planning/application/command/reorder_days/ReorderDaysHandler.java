@@ -1,8 +1,8 @@
 package com.standofit.back.modules.training.planning.application.command.reorder_days;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Void> {

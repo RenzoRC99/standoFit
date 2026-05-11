@@ -33,16 +33,9 @@ public record Criteria(List<Filter> filters, String orderBy, Order order, PageIn
     return EMPTY;
   }
 
-  /**
-   * Creates a Criteria from raw values — like PHP fromValues.
-   */
+  /** Creates a Criteria from raw values — like PHP fromValues. */
   public static Criteria fromValues(
-      String orderBy,
-      String order,
-      int page,
-      int pageSize,
-      List<Filter> filters
-  ) {
+      String orderBy, String order, int page, int pageSize, List<Filter> filters) {
     var builder = builder();
     builder.page(page, pageSize);
 
@@ -57,19 +50,17 @@ public record Criteria(List<Filter> filters, String orderBy, Order order, PageIn
     return builder.build();
   }
 
-  /**
-   * Creates a Criteria from filter maps — like PHP Filters::fromValues.
-   */
+  /** Creates a Criteria from filter maps — like PHP Filters::fromValues. */
   public static Criteria fromFilterValues(
       String orderBy,
       String order,
       int page,
       int pageSize,
-      List<Map<String, String>> filterValues
-  ) {
-    var filters = filterValues != null
-        ? filterValues.stream().map(Filter::fromValues).toList()
-        : List.<Filter>of();
+      List<Map<String, String>> filterValues) {
+    var filters =
+        filterValues != null
+            ? filterValues.stream().map(Filter::fromValues).toList()
+            : List.<Filter>of();
 
     return fromValues(orderBy, order, page, pageSize, filters);
   }

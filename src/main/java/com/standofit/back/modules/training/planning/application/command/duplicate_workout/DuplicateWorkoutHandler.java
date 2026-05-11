@@ -1,9 +1,9 @@
 package com.standofit.back.modules.training.planning.application.command.duplicate_workout;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DuplicateWorkoutHandler implements CommandHandler<DuplicateWorkoutCommand, UUID> {

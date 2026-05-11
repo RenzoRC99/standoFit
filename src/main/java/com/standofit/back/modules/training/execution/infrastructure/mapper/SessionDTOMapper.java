@@ -3,7 +3,6 @@ package com.standofit.back.modules.training.execution.infrastructure.mapper;
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.vo.WorkoutSessionStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;

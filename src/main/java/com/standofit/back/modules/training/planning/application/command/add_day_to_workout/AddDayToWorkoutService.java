@@ -23,32 +23,51 @@ import org.springframework.stereotype.Service;
 @Service
 public class AddDayToWorkoutService extends PlanningUseCase {
 
-  public AddDayToWorkoutService(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
+  public AddDayToWorkoutService(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
     super(repository, mapper, applicationEventBus);
   }
 
   public void addDay(AddDayToWorkoutCommand command) {
     try {
-      Workout workout = repository.findById(command.workoutId())
-          .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout =
+          repository
+              .findById(command.workoutId())
+              .orElseThrow(
+                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
 
       List<WorkoutExercise> exercises = new ArrayList<>();
       for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
-        exercises.add(WorkoutExercise.create(
-            new WorkoutExerciseId(UUID.randomUUID()),
-            new ExerciseId(exInput.exerciseId()),
-            new WorkoutExerciseSets(exInput.sets()),
-            new WorkoutExerciseReps(exInput.reps()),
-            new WorkoutExerciseRest(exInput.restSeconds())));
+        exercises.add(
+            WorkoutExercise.create(
+                new WorkoutExerciseId(UUID.randomUUID()),
+                new ExerciseId(exInput.exerciseId()),
+                new WorkoutExerciseSets(exInput.sets()),
+                new WorkoutExerciseReps(exInput.reps()),
+                new WorkoutExerciseRest(exInput.restSeconds())));
       }
 
-      WorkoutDay newDay = WorkoutDay.create(
-          new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName(command.dayName()), exercises);
+      WorkoutDay newDay =
+          WorkoutDay.create(
+              new WorkoutDayId(UUID.randomUUID()),
+              new WorkoutDayName(command.dayName()),
+              exercises);
       Workout updatedWorkout = workout.addDays(List.of(newDay));
       repository.save(updatedWorkout);
-      publishEvent(PlanningActivityEvent.success("workout.day.added", command.workoutId().toString(), "Added day: " + command.dayName()));
+      publishEvent(
+          PlanningActivityEvent.success(
+              "workout.day.added",
+              command.workoutId().toString(),
+              "Added day: " + command.dayName()));
     } catch (Exception e) {
-      publishEvent(PlanningActivityEvent.failure("workout.day.added", command.workoutId().toString(), "Failed to add day", e.getMessage()));
+      publishEvent(
+          PlanningActivityEvent.failure(
+              "workout.day.added",
+              command.workoutId().toString(),
+              "Failed to add day",
+              e.getMessage()));
       throw e;
     }
   }

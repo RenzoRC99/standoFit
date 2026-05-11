@@ -10,7 +10,6 @@ import com.standofit.back.modules.training.execution.domain.entity.SessionReposi
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
-
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,14 +35,15 @@ class GetSessionByIdHandlerTest {
   void should_return_session_when_exists() {
     SessionId sessionId = new SessionId(UUID.randomUUID());
     Session session = Session.create(sessionId, new SessionDayId(UUID.randomUUID()));
-    SessionDto dto = new SessionDto(
-        session.getId().value(),
-        session.getDayId().value(),
-        session.getStatus().name(),
-        List.of(),
-        "",
-        "",
-        "");
+    SessionDto dto =
+        new SessionDto(
+            session.getId().value(),
+            session.getDayId().value(),
+            session.getStatus().name(),
+            List.of(),
+            "",
+            "",
+            "");
     when(repository.findById(sessionId)).thenReturn(session);
     when(mapper.toDTO(session)).thenReturn(dto);
 
@@ -60,7 +60,6 @@ class GetSessionByIdHandlerTest {
     when(repository.findById(sessionId)).thenReturn(null);
 
     assertThrows(
-        IllegalArgumentException.class,
-        () -> handler.handle(new GetSessionByIdQuery(sessionId)));
+        IllegalArgumentException.class, () -> handler.handle(new GetSessionByIdQuery(sessionId)));
   }
 }

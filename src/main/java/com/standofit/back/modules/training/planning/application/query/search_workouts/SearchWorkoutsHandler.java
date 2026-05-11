@@ -5,11 +5,11 @@ import com.standofit.back.shared.domain.bus.query.QueryHandler;
 import com.standofit.back.shared.domain.criteria.Filters;
 import com.standofit.back.shared.domain.criteria.Order;
 import com.standofit.back.shared.domain.criteria.PagedResult;
-
 import org.springframework.stereotype.Component;
 
 @Component
-public class SearchWorkoutsHandler implements QueryHandler<SearchWorkoutsQuery, PagedResult<WorkoutDto>> {
+public class SearchWorkoutsHandler
+    implements QueryHandler<SearchWorkoutsQuery, PagedResult<WorkoutDto>> {
 
   private final WorkoutsByCriteriaSearcher searcher;
 

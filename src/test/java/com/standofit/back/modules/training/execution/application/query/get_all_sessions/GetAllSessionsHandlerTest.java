@@ -33,17 +33,17 @@ class GetAllSessionsHandlerTest {
   @Test
   void should_return_all_sessions() {
     Session session =
-        Session.create(
-            new SessionId(UUID.randomUUID()), new SessionDayId(UUID.randomUUID()));
+        Session.create(new SessionId(UUID.randomUUID()), new SessionDayId(UUID.randomUUID()));
     List<Session> sessions = List.of(session);
-    SessionDto sessionDto = new SessionDto(
-        session.getId().value(),
-        session.getDayId().value(),
-        session.getStatus().name(),
-        List.of(),
-        "",
-        "",
-        "");
+    SessionDto sessionDto =
+        new SessionDto(
+            session.getId().value(),
+            session.getDayId().value(),
+            session.getStatus().name(),
+            List.of(),
+            "",
+            "",
+            "");
     SessionListDto dto = new SessionListDto(List.of(sessionDto));
     when(repository.getAll()).thenReturn(sessions);
     when(mapper.toListDTO(sessions)).thenReturn(dto);

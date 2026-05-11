@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReorderDaysService extends PlanningUseCase {
 
-  public ReorderDaysService(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
+  public ReorderDaysService(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
     super(repository, mapper, applicationEventBus);
   }
 
@@ -30,9 +33,16 @@ public class ReorderDaysService extends PlanningUseCase {
       Workout reordered = workout.reorderDays(dayIds);
 
       repository.save(reordered);
-      publishEvent(PlanningActivityEvent.success("workout.days.reordered", command.workoutId().toString(), "Days reordered"));
+      publishEvent(
+          PlanningActivityEvent.success(
+              "workout.days.reordered", command.workoutId().toString(), "Days reordered"));
     } catch (Exception e) {
-      publishEvent(PlanningActivityEvent.failure("workout.days.reordered", command.workoutId().toString(), "Failed to reorder days", e.getMessage()));
+      publishEvent(
+          PlanningActivityEvent.failure(
+              "workout.days.reordered",
+              command.workoutId().toString(),
+              "Failed to reorder days",
+              e.getMessage()));
       throw e;
     }
   }

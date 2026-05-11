@@ -7,9 +7,5 @@ import java.util.List;
 import java.util.Map;
 
 public record SearchWorkoutsQuery(
-    String orderBy,
-    String order,
-    int page,
-    int pageSize,
-    List<Map<String, String>> filters
-) implements Query<PagedResult<WorkoutDto>> {}
+    String orderBy, String order, int page, int pageSize, List<Map<String, String>> filters)
+    implements Query<PagedResult<WorkoutDto>> {}

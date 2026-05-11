@@ -41,10 +41,11 @@ class WorkoutRestApiIntegrationTest {
         new com.standofit.back.api.planning.dto.PlanWorkoutRequest()
             .name(name)
             .description("Description")
-            .days(List.of(
-                new com.standofit.back.api.planning.dto.DayInputDTO()
-                    .name("Day 1")
-                    .exercises(List.of())));
+            .days(
+                List.of(
+                    new com.standofit.back.api.planning.dto.DayInputDTO()
+                        .name("Day 1")
+                        .exercises(List.of())));
 
     return mockMvc
         .perform(
@@ -63,10 +64,14 @@ class WorkoutRestApiIntegrationTest {
         new com.standofit.back.api.planning.dto.PlanWorkoutRequest()
             .name(name)
             .description("Description")
-            .days(dayNames.stream().map(d -> 
-                new com.standofit.back.api.planning.dto.DayInputDTO()
-                    .name(d)
-                    .exercises(List.of())).toList());
+            .days(
+                dayNames.stream()
+                    .map(
+                        d ->
+                            new com.standofit.back.api.planning.dto.DayInputDTO()
+                                .name(d)
+                                .exercises(List.of()))
+                    .toList());
 
     return mockMvc
         .perform(

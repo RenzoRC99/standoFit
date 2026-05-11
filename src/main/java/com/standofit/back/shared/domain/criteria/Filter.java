@@ -17,24 +17,22 @@ public record Filter(FilterField field, FilterOperator operator, FilterValue val
     return new Filter(
         new FilterField(values.get("field")),
         FilterOperator.fromString(values.get("operator")),
-        new FilterValue(values.get("value"))
-    );
+        new FilterValue(values.get("value")));
   }
 
   public static Filter fromValues(String field, String operator, String value) {
     return new Filter(
-        new FilterField(field),
-        FilterOperator.fromString(operator),
-        new FilterValue(value)
-    );
+        new FilterField(field), FilterOperator.fromString(operator), new FilterValue(value));
   }
 
   public static Filter equal(String field, Object value) {
-    return new Filter(new FilterField(field), FilterOperator.EQUAL, new FilterValue(value.toString()));
+    return new Filter(
+        new FilterField(field), FilterOperator.EQUAL, new FilterValue(value.toString()));
   }
 
   public static Filter notEqual(String field, Object value) {
-    return new Filter(new FilterField(field), FilterOperator.NOT_EQUAL, new FilterValue(value.toString()));
+    return new Filter(
+        new FilterField(field), FilterOperator.NOT_EQUAL, new FilterValue(value.toString()));
   }
 
   public static Filter like(String field, String value) {
@@ -50,11 +48,13 @@ public record Filter(FilterField field, FilterOperator operator, FilterValue val
   }
 
   public static Filter gte(String field, Comparable value) {
-    return new Filter(new FilterField(field), FilterOperator.GTE, new FilterValue(value.toString()));
+    return new Filter(
+        new FilterField(field), FilterOperator.GTE, new FilterValue(value.toString()));
   }
 
   public static Filter lte(String field, Comparable value) {
-    return new Filter(new FilterField(field), FilterOperator.LTE, new FilterValue(value.toString()));
+    return new Filter(
+        new FilterField(field), FilterOperator.LTE, new FilterValue(value.toString()));
   }
 
   public static Filter in(String field, Object value) {

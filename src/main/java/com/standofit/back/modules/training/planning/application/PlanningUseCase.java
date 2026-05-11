@@ -7,17 +7,20 @@ import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBu
 
 public abstract class PlanningUseCase {
 
-    protected final WorkoutRepository repository;
-    protected final WorkoutDtoMapper mapper;
-    protected final ApplicationEventBus applicationEventBus;
+  protected final WorkoutRepository repository;
+  protected final WorkoutDtoMapper mapper;
+  protected final ApplicationEventBus applicationEventBus;
 
-    protected PlanningUseCase(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.applicationEventBus = applicationEventBus;
-    }
+  protected PlanningUseCase(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
+    this.repository = repository;
+    this.mapper = mapper;
+    this.applicationEventBus = applicationEventBus;
+  }
 
-    protected void publishEvent(ApplicationEvent event) {
-        applicationEventBus.publish(event);
-    }
+  protected void publishEvent(ApplicationEvent event) {
+    applicationEventBus.publish(event);
+  }
 }

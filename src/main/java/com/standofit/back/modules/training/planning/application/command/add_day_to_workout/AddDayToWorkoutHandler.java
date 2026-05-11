@@ -7,21 +7,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCommand, Void> {
 
-    private final AddDayToWorkoutService service;
+  private final AddDayToWorkoutService service;
 
-    public AddDayToWorkoutHandler(AddDayToWorkoutService service) {
-        this.service = service;
-    }
+  public AddDayToWorkoutHandler(AddDayToWorkoutService service) {
+    this.service = service;
+  }
 
-    @Override
-    public Class<AddDayToWorkoutCommand> commandType() {
-        return AddDayToWorkoutCommand.class;
-    }
+  @Override
+  public Class<AddDayToWorkoutCommand> commandType() {
+    return AddDayToWorkoutCommand.class;
+  }
 
-    @Override
-    @Transactional
-    public Void handle(AddDayToWorkoutCommand command) {
-        service.addDay(command);
-        return null;
-    }
+  @Override
+  @Transactional
+  public Void handle(AddDayToWorkoutCommand command) {
+    service.addDay(command);
+    return null;
+  }
 }

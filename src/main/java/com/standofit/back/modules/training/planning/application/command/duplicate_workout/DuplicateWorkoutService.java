@@ -13,69 +13,78 @@ import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DuplicateWorkoutService extends PlanningUseCase {
 
-    public DuplicateWorkoutService(WorkoutRepository repository, WorkoutDtoMapper mapper, ApplicationEventBus applicationEventBus) {
-        super(repository, mapper, applicationEventBus);
-    }
+  public DuplicateWorkoutService(
+      WorkoutRepository repository,
+      WorkoutDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
+    super(repository, mapper, applicationEventBus);
+  }
 
-    public UUID duplicate(DuplicateWorkoutCommand command) {
-        try {
-            Workout original =
-                    repository
-                            .findById(command.workoutId())
-                            .orElseThrow(
-                                    () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+  public UUID duplicate(DuplicateWorkoutCommand command) {
+    try {
+      Workout original =
+          repository
+              .findById(command.workoutId())
+              .orElseThrow(
+                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
 
-            List<WorkoutDay> duplicatedDays = new ArrayList<>();
-            for (WorkoutDay day : original.getDays()) {
-                List<WorkoutExercise> duplicatedExercises = new ArrayList<>();
-                for (WorkoutExercise ex : day.getExercises()) {
-                    WorkoutExercise newEx =
-                            WorkoutExercise.create(
-                                    new WorkoutExerciseId(UUID.randomUUID()),
-                                    new ExerciseId(ex.getExerciseId().value()),
-                                    new WorkoutExerciseSets(ex.getSets().value()),
-                                    new WorkoutExerciseReps(ex.getReps().value()),
-                                    new WorkoutExerciseRest(ex.getRestSeconds().value()));
-                    duplicatedExercises.add(newEx);
-                }
-
-                WorkoutDay newDay =
-                        WorkoutDay.create(
-                                new WorkoutDayId(UUID.randomUUID()),
-                                new WorkoutDayName(day.getName().value()),
-                                duplicatedExercises);
-                duplicatedDays.add(newDay);
-            }
-
-            WorkoutName newName =
-                    command.newName() != null && !command.newName().isBlank()
-                            ? new WorkoutName(command.newName())
-                            : new WorkoutName(original.getName().value() + " (Copy)");
-
-            Workout duplicated =
-                    Workout.create(
-                            new WorkoutId(UUID.randomUUID()),
-                            original.getDescription() != null
-                                    ? new WorkoutDescription(original.getDescription().value())
-                                    : new WorkoutDescription(""),
-                            newName,
-                            duplicatedDays);
-
-            UUID id = repository.save(duplicated).getId().value();
-            publishEvent(PlanningActivityEvent.success("workout.duplicated", id.toString(), "Duplicated from: " + command.workoutId()));
-            return id;
-        } catch (Exception e) {
-            publishEvent(PlanningActivityEvent.failure("workout.duplicated", command.workoutId().toString(), "Failed to duplicate workout", e.getMessage()));
-            throw e;
+      List<WorkoutDay> duplicatedDays = new ArrayList<>();
+      for (WorkoutDay day : original.getDays()) {
+        List<WorkoutExercise> duplicatedExercises = new ArrayList<>();
+        for (WorkoutExercise ex : day.getExercises()) {
+          WorkoutExercise newEx =
+              WorkoutExercise.create(
+                  new WorkoutExerciseId(UUID.randomUUID()),
+                  new ExerciseId(ex.getExerciseId().value()),
+                  new WorkoutExerciseSets(ex.getSets().value()),
+                  new WorkoutExerciseReps(ex.getReps().value()),
+                  new WorkoutExerciseRest(ex.getRestSeconds().value()));
+          duplicatedExercises.add(newEx);
         }
+
+        WorkoutDay newDay =
+            WorkoutDay.create(
+                new WorkoutDayId(UUID.randomUUID()),
+                new WorkoutDayName(day.getName().value()),
+                duplicatedExercises);
+        duplicatedDays.add(newDay);
+      }
+
+      WorkoutName newName =
+          command.newName() != null && !command.newName().isBlank()
+              ? new WorkoutName(command.newName())
+              : new WorkoutName(original.getName().value() + " (Copy)");
+
+      Workout duplicated =
+          Workout.create(
+              new WorkoutId(UUID.randomUUID()),
+              original.getDescription() != null
+                  ? new WorkoutDescription(original.getDescription().value())
+                  : new WorkoutDescription(""),
+              newName,
+              duplicatedDays);
+
+      UUID id = repository.save(duplicated).getId().value();
+      publishEvent(
+          PlanningActivityEvent.success(
+              "workout.duplicated", id.toString(), "Duplicated from: " + command.workoutId()));
+      return id;
+    } catch (Exception e) {
+      publishEvent(
+          PlanningActivityEvent.failure(
+              "workout.duplicated",
+              command.workoutId().toString(),
+              "Failed to duplicate workout",
+              e.getMessage()));
+      throw e;
     }
+  }
 }
