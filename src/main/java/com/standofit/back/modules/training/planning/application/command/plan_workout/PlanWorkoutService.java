@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.plan_wo
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
@@ -64,12 +65,17 @@ public class PlanWorkoutService extends PlanningUseCase {
       UUID id = repository.save(workout).getId().value();
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.planned", id.toString(), "Planned workout: " + command.name()));
+              PlanningActivityType.WORKOUT_PLANNED,
+              id.toString(),
+              PlanningActivityType.WORKOUT_PLANNED.getDefaultDescription()));
       return id;
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.planned", null, "Failed to plan workout", e.getMessage()));
+              PlanningActivityType.WORKOUT_PLANNED,
+              null,
+              PlanningActivityType.WORKOUT_PLANNED.getDefaultDescription(),
+              e.getMessage()));
       throw e;
     }
   }

@@ -1,17 +1,16 @@
 package com.standofit.back.modules.training.execution.application.command.cancel_session;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class CancelSessionHandler implements CommandHandler<CancelSessionCommand, Void> {
 
-  private final SessionRepository repository;
+  private final CancelSessionService service;
 
-  public CancelSessionHandler(SessionRepository repository) {
-    this.repository = repository;
+  public CancelSessionHandler(CancelSessionService service) {
+    this.service = service;
   }
 
   @Override
@@ -20,9 +19,9 @@ public class CancelSessionHandler implements CommandHandler<CancelSessionCommand
   }
 
   @Override
+  @Transactional
   public Void handle(CancelSessionCommand command) {
-    Session session = repository.findById(command.sessionId());
-    repository.save(session.cancel());
+    service.cancel(command);
     return null;
   }
 }

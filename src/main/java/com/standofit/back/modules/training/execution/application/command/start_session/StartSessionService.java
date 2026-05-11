@@ -1,0 +1,48 @@
+package com.standofit.back.modules.training.execution.application.command.start_session;
+
+import com.standofit.back.modules.training.execution.application.ApplicationExecutionException;
+import com.standofit.back.modules.training.execution.application.ExecutionApplicationError;
+import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
+import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
+import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
+import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
+import com.standofit.back.modules.training.execution.domain.entity.Session;
+import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
+import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StartSessionService extends ExecutionUseCase {
+
+  public StartSessionService(
+      SessionRepository repository,
+      SessionDtoMapper mapper,
+      ApplicationEventBus applicationEventBus) {
+    super(repository, mapper, applicationEventBus);
+  }
+
+  public UUID startSession(StartSessionCommand command) {
+    UUID id = UUID.randomUUID();
+    try {
+      Session session = Session.create(new SessionId(id), command.dayId());
+      repository.save(session);
+      publishEvent(
+          SessionActivityEvent.success(
+              ExecutionActivityType.SESSION_STARTED,
+              id.toString(),
+              ExecutionActivityType.SESSION_STARTED.getDefaultDescription()));
+      return id;
+    } catch (Exception e) {
+      publishEvent(
+          SessionActivityEvent.failure(
+              ExecutionActivityType.SESSION_STARTED,
+              null,
+              ExecutionActivityType.SESSION_STARTED.getDefaultDescription(),
+              e.getMessage()));
+      throw new ApplicationExecutionException(
+          ExecutionApplicationError.SESSION_START_FAILED, id.toString(), e);
+    }
+  }
+}

@@ -3,6 +3,7 @@ package com.standofit.back.modules.training.planning.application.query.search_wo
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
@@ -39,12 +40,17 @@ public class WorkoutsByCriteriaSearcher extends PlanningUseCase {
       PagedResult<WorkoutDto> result = PagedResult.of(workouts, total, page, pageSize);
       publishEvent(
           PlanningActivityEvent.success(
-              "workouts.searched", null, "Searched workouts with filters"));
+              PlanningActivityType.WORKOUTS_SEARCHED,
+              null,
+              PlanningActivityType.WORKOUTS_SEARCHED.getDefaultDescription()));
       return result;
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workouts.searched", null, "Failed to search workouts", e.getMessage()));
+              PlanningActivityType.WORKOUTS_SEARCHED,
+              null,
+              PlanningActivityType.WORKOUTS_SEARCHED.getDefaultDescription(),
+              e.getMessage()));
       throw e;
     }
   }

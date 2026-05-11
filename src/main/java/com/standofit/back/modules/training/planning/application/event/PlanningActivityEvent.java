@@ -10,7 +10,7 @@ public class PlanningActivityEvent implements ApplicationEvent {
     FAILURE
   }
 
-  private final String activity;
+  private final PlanningActivityType activity;
   private final Status status;
   private final String entityId;
   private final String description;
@@ -18,7 +18,11 @@ public class PlanningActivityEvent implements ApplicationEvent {
   private final Instant occurredOn;
 
   private PlanningActivityEvent(
-      String activity, Status status, String entityId, String description, String errorMessage) {
+      PlanningActivityType activity,
+      Status status,
+      String entityId,
+      String description,
+      String errorMessage) {
     this.activity = activity;
     this.status = status;
     this.entityId = entityId;
@@ -28,16 +32,16 @@ public class PlanningActivityEvent implements ApplicationEvent {
   }
 
   public static PlanningActivityEvent success(
-      String activity, String entityId, String description) {
+      PlanningActivityType activity, String entityId, String description) {
     return new PlanningActivityEvent(activity, Status.SUCCESS, entityId, description, null);
   }
 
   public static PlanningActivityEvent failure(
-      String activity, String entityId, String description, String errorMessage) {
+      PlanningActivityType activity, String entityId, String description, String errorMessage) {
     return new PlanningActivityEvent(activity, Status.FAILURE, entityId, description, errorMessage);
   }
 
-  public String activity() {
+  public PlanningActivityType activity() {
     return activity;
   }
 

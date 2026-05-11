@@ -1,18 +1,16 @@
 package com.standofit.back.modules.training.execution.application.command.add_exercise_log;
 
-import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogCommand, Void> {
 
-  private final SessionRepository repository;
+  private final AddExerciseLogService service;
 
-  public AddExerciseLogHandler(SessionRepository repository) {
-    this.repository = repository;
+  public AddExerciseLogHandler(AddExerciseLogService service) {
+    this.service = service;
   }
 
   @Override
@@ -21,16 +19,9 @@ public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogComma
   }
 
   @Override
+  @Transactional
   public Void handle(AddExerciseLogCommand command) {
-    Session session = repository.findById(command.sessionId());
-    ExerciseLog log =
-        ExerciseLog.create(
-            command.logId(),
-            command.exerciseId(),
-            command.sets(),
-            command.reps(),
-            command.weight());
-    repository.save(session.addLog(log));
+    service.addExerciseLog(command);
     return null;
   }
 }
