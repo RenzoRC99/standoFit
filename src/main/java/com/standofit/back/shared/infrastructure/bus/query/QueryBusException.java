@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus.query;
+package com.standofit.back.shared.infrastructure.bus.query;
 
 public class QueryBusException extends RuntimeException {
 

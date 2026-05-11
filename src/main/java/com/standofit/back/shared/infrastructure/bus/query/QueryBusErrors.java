@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus.query;
+package com.standofit.back.shared.infrastructure.bus.query;
 
 enum QueryBusErrors {
   DUPLICATE_QUERY_HANDLER("Duplicate query handler for: %s"),

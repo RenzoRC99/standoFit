@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus.command;
+package com.standofit.back.shared.infrastructure.bus.command;
 
 public enum CommandBusErrors {
   COMMAND_HANDLER_NOT_FOUND("No command handler found for: %s"),

@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus.event;
+package com.standofit.back.shared.infrastructure.bus.event;
 
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEvent;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
@@ -23,16 +23,9 @@ public class InMemoryApplicationEventBus implements ApplicationEventBus {
   @SuppressWarnings("unchecked")
   public void publish(ApplicationEvent event) {
     var eventHandlers = handlers.get(event.getClass());
-    if (eventHandlers != null) {
-      for (ApplicationEventHandler<?> handler : eventHandlers) {
-        ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
-      }
-    }
-    var superTypeHandlers = handlers.get(ApplicationEvent.class);
-    if (superTypeHandlers != null) {
-      for (ApplicationEventHandler<?> handler : superTypeHandlers) {
-        ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
-      }
+    if (eventHandlers == null) return;
+    for (ApplicationEventHandler<?> handler : eventHandlers) {
+      ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
     }
   }
 }

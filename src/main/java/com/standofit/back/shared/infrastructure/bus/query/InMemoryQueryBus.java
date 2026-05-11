@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus.query;
+package com.standofit.back.shared.infrastructure.bus.query;
 
 import com.standofit.back.shared.domain.bus.query.Query;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
