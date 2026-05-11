@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus;
+package com.standofit.back.shared.infrastructure.bus.command;
 
 import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
@@ -16,10 +16,12 @@ public class InMemoryCommandBus implements CommandBus {
 
     for (CommandHandler<?, ?> handler : handlers) {
       Class<?> type = handler.commandType();
+
       if (this.handlers.containsKey(type)) {
-        throw new BusException(
-            BusErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName()));
+        throw new CommandBusException(
+            CommandBusErrors.DUPLICATE_COMMAND_HANDLER.getMessage(type.getSimpleName()));
       }
+
       this.handlers.put(type, handler);
     }
   }
@@ -27,12 +29,14 @@ public class InMemoryCommandBus implements CommandBus {
   @Override
   @SuppressWarnings("unchecked")
   public <R> R dispatch(Command<R> command) {
+
     CommandHandler<Command<R>, R> handler =
         (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
 
     if (handler == null) {
-      throw new BusException(
-          BusErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(command.getClass().getSimpleName()));
+      throw new CommandBusException(
+          CommandBusErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(
+              command.getClass().getSimpleName()));
     }
 
     return handler.handle(command);

@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.reorder
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -35,13 +36,15 @@ public class ReorderDaysService extends PlanningUseCase {
       repository.save(reordered);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.days.reordered", command.workoutId().toString(), "Days reordered"));
+              PlanningActivityType.WORKOUT_DAYS_REORDERED,
+              command.workoutId().toString(),
+              PlanningActivityType.WORKOUT_DAYS_REORDERED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.days.reordered",
+              PlanningActivityType.WORKOUT_DAYS_REORDERED,
               command.workoutId().toString(),
-              "Failed to reorder days",
+              PlanningActivityType.WORKOUT_DAYS_REORDERED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

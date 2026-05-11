@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.change_
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -32,15 +33,15 @@ public class ChangeWorkoutDescriptionService extends PlanningUseCase {
       repository.save(updated);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.description.changed",
+              PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED,
               command.workoutId().toString(),
-              "Changed description"));
+              PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.description.changed",
+              PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED,
               command.workoutId().toString(),
-              "Failed to change description",
+              PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

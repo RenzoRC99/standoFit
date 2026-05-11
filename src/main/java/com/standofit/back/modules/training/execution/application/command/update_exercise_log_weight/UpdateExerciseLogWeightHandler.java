@@ -1,18 +1,17 @@
 package com.standofit.back.modules.training.execution.application.command.update_exercise_log_weight;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class UpdateExerciseLogWeightHandler
     implements CommandHandler<UpdateExerciseLogWeightCommand, Void> {
 
-  private final SessionRepository repository;
+  private final UpdateExerciseLogWeightService service;
 
-  public UpdateExerciseLogWeightHandler(SessionRepository repository) {
-    this.repository = repository;
+  public UpdateExerciseLogWeightHandler(UpdateExerciseLogWeightService service) {
+    this.service = service;
   }
 
   @Override
@@ -21,9 +20,9 @@ public class UpdateExerciseLogWeightHandler
   }
 
   @Override
+  @Transactional
   public Void handle(UpdateExerciseLogWeightCommand command) {
-    Session session = repository.findById(command.sessionId());
-    repository.save(session.updateLogWeight(command.logId(), command.weight()));
+    service.updateWeight(command);
     return null;
   }
 }

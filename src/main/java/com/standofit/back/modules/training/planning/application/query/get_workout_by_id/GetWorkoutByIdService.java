@@ -3,6 +3,7 @@ package com.standofit.back.modules.training.planning.application.query.get_worko
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
@@ -30,14 +31,16 @@ public class GetWorkoutByIdService extends PlanningUseCase {
                           "Workout not found: " + query.workoutId().value()));
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.queried", query.workoutId().value().toString(), "Queried workout by ID"));
+              PlanningActivityType.WORKOUT_QUERIED,
+              query.workoutId().value().toString(),
+              PlanningActivityType.WORKOUT_QUERIED.getDefaultDescription()));
       return dto;
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.queried",
+              PlanningActivityType.WORKOUT_QUERIED,
               query.workoutId().value().toString(),
-              "Failed to query workout",
+              PlanningActivityType.WORKOUT_QUERIED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

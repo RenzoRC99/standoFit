@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.rename_
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -32,15 +33,15 @@ public class RenameWorkoutService extends PlanningUseCase {
       repository.save(renamed);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.renamed",
+              PlanningActivityType.WORKOUT_RENAMED,
               command.workoutId().toString(),
-              "Renamed to: " + command.newName()));
+              PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.renamed",
+              PlanningActivityType.WORKOUT_RENAMED,
               command.workoutId().toString(),
-              "Failed to rename workout",
+              PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

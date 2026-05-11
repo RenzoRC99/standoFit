@@ -2,10 +2,11 @@ package com.standofit.back.training.planning.presentation.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.standofit.back.configuration.bus.ApplicationBus;
 import com.standofit.back.modules.training.planning.application.command.plan_workout.PlanWorkoutCommand;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.query.get_workout_by_id.GetWorkoutByIdQuery;
+import com.standofit.back.shared.domain.bus.command.CommandBus;
+import com.standofit.back.shared.domain.bus.query.QueryBus;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("Workout Controller Integration Tests")
 class WorkoutControllerIntegrationTest {
 
-  @Autowired private ApplicationBus applicationBus;
+  @Autowired private CommandBus commandBus;
+  @Autowired private QueryBus queryBus;
 
   @Nested
   @DisplayName("Plan Workout Command")
@@ -41,7 +43,7 @@ class WorkoutControllerIntegrationTest {
                       List.of(
                           new PlanWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 10, 60)))));
 
-      UUID result = applicationBus.execute(command);
+      UUID result = commandBus.dispatch(command);
 
       assertNotNull(result);
     }
@@ -59,9 +61,9 @@ class WorkoutControllerIntegrationTest {
                       List.of(
                           new PlanWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 12, 45)))));
 
-      UUID workoutId = applicationBus.execute(command);
+      UUID workoutId = commandBus.dispatch(command);
 
-      WorkoutDto workout = applicationBus.ask(new GetWorkoutByIdQuery(workoutId));
+      WorkoutDto workout = queryBus.ask(new GetWorkoutByIdQuery(workoutId));
 
       assertNotNull(workout);
       assertEquals("Test Workout", workout.name());
@@ -77,7 +79,7 @@ class WorkoutControllerIntegrationTest {
       assertThrows(
           IllegalArgumentException.class,
           () -> {
-            applicationBus.ask(new GetWorkoutByIdQuery(UUID.randomUUID()));
+            queryBus.ask(new GetWorkoutByIdQuery(UUID.randomUUID()));
           });
     }
   }

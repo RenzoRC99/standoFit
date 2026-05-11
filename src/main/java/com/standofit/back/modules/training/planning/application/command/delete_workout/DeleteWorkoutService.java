@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.delete_
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
@@ -22,13 +23,15 @@ public class DeleteWorkoutService extends PlanningUseCase {
       repository.deleteById(command.workoutId());
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.deleted", command.workoutId().toString(), "Deleted workout"));
+              PlanningActivityType.WORKOUT_DELETED,
+              command.workoutId().toString(),
+              PlanningActivityType.WORKOUT_DELETED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.deleted",
+              PlanningActivityType.WORKOUT_DELETED,
               command.workoutId().toString(),
-              "Failed to delete workout",
+              PlanningActivityType.WORKOUT_DELETED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

@@ -1,17 +1,16 @@
 package com.standofit.back.modules.training.execution.application.command.finish_session;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class FinishSessionHandler implements CommandHandler<FinishSessionCommand, Void> {
 
-  private final SessionRepository repository;
+  private final FinishSessionService service;
 
-  public FinishSessionHandler(SessionRepository repository) {
-    this.repository = repository;
+  public FinishSessionHandler(FinishSessionService service) {
+    this.service = service;
   }
 
   @Override
@@ -20,9 +19,9 @@ public class FinishSessionHandler implements CommandHandler<FinishSessionCommand
   }
 
   @Override
+  @Transactional
   public Void handle(FinishSessionCommand command) {
-    Session session = repository.findById(command.sessionId());
-    repository.save(session.finish());
+    service.finish(command);
     return null;
   }
 }

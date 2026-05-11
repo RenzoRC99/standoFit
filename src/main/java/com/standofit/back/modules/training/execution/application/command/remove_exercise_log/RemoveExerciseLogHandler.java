@@ -1,17 +1,16 @@
 package com.standofit.back.modules.training.execution.application.command.remove_exercise_log;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLogCommand, Void> {
 
-  private final SessionRepository repository;
+  private final RemoveExerciseLogService service;
 
-  public RemoveExerciseLogHandler(SessionRepository repository) {
-    this.repository = repository;
+  public RemoveExerciseLogHandler(RemoveExerciseLogService service) {
+    this.service = service;
   }
 
   @Override
@@ -20,9 +19,9 @@ public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLo
   }
 
   @Override
+  @Transactional
   public Void handle(RemoveExerciseLogCommand command) {
-    Session session = repository.findById(command.sessionId());
-    repository.save(session.removeLog(command.logId()));
+    service.removeExerciseLog(command);
     return null;
   }
 }

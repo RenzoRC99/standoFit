@@ -1,17 +1,16 @@
 package com.standofit.back.modules.training.execution.application.command.update_session_notes;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNotesCommand, Void> {
 
-  private final SessionRepository repository;
+  private final UpdateSessionNotesService service;
 
-  public UpdateSessionNotesHandler(SessionRepository repository) {
-    this.repository = repository;
+  public UpdateSessionNotesHandler(UpdateSessionNotesService service) {
+    this.service = service;
   }
 
   @Override
@@ -20,9 +19,9 @@ public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNo
   }
 
   @Override
+  @Transactional
   public Void handle(UpdateSessionNotesCommand command) {
-    Session session = repository.findById(command.sessionId());
-    repository.save(session.changeNotes(command.notes()));
+    service.updateNotes(command);
     return null;
   }
 }

@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.archive
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -24,13 +25,15 @@ public class ArchiveWorkoutService extends PlanningUseCase {
       repository.save(workout);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.archived", command.workoutId().toString(), "Archived workout"));
+              PlanningActivityType.WORKOUT_ARCHIVED,
+              command.workoutId().toString(),
+              PlanningActivityType.WORKOUT_ARCHIVED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.archived",
+              PlanningActivityType.WORKOUT_ARCHIVED,
               command.workoutId().toString(),
-              "Failed to archive workout",
+              PlanningActivityType.WORKOUT_ARCHIVED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

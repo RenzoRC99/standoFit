@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.add_day
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
@@ -58,15 +59,15 @@ public class AddDayToWorkoutService extends PlanningUseCase {
       repository.save(updatedWorkout);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.day.added",
+              PlanningActivityType.WORKOUT_DAY_ADDED,
               command.workoutId().toString(),
-              "Added day: " + command.dayName()));
+              PlanningActivityType.WORKOUT_DAY_ADDED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.day.added",
+              PlanningActivityType.WORKOUT_DAY_ADDED,
               command.workoutId().toString(),
-              "Failed to add day",
+              PlanningActivityType.WORKOUT_DAY_ADDED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

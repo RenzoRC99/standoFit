@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.remove_
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -33,15 +34,15 @@ public class RemoveDayFromWorkoutService extends PlanningUseCase {
       repository.save(updated);
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.day.removed",
+              PlanningActivityType.WORKOUT_DAY_REMOVED,
               command.workoutId().toString(),
-              "Removed day: " + command.dayId()));
+              PlanningActivityType.WORKOUT_DAY_REMOVED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.day.removed",
+              PlanningActivityType.WORKOUT_DAY_REMOVED,
               command.workoutId().toString(),
-              "Failed to remove day",
+              PlanningActivityType.WORKOUT_DAY_REMOVED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

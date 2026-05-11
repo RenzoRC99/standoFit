@@ -2,6 +2,7 @@ package com.standofit.back.modules.training.planning.application.command.duplica
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
+import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
@@ -75,14 +76,16 @@ public class DuplicateWorkoutService extends PlanningUseCase {
       UUID id = repository.save(duplicated).getId().value();
       publishEvent(
           PlanningActivityEvent.success(
-              "workout.duplicated", id.toString(), "Duplicated from: " + command.workoutId()));
+              PlanningActivityType.WORKOUT_DUPLICATED,
+              id.toString(),
+              PlanningActivityType.WORKOUT_DUPLICATED.getDefaultDescription()));
       return id;
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              "workout.duplicated",
+              PlanningActivityType.WORKOUT_DUPLICATED,
               command.workoutId().toString(),
-              "Failed to duplicate workout",
+              PlanningActivityType.WORKOUT_DUPLICATED.getDefaultDescription(),
               e.getMessage()));
       throw e;
     }

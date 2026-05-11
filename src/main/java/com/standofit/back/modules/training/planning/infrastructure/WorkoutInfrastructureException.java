@@ -4,6 +4,6 @@ import com.standofit.back.shared.domain.InfrastructureException;
 
 public class WorkoutInfrastructureException extends InfrastructureException {
   public WorkoutInfrastructureException(String message) {
-    super(message);
+    super(WorkoutInfrastructureException.class, message);
   }
 }
