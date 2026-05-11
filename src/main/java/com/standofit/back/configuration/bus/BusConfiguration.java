@@ -1,5 +1,8 @@
 package com.standofit.back.configuration.bus;
 
+import com.standofit.back.configuration.bus.command.InMemoryCommandBus;
+import com.standofit.back.configuration.bus.event.InMemoryApplicationEventBus;
+import com.standofit.back.configuration.bus.query.InMemoryQueryBus;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventHandler;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;

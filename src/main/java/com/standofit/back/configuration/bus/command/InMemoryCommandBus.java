@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus;
+package com.standofit.back.configuration.bus.command;
 
 import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.CommandBus;

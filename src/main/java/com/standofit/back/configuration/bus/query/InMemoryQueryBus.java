@@ -1,5 +1,7 @@
-package com.standofit.back.configuration.bus;
+package com.standofit.back.configuration.bus.query;
 
+import com.standofit.back.configuration.bus.command.BusErrors;
+import com.standofit.back.configuration.bus.command.BusException;
 import com.standofit.back.shared.domain.bus.query.Query;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
 import com.standofit.back.shared.domain.bus.query.QueryHandler;

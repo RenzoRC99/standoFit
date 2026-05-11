@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.event_store;
+package com.standofit.back.configuration.bus.event.store;
 
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEvent;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventHandler;

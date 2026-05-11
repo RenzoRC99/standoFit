@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.bus;
+package com.standofit.back.configuration.bus.command;
 
 public class BusException extends RuntimeException {
   public BusException(String message) {

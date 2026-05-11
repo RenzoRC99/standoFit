@@ -1,4 +1,4 @@
-package com.standofit.back.configuration.event_store;
+package com.standofit.back.configuration.bus.event.store;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
