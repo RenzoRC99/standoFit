@@ -64,6 +64,7 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
         targetExclude '**/api/execution/ApiApi.java'
+        targetExclude 'build/generated/**'
     }
 }
 
@@ -118,5 +119,20 @@ compileJava {
             planApi.write(planApi.text.replace('interface ApiApi', 'interface PlanningApi'))
             planApi.renameTo(new File('build/generated/src/main/java/com/standofit/back/api/planning/PlanningApi.java'))
         }
+    }
+}
+
+afterEvaluate {
+    tasks.named('spotlessCheck') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+    }
+    tasks.named('spotlessJavaCheck') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+    }
+    tasks.named('spotlessJava') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
     }
 }
