@@ -23,9 +23,16 @@ public class InMemoryApplicationEventBus implements ApplicationEventBus {
   @SuppressWarnings("unchecked")
   public void publish(ApplicationEvent event) {
     var eventHandlers = handlers.get(event.getClass());
-    if (eventHandlers == null) return;
-    for (ApplicationEventHandler<?> handler : eventHandlers) {
-      ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
+    if (eventHandlers != null) {
+      for (ApplicationEventHandler<?> handler : eventHandlers) {
+        ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
+      }
+    }
+    var superTypeHandlers = handlers.get(ApplicationEvent.class);
+    if (superTypeHandlers != null) {
+      for (ApplicationEventHandler<?> handler : superTypeHandlers) {
+        ((ApplicationEventHandler<ApplicationEvent>) handler).handle(event);
+      }
     }
   }
 }
