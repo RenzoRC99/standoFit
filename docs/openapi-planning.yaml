@@ -22,6 +22,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkoutPageDTO'
+              example:
+                content:
+                  - id: "70000000-0000-0000-0000-000000000001"
+                    name: "Push Pull Legs"
+                    description: "Rutina PPL para ganar masa muscular"
+                    archived: false
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000001"
+                        name: "Push Day"
+                        exercises:
+                          - id: "90000000-0000-0000-0000-000000000001"
+                            exerciseId: "10000000-0000-0000-0000-000000000001"
+                            sets: 4
+                            reps: 10
+                            restSeconds: 90
+                    createdAt: "2026-01-15T10:30:00Z"
+                    updatedAt: "2026-01-20T14:20:00Z"
+                  - id: "70000000-0000-0000-0000-000000000002"
+                    name: "Full Body"
+                    description: "Rutina de cuerpo completo"
+                    archived: true
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000002"
+                        name: "Día 1"
+                        exercises: []
+                    createdAt: "2026-01-10T09:00:00Z"
+                    updatedAt: "2026-01-12T11:00:00Z"
+                totalElements: 2
+                totalPages: 1
+                pageNumber: 0
+                pageSize: 10
         '400':
           description: Error
           content:
@@ -51,12 +82,14 @@ paths:
               schema:
                 type: string
                 format: uri
-              description: URL del plan creado
+                description: URL del plan creado
+              example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000001"
           content:
             text/plain:
               schema:
                 type: string
                 format: uuid
+              example: "70000000-0000-0000-0000-000000000001"
 
   /api/workouts/search:
     post:
@@ -70,6 +103,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SearchWorkoutsRequest'
+            example:
+              orderBy: "createdAt"
+              order: "DESC"
+              page: 0
+              pageSize: 10
+              filters:
+                - field: "name"
+                  operator: "LIKE"
+                  value: "push"
+                - field: "archived"
+                  operator: "EQUALS"
+                  value: "false"
       responses:
         '200':
           description: Resultados de búsqueda
@@ -77,6 +122,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkoutPageDTO'
+              example:
+                content:
+                  - id: "70000000-0000-0000-0000-000000000001"
+                    name: "Push Pull Legs"
+                    description: "Rutina PPL"
+                    archived: false
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000001"
+                        name: "Push Day"
+                        exercises:
+                          - id: "90000000-0000-0000-0000-000000000001"
+                            exerciseId: "10000000-0000-0000-0000-000000000001"
+                            sets: 4
+                            reps: 10
+                            restSeconds: 90
+                    createdAt: "2026-01-15T10:30:00Z"
+                    updatedAt: "2026-01-20T14:20:00Z"
+                totalElements: 1
+                totalPages: 1
+                pageNumber: 0
+                pageSize: 10
 
   /api/workouts/{workoutId}:
     get:
@@ -99,6 +165,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkoutDTO'
+              example:
+                id: "70000000-0000-0000-0000-000000000001"
+                name: "Push Pull Legs"
+                description: "Rutina PPL para ganar masa muscular"
+                archived: false
+                days:
+                  - id: "80000000-0000-0000-0000-000000000001"
+                    name: "Push Day"
+                    exercises:
+                      - id: "90000000-0000-0000-0000-000000000001"
+                        exerciseId: "10000000-0000-0000-0000-000000000001"
+                        sets: 4
+                        reps: 10
+                        restSeconds: 90
+                      - id: "90000000-0000-0000-0000-000000000002"
+                        exerciseId: "10000000-0000-0000-0000-000000000002"
+                        sets: 3
+                        reps: 12
+                        restSeconds: 60
+                  - id: "80000000-0000-0000-0000-000000000002"
+                    name: "Pull Day"
+                    exercises:
+                      - id: "90000000-0000-0000-0000-000000000003"
+                        exerciseId: "10000000-0000-0000-0000-000000000003"
+                        sets: 4
+                        reps: 8
+                        restSeconds: 120
+                createdAt: "2026-01-15T10:30:00Z"
+                updatedAt: "2026-01-20T14:20:00Z"
         '404':
           description: Plan no encontrado
           content:
@@ -224,6 +319,7 @@ paths:
               schema:
                 type: string
                 format: uuid
+              example: "80000000-0000-0000-0000-000000000003"
         '404':
           description: Plan no encontrado
           content:
@@ -322,11 +418,13 @@ paths:
               schema:
                 type: string
                 format: uri
+              example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000003"
           content:
             text/plain:
               schema:
                 type: string
                 format: uuid
+              example: "70000000-0000-0000-0000-000000000003"
 
   /api/workouts/{workoutId}/archive:
     post:
@@ -441,12 +539,27 @@ components:
       properties:
         name:
           type: string
+          example: "Push Pull Legs"
         description:
           type: string
+          example: "Rutina PPL para ganar masa muscular"
         days:
           type: array
           items:
             $ref: '#/components/schemas/DayInputDTO'
+          example:
+            - name: "Push Day"
+              exercises:
+                - exerciseId: "10000000-0000-0000-0000-000000000001"
+                  sets: 4
+                  reps: 10
+                  restSeconds: 90
+                - exerciseId: "10000000-0000-0000-0000-000000000002"
+                  sets: 3
+                  reps: 12
+                  restSeconds: 60
+            - name: "Pull Day"
+              exercises: []
 
     DayInputDTO:
       type: object
@@ -485,10 +598,20 @@ components:
       properties:
         dayName:
           type: string
+          example: "Push Day"
         exercises:
           type: array
           items:
             $ref: '#/components/schemas/ExerciseInputDTO'
+          example:
+            - exerciseId: "10000000-0000-0000-0000-000000000001"
+              sets: 4
+              reps: 10
+              restSeconds: 90
+            - exerciseId: "10000000-0000-0000-0000-000000000002"
+              sets: 3
+              reps: 12
+              restSeconds: 60
 
     ExerciseInputDTO:
       type: object

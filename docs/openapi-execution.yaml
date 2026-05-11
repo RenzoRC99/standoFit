@@ -22,6 +22,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionListDTO'
+              example:
+                sessions:
+                  - id: "50000000-0000-0000-0000-000000000001"
+                    dayId: "80000000-0000-0000-0000-000000000001"
+                    status: "COMPLETED"
+                    notes: "Buena sesión de pecho"
+                    startedAt: "2026-01-20T10:00:00Z"
+                    finishedAt: "2026-01-20T11:30:00Z"
+                  - id: "50000000-0000-0000-0000-000000000002"
+                    dayId: "80000000-0000-0000-0000-000000000002"
+                    status: "IN_PROGRESS"
+                    notes: null
+                    startedAt: "2026-01-20T14:00:00Z"
+                    finishedAt: null
         '204':
           description: No hay sesiones
         '400':
@@ -51,7 +65,14 @@ paths:
               schema:
                 type: string
                 format: uri
+                example: "http://localhost:8080/api/sessions/50000000-0000-0000-0000-000000000003"
               description: URL de la sesión creada
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+              example: "50000000-0000-0000-0000-000000000003"
 
   /api/sessions/{sessionId}:
     get:
@@ -74,6 +95,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionDTO'
+              example:
+                id: "50000000-0000-0000-0000-000000000001"
+                dayId: "80000000-0000-0000-0000-000000000001"
+                status: "IN_PROGRESS"
+                notes: null
+                startedAt: "2026-01-20T14:00:00Z"
+                finishedAt: null
         '404':
           description: Sesión no encontrada
           content:
@@ -458,6 +486,11 @@ components:
         dayId:
           type: string
           format: uuid
+          example: "80000000-0000-0000-0000-000000000001"
+        workoutId:
+          type: string
+          format: uuid
+          example: "70000000-0000-0000-0000-000000000001"
 
     AddExerciseLogRequest:
       type: object
@@ -470,15 +503,20 @@ components:
         logId:
           type: string
           format: uuid
+          example: "60000000-0000-0000-0000-000000000001"
         exerciseId:
           type: string
           format: uuid
+          example: "10000000-0000-0000-0000-000000000001"
         sets:
           type: integer
+          example: 4
         reps:
           type: integer
+          example: 10
         weight:
           type: integer
+          example: 50
 
     UpdateSetsRequest:
       type: object
