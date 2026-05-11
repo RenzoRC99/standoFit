@@ -15,9 +15,7 @@ public class InMemoryApplicationEventBus implements ApplicationEventBus {
   public InMemoryApplicationEventBus(List<ApplicationEventHandler<?>> handlers) {
     this.handlers = new HashMap<>();
     for (ApplicationEventHandler<?> handler : handlers) {
-      this.handlers
-          .computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
-          .add(handler);
+      this.handlers.computeIfAbsent(handler.eventType(), k -> new ArrayList<>()).add(handler);
     }
   }
 

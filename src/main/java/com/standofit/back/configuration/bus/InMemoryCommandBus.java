@@ -32,8 +32,7 @@ public class InMemoryCommandBus implements CommandBus {
 
     if (handler == null) {
       throw new BusException(
-          BusErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(
-              command.getClass().getSimpleName()));
+          BusErrors.COMMAND_HANDLER_NOT_FOUND.getMessage(command.getClass().getSimpleName()));
     }
 
     return handler.handle(command);

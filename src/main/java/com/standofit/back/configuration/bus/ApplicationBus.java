@@ -7,19 +7,19 @@ import com.standofit.back.shared.domain.bus.query.QueryBus;
 
 public class ApplicationBus {
 
-    private final CommandBus commandBus;
-    private final QueryBus queryBus;
+  private final CommandBus commandBus;
+  private final QueryBus queryBus;
 
-    public ApplicationBus(CommandBus commandBus, QueryBus queryBus) {
-        this.commandBus = commandBus;
-        this.queryBus = queryBus;
-    }
+  public ApplicationBus(CommandBus commandBus, QueryBus queryBus) {
+    this.commandBus = commandBus;
+    this.queryBus = queryBus;
+  }
 
-    public <R> R execute(Command<R> command) {
-        return commandBus.dispatch(command);
-    }
+  public <R> R execute(Command<R> command) {
+    return commandBus.dispatch(command);
+  }
 
-    public <R> R ask(Query<R> query) {
-        return queryBus.ask(query);
-    }
+  public <R> R ask(Query<R> query) {
+    return queryBus.ask(query);
+  }
 }
