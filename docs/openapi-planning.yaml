@@ -1,0 +1,685 @@
+openapi: 3.0.3
+info:
+  title: StandoFit - Training Planning API
+  description: API para gestión de planes de entrenamiento
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local
+
+paths:
+  /api/workouts:
+    get:
+      summary: Listar todos los planes de entrenamiento
+      operationId: getAllWorkouts
+      tags:
+        - Workouts
+      responses:
+        '200':
+          description: Lista de planes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPageDTO'
+              example:
+                content:
+                  - id: "70000000-0000-0000-0000-000000000001"
+                    name: "Push Pull Legs"
+                    description: "Rutina PPL para ganar masa muscular"
+                    archived: false
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000001"
+                        name: "Push Day"
+                        exercises:
+                          - id: "90000000-0000-0000-0000-000000000001"
+                            exerciseId: "10000000-0000-0000-0000-000000000001"
+                            sets: 4
+                            reps: 10
+                            restSeconds: 90
+                    createdAt: "2026-01-15T10:30:00Z"
+                    updatedAt: "2026-01-20T14:20:00Z"
+                  - id: "70000000-0000-0000-0000-000000000002"
+                    name: "Full Body"
+                    description: "Rutina de cuerpo completo"
+                    archived: true
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000002"
+                        name: "Día 1"
+                        exercises: []
+                    createdAt: "2026-01-10T09:00:00Z"
+                    updatedAt: "2026-01-12T11:00:00Z"
+                totalElements: 2
+                totalPages: 1
+                pageNumber: 0
+                pageSize: 10
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+    post:
+      summary: Crear un nuevo plan de entrenamiento
+      operationId: planWorkout
+      tags:
+        - Workouts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanWorkoutRequest'
+            example:
+              name: "Push Pull Legs"
+              description: "Rutina PPL"
+      responses:
+        '201':
+          description: Plan creado
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+                description: URL del plan creado
+              example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000001"
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+              example: "70000000-0000-0000-0000-000000000001"
+
+  /api/workouts/search:
+    post:
+      summary: Buscar planes de entrenamiento
+      operationId: searchWorkouts
+      tags:
+        - Workouts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchWorkoutsRequest'
+            example:
+              orderBy: "createdAt"
+              order: "DESC"
+              page: 0
+              pageSize: 10
+              filters:
+                - field: "name"
+                  operator: "LIKE"
+                  value: "push"
+                - field: "archived"
+                  operator: "EQUALS"
+                  value: "false"
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPageDTO'
+              example:
+                content:
+                  - id: "70000000-0000-0000-0000-000000000001"
+                    name: "Push Pull Legs"
+                    description: "Rutina PPL"
+                    archived: false
+                    days:
+                      - id: "80000000-0000-0000-0000-000000000001"
+                        name: "Push Day"
+                        exercises:
+                          - id: "90000000-0000-0000-0000-000000000001"
+                            exerciseId: "10000000-0000-0000-0000-000000000001"
+                            sets: 4
+                            reps: 10
+                            restSeconds: 90
+                    createdAt: "2026-01-15T10:30:00Z"
+                    updatedAt: "2026-01-20T14:20:00Z"
+                totalElements: 1
+                totalPages: 1
+                pageNumber: 0
+                pageSize: 10
+
+  /api/workouts/{workoutId}:
+    get:
+      summary: Obtener plan por ID
+      operationId: getWorkoutById
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "70000000-0000-0000-0000-000000000001"
+      responses:
+        '200':
+          description: Plan encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutDTO'
+              example:
+                id: "70000000-0000-0000-0000-000000000001"
+                name: "Push Pull Legs"
+                description: "Rutina PPL para ganar masa muscular"
+                archived: false
+                days:
+                  - id: "80000000-0000-0000-0000-000000000001"
+                    name: "Push Day"
+                    exercises:
+                      - id: "90000000-0000-0000-0000-000000000001"
+                        exerciseId: "10000000-0000-0000-0000-000000000001"
+                        sets: 4
+                        reps: 10
+                        restSeconds: 90
+                      - id: "90000000-0000-0000-0000-000000000002"
+                        exerciseId: "10000000-0000-0000-0000-000000000002"
+                        sets: 3
+                        reps: 12
+                        restSeconds: 60
+                  - id: "80000000-0000-0000-0000-000000000002"
+                    name: "Pull Day"
+                    exercises:
+                      - id: "90000000-0000-0000-0000-000000000003"
+                        exerciseId: "10000000-0000-0000-0000-000000000003"
+                        sets: 4
+                        reps: 8
+                        restSeconds: 120
+                createdAt: "2026-01-15T10:30:00Z"
+                updatedAt: "2026-01-20T14:20:00Z"
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+    delete:
+      summary: Eliminar plan
+      operationId: deleteWorkout
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Plan eliminado
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/name:
+    put:
+      summary: Renombrar plan
+      operationId: renameWorkout
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenameRequest'
+            example:
+              name: "Nuevo nombre"
+      responses:
+        '204':
+          description: Plan renombrado
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/description:
+    put:
+      summary: Cambiar descripción del plan
+      operationId: changeWorkoutDescription
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DescriptionRequest'
+            example:
+              description: "Nueva descripción"
+      responses:
+        '204':
+          description: Descripción actualizada
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/days:
+    post:
+      summary: Añadir día al plan
+      operationId: addDayToWorkout
+      tags:
+        - Workout Days
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDayRequest'
+            example:
+              dayName: "Push Day"
+              exercises:
+                - exerciseId: "10000000-0000-0000-0000-000000000001"
+                  sets: 3
+                  reps: 10
+                  restSeconds: 60
+      responses:
+        '201':
+          description: Día añadido
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+              example: "80000000-0000-0000-0000-000000000003"
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/days/{dayId}:
+    delete:
+      summary: Eliminar día del plan
+      operationId: removeDayFromWorkout
+      tags:
+        - Workout Days
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: dayId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Día eliminado
+        '404':
+          description: Plan o día no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/days/reorder:
+    put:
+      summary: Reordenar días del plan
+      operationId: reorderDays
+      tags:
+        - Workout Days
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderDaysRequest'
+            example:
+              dayIds:
+                - "80000000-0000-0000-0000-000000000001"
+                - "80000000-0000-0000-0000-000000000002"
+      responses:
+        '204':
+          description: Días reordenados
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+  /api/workouts/{workoutId}/duplicate:
+    post:
+      summary: Duplicar plan
+      operationId: duplicateWorkout
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuplicateWorkoutRequest'
+            example:
+              newName: "Copia de Push Pull Legs"
+      responses:
+        '201':
+          description: Plan duplicado
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000003"
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+              example: "70000000-0000-0000-0000-000000000003"
+
+  /api/workouts/{workoutId}/archive:
+    post:
+      summary: Archivar plan
+      operationId: archiveWorkout
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Plan archivado
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+components:
+  schemas:
+    ErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    WorkoutDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        archived:
+          type: boolean
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutDayDTO'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    WorkoutDayDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExerciseDTO'
+
+    WorkoutExerciseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        exerciseId:
+          type: string
+          format: uuid
+        sets:
+          type: integer
+        reps:
+          type: integer
+        restSeconds:
+          type: integer
+
+    WorkoutPageDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutDTO'
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    PlanWorkoutRequest:
+      type: object
+      required:
+        - name
+        - days
+      properties:
+        name:
+          type: string
+          example: "Push Pull Legs"
+        description:
+          type: string
+          example: "Rutina PPL para ganar masa muscular"
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayInputDTO'
+          example:
+            - name: "Push Day"
+              exercises:
+                - exerciseId: "10000000-0000-0000-0000-000000000001"
+                  sets: 4
+                  reps: 10
+                  restSeconds: 90
+                - exerciseId: "10000000-0000-0000-0000-000000000002"
+                  sets: 3
+                  reps: 12
+                  restSeconds: 60
+            - name: "Pull Day"
+              exercises: []
+
+    DayInputDTO:
+      type: object
+      required:
+        - name
+        - exercises
+      properties:
+        name:
+          type: string
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseInputDTO'
+
+    RenameRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    DescriptionRequest:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+
+    AddDayRequest:
+      type: object
+      required:
+        - dayName
+        - exercises
+      properties:
+        dayName:
+          type: string
+          example: "Push Day"
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseInputDTO'
+          example:
+            - exerciseId: "10000000-0000-0000-0000-000000000001"
+              sets: 4
+              reps: 10
+              restSeconds: 90
+            - exerciseId: "10000000-0000-0000-0000-000000000002"
+              sets: 3
+              reps: 12
+              restSeconds: 60
+
+    ExerciseInputDTO:
+      type: object
+      required:
+        - exerciseId
+        - sets
+        - reps
+        - restSeconds
+      properties:
+        exerciseId:
+          type: string
+          format: uuid
+        sets:
+          type: integer
+        reps:
+          type: integer
+        restSeconds:
+          type: integer
+
+    ReorderDaysRequest:
+      type: object
+      required:
+        - dayIds
+      properties:
+        dayIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    DuplicateWorkoutRequest:
+      type: object
+      properties:
+        newName:
+          type: string
+
+    SearchWorkoutsRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterRequest'
+        orderBy:
+          type: string
+        order:
+          type: string
+          enum: [ASC, DESC]
+          default: ASC
+        page:
+          type: integer
+          default: 0
+        pageSize:
+          type: integer
+          default: 10
+
+    FilterRequest:
+      type: object
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+        operator:
+          type: string
+        value:
+          type: string

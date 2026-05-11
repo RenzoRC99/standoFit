@@ -8,21 +8,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class FinishSessionHandler implements CommandHandler<FinishSessionCommand, Void> {
 
-    private final SessionRepository repository;
+  private final SessionRepository repository;
 
-    public FinishSessionHandler(SessionRepository repository) {
-        this.repository = repository;
-    }
+  public FinishSessionHandler(SessionRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Class<FinishSessionCommand> commandType() {
-        return FinishSessionCommand.class;
-    }
+  @Override
+  public Class<FinishSessionCommand> commandType() {
+    return FinishSessionCommand.class;
+  }
 
-    @Override
-    public Void handle(FinishSessionCommand command) {
-        Session session = repository.findById(command.sessionId());
-        repository.save(session.finish());
-        return null;
-    }
+  @Override
+  public Void handle(FinishSessionCommand command) {
+    Session session = repository.findById(command.sessionId());
+    repository.save(session.finish());
+    return null;
+  }
 }

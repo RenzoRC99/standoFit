@@ -9,9 +9,4 @@ import java.util.UUID;
  * @author standofit
  * @version 1.0
  */
-public record WorkoutDayDto(
-        UUID id,
-        String name,
-        List<WorkoutExerciseDto> exercises
-) {
-}
+public record WorkoutDayDto(UUID id, String name, List<WorkoutExerciseDto> exercises) {}

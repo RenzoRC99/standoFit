@@ -1,36 +1,28 @@
 package com.standofit.back.modules.training.planning.application.command.change_workout_description;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
-import com.standofit.back.modules.training.planning.domain.vo.WorkoutDescription;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
-public class ChangeWorkoutDescriptionHandler implements CommandHandler<ChangeWorkoutDescriptionCommand, Void> {
+@Component
+public class ChangeWorkoutDescriptionHandler
+    implements CommandHandler<ChangeWorkoutDescriptionCommand, Void> {
 
-    private final WorkoutRepository repository;
+  private final ChangeWorkoutDescriptionService service;
 
-    public ChangeWorkoutDescriptionHandler(WorkoutRepository repository) {
-        this.repository = repository;
-    }
+  public ChangeWorkoutDescriptionHandler(ChangeWorkoutDescriptionService service) {
+    this.service = service;
+  }
 
-    @Override
-    public Class<ChangeWorkoutDescriptionCommand> commandType() {
-        return ChangeWorkoutDescriptionCommand.class;
-    }
+  @Override
+  public Class<ChangeWorkoutDescriptionCommand> commandType() {
+    return ChangeWorkoutDescriptionCommand.class;
+  }
 
-    @Override
-    public Void handle(ChangeWorkoutDescriptionCommand command) {
-        Workout workout = repository.findById(command.workoutId())
-                .orElseThrow(() -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
-
-        Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
-
-        // TODO: Publish WorkoutDescriptionChangedEvent
-        // eventBus.publish(new WorkoutDescriptionChangedEvent(command.workoutId(), command.description()));
-
-        repository.save(updated);
-        return null;
-    }
+  @Override
+  @Transactional
+  public Void handle(ChangeWorkoutDescriptionCommand command) {
+    service.changeDescription(command);
+    return null;
+  }
 }

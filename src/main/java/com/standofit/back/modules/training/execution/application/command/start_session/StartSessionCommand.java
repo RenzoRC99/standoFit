@@ -4,5 +4,4 @@ import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import java.util.UUID;
 
-public record StartSessionCommand(SessionDayId dayId) implements Command<UUID> {
-}
+public record StartSessionCommand(SessionDayId dayId) implements Command<UUID> {}

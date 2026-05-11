@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '6.25.0'
     id 'jacoco'
@@ -17,6 +17,19 @@ java {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated/src/main/java'
+            exclude 'org/openapitools/**'
+        }
+    }
+}
+
+compileJava.dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+
+compileJava.mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+
 repositories {
     mavenCentral()
 }
@@ -27,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.21'
+    implementation 'io.swagger.core.v3:swagger-core:2.2.21'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
@@ -49,6 +63,8 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
+        targetExclude '**/api/execution/ApiApi.java'
+        targetExclude 'build/generated/**'
     }
 }
 
@@ -66,23 +82,57 @@ openApiGenerate {
     generatorName = "spring"
     apiPackage = "com.standofit.back.api.execution"
     modelPackage = "com.standofit.back.api.execution.dto"
-    invokerPackage = "com.standofit.back.api.execution"
+    invokerPackage = "com.standofit.back.clients.execution"
+    configOptions = [
+        useSpringBoot3: "true",
+        interfaceOnly: "true",
+        interfaceName: "ExecutionApi"
+    ]
 }
 
-tasks.register('fixApiImports', Exec) {
-    dependsOn 'openApiGenerate'
-    workingDir '.'
-    commandLine 'echo', 'copying ApiApi...'
-    doLast {
-        def src = file("build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java")
-        def content = src.text
-        content = content.replace('javax.validation', 'jakarta.validation')
-        content = content.replace('javax.annotation', 'jakarta.annotation')
-        def dest = file("src/main/java/com/standofit/back/api/execution/ApiApi.java")
-        dest.write(content)
-    }
+task openApiGeneratePlanning(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    inputSpec = "$projectDir/docs/openapi-planning.yaml".toString()
+    outputDir = "$projectDir/build/generated".toString()
+    generatorName = "spring"
+    apiPackage = "com.standofit.back.api.planning"
+    modelPackage = "com.standofit.back.api.planning.dto"
+    invokerPackage = "com.standofit.back.clients.planning"
+    configOptions = [
+        useSpringBoot3: "true",
+        interfaceOnly: "true",
+        interfaceName: "PlanningApi"
+    ]
 }
 
 compileJava {
-    dependsOn fixApiImports
+    doFirst {
+        def execApiSource = new File('build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java')
+        if (execApiSource.exists()) {
+            def execApi = new File('build/generated/src/main/java/com/standofit/back/api/execution/ApiApi.java')
+            execApi.write(execApi.text.replace('interface ApiApi', 'interface ExecutionApi'))
+            execApi.renameTo(new File('build/generated/src/main/java/com/standofit/back/api/execution/ExecutionApi.java'))
+        }
+        
+        def planApiSource = new File('build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java')
+        if (planApiSource.exists()) {
+            def planApi = new File('build/generated/src/main/java/com/standofit/back/api/planning/ApiApi.java')
+            planApi.write(planApi.text.replace('interface ApiApi', 'interface PlanningApi'))
+            planApi.renameTo(new File('build/generated/src/main/java/com/standofit/back/api/planning/PlanningApi.java'))
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.named('spotlessCheck') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+    }
+    tasks.named('spotlessJavaCheck') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+    }
+    tasks.named('spotlessJava') {
+        dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+        mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
+    }
 }

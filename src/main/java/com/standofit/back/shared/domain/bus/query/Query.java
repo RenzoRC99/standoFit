@@ -3,10 +3,11 @@ package com.standofit.back.shared.domain.bus.query;
 /**
  * Base interface for all queries in the application.
  *
- * A Query represents a read-only operation that retrieves data without modifying state.
- * Each query should implement this interface and contain the data needed to perform the read.
+ * <p>A Query represents a read-only operation that retrieves data without modifying state. Each
+ * query should implement this interface and contain the data needed to perform the read.
  *
- * Example:
+ * <p>Example:
+ *
  * <pre>
  * public class GetWorkoutByIdQuery implements Query<WorkoutDto> {
  *     private final WorkoutId workoutId;

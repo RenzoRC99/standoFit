@@ -10,11 +10,9 @@ import java.util.UUID;
  * @version 1.0
  */
 public record WorkoutDto(
-        UUID id,
-        String name,
-        String description,
-        List<WorkoutDayDto> days,
-        String createdAt,
-        String updatedAt
-) {
-}
+    UUID id,
+    String name,
+    String description,
+    List<WorkoutDayDto> days,
+    String createdAt,
+    String updatedAt) {}
