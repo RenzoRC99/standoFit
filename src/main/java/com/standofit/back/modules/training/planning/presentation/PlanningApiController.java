@@ -10,6 +10,7 @@ import com.standofit.back.modules.training.planning.application.command.remove_d
 import com.standofit.back.modules.training.planning.application.command.rename_workout.RenameWorkoutCommand;
 import com.standofit.back.modules.training.planning.application.command.reorder_days.ReorderDaysCommand;
 import com.standofit.back.modules.training.planning.application.query.get_workout_by_id.GetWorkoutByIdQuery;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
@@ -77,7 +78,7 @@ public class PlanningApiController implements PlanningApi {
     try {
       var dto = queryBus.ask(new GetWorkoutByIdQuery(new WorkoutId(workoutId)));
       return ResponseEntity.ok(WorkoutApiMapper.toApi(dto));
-    } catch (IllegalArgumentException e) {
+    } catch (WorkoutInfrastructureException e) {
       return ResponseEntity.notFound().build();
     }
   }

@@ -21,20 +21,20 @@ public class ArchiveWorkoutService extends PlanningUseCase {
 
   public void archive(ArchiveWorkoutCommand command) {
     try {
-      Workout workout = repository.findById(command.workoutId()).orElseThrow();
+      Workout workout = repository.getById(command.workoutId());
       repository.save(workout);
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_ARCHIVED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_ARCHIVED.getDefaultDescription()));
-    } catch (Exception e) {
+    } catch (Exception e  ) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_ARCHIVED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_ARCHIVED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }

@@ -22,11 +22,7 @@ public class ChangeWorkoutDescriptionService extends PlanningUseCase {
 
   public void changeDescription(ChangeWorkoutDescriptionCommand command) {
     try {
-      Workout workout =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout = repository.getById(command.workoutId());
 
       Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
 
@@ -42,8 +38,9 @@ public class ChangeWorkoutDescriptionService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

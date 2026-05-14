@@ -22,11 +22,7 @@ public class RenameWorkoutService extends PlanningUseCase {
 
   public void rename(RenameWorkoutCommand command) {
     try {
-      Workout workout =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout = repository.getById(command.workoutId());
 
       Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
 
@@ -42,8 +38,9 @@ public class RenameWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_RENAMED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

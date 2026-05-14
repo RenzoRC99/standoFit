@@ -6,6 +6,8 @@ import com.standofit.back.modules.training.planning.application.event.PlanningAc
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +29,9 @@ public class GetWorkoutByIdService extends PlanningUseCase {
               .map(mapper::toDto)
               .orElseThrow(
                   () ->
-                      new IllegalArgumentException(
-                          "Workout not found: " + query.workoutId().value()));
+                      new WorkoutInfrastructureException(
+                          WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(
+                              query.workoutId().value())));
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_QUERIED,
@@ -41,8 +44,9 @@ public class GetWorkoutByIdService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_QUERIED,
               query.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_QUERIED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

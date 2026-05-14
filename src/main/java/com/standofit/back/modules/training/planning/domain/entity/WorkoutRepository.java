@@ -11,6 +11,8 @@ public interface WorkoutRepository {
 
   Optional<Workout> findById(UUID id);
 
+  Workout getById(UUID id);
+
   List<Workout> findAll();
 
   List<Workout> searchByCriteria(Criteria criteria);

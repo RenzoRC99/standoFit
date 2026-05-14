@@ -33,11 +33,7 @@ public class AddDayToWorkoutService extends PlanningUseCase {
 
   public void addDay(AddDayToWorkoutCommand command) {
     try {
-      Workout workout =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout = repository.getById(command.workoutId());
 
       List<WorkoutExercise> exercises = new ArrayList<>();
       for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
@@ -68,8 +64,9 @@ public class AddDayToWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DAY_ADDED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DAY_ADDED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

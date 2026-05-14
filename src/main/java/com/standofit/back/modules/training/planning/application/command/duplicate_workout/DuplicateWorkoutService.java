@@ -31,11 +31,7 @@ public class DuplicateWorkoutService extends PlanningUseCase {
 
   public UUID duplicate(DuplicateWorkoutCommand command) {
     try {
-      Workout original =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout original = repository.getById(command.workoutId());
 
       List<WorkoutDay> duplicatedDays = new ArrayList<>();
       for (WorkoutDay day : original.getDays()) {
@@ -86,8 +82,9 @@ public class DuplicateWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DUPLICATED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DUPLICATED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+
