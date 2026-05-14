@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.execution.application.command.start_session;
 
-import com.standofit.back.modules.training.execution.application.ApplicationExecutionException;
-import com.standofit.back.modules.training.execution.application.ExecutionApplicationError;
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
@@ -40,9 +38,8 @@ public class StartSessionService extends ExecutionUseCase {
               ExecutionActivityType.SESSION_STARTED,
               null,
               ExecutionActivityType.SESSION_STARTED.getDefaultDescription(),
-              e.getMessage()));
-      throw new ApplicationExecutionException(
-          ExecutionApplicationError.SESSION_START_FAILED, id.toString(), e);
+              resolveErrorDetail(e)));
+      throw e;
     }
   }
 }

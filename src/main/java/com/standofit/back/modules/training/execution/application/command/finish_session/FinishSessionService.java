@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.execution.application.command.finish_session;
 
-import com.standofit.back.modules.training.execution.application.ApplicationExecutionException;
-import com.standofit.back.modules.training.execution.application.ExecutionApplicationError;
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
@@ -36,11 +34,8 @@ public class FinishSessionService extends ExecutionUseCase {
               ExecutionActivityType.SESSION_FINISHED,
               command.sessionId().value().toString(),
               ExecutionActivityType.SESSION_FINISHED.getDefaultDescription(),
-              e.getMessage()));
-      throw new ApplicationExecutionException(
-          ExecutionApplicationError.SESSION_FINISH_FAILED,
-          command.sessionId().value().toString(),
-          e);
+              resolveErrorDetail(e)));
+      throw e;
     }
   }
 }

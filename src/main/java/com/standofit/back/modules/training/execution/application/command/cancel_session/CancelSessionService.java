@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.execution.application.command.cancel_session;
 
-import com.standofit.back.modules.training.execution.application.ApplicationExecutionException;
-import com.standofit.back.modules.training.execution.application.ExecutionApplicationError;
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
@@ -36,11 +34,8 @@ public class CancelSessionService extends ExecutionUseCase {
               ExecutionActivityType.SESSION_CANCELLED,
               command.sessionId().value().toString(),
               ExecutionActivityType.SESSION_CANCELLED.getDefaultDescription(),
-              e.getMessage()));
-      throw new ApplicationExecutionException(
-          ExecutionApplicationError.SESSION_CANCEL_FAILED,
-          command.sessionId().value().toString(),
-          e);
+              resolveErrorDetail(e)));
+      throw e;
     }
   }
 }

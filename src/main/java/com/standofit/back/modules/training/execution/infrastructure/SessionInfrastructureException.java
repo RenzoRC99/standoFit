@@ -1,15 +1,13 @@
 package com.standofit.back.modules.training.execution.infrastructure;
 
-public class SessionInfrastructureException extends RuntimeException {
+import com.standofit.back.shared.domain.InfrastructureException;
 
-  private final String code;
-
-  public SessionInfrastructureException(String code) {
-    super(code);
-    this.code = code;
+public class SessionInfrastructureException extends InfrastructureException {
+  public SessionInfrastructureException(String message) {
+    super(SessionInfrastructureException.class, message);
   }
 
-  public String getCode() {
-    return code;
+  public SessionInfrastructureException(String message, Throwable cause) {
+    super(SessionInfrastructureException.class, message, cause);
   }
 }

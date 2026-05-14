@@ -1,15 +1,9 @@
 package com.standofit.back.modules.training.execution.domain;
 
-public class SessionDomainException extends RuntimeException {
+import com.standofit.back.shared.domain.DomainException;
 
-  private final String code;
-
-  public SessionDomainException(String code) {
-    super(code);
-    this.code = code;
-  }
-
-  public String getCode() {
-    return code;
+public class SessionDomainException extends DomainException {
+  public SessionDomainException(String message) {
+    super(SessionDomainException.class, message);
   }
 }
