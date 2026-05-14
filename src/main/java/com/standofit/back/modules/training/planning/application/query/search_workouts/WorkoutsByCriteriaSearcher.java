@@ -50,8 +50,9 @@ public class WorkoutsByCriteriaSearcher extends PlanningUseCase {
               PlanningActivityType.WORKOUTS_SEARCHED,
               null,
               PlanningActivityType.WORKOUTS_SEARCHED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

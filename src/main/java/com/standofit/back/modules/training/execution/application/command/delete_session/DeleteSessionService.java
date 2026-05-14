@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.execution.application.command.delete_session;
 
-import com.standofit.back.modules.training.execution.application.ApplicationExecutionException;
-import com.standofit.back.modules.training.execution.application.ExecutionApplicationError;
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
@@ -34,11 +32,8 @@ public class DeleteSessionService extends ExecutionUseCase {
               ExecutionActivityType.SESSION_DELETED,
               command.sessionId().value().toString(),
               ExecutionActivityType.SESSION_DELETED.getDefaultDescription(),
-              e.getMessage()));
-      throw new ApplicationExecutionException(
-          ExecutionApplicationError.SESSION_DELETE_FAILED,
-          command.sessionId().value().toString(),
-          e);
+              resolveErrorDetail(e)));
+      throw e;
     }
   }
 }

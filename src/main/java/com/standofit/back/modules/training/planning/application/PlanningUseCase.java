@@ -23,4 +23,12 @@ public abstract class PlanningUseCase {
   protected void publishEvent(ApplicationEvent event) {
     applicationEventBus.publish(event);
   }
+
+  protected String resolveErrorDetail(Exception e) {
+    String message = e.getMessage();
+    if (e.getCause() != null) {
+      return message + " | cause: " + e.getCause().getMessage();
+    }
+    return message;
+  }
 }

@@ -23,11 +23,7 @@ public class RemoveDayFromWorkoutService extends PlanningUseCase {
 
   public void removeDay(RemoveDayFromWorkoutCommand command) {
     try {
-      Workout workout =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout = repository.getById(command.workoutId());
 
       Workout updated = workout.removeDays(List.of(new WorkoutDayId(command.dayId())));
 
@@ -43,8 +39,9 @@ public class RemoveDayFromWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DAY_REMOVED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DAY_REMOVED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

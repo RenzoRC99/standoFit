@@ -75,8 +75,9 @@ public class PlanWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_PLANNED,
               null,
               PlanningActivityType.WORKOUT_PLANNED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

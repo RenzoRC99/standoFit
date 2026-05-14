@@ -7,4 +7,8 @@ public class InfrastructureException extends BaseException {
   protected InfrastructureException(Class<?> clazz, String message) {
     super(clazz, message);
   }
+
+  protected InfrastructureException(Class<?> clazz, String message, Throwable cause) {
+    super(clazz, message, cause);
+  }
 }

@@ -6,4 +6,8 @@ public class WorkoutInfrastructureException extends InfrastructureException {
   public WorkoutInfrastructureException(String message) {
     super(WorkoutInfrastructureException.class, message);
   }
+
+  public WorkoutInfrastructureException(String message, Throwable cause) {
+    super(WorkoutInfrastructureException.class, message, cause);
+  }
 }

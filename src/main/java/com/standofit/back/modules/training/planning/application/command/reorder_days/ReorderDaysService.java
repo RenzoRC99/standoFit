@@ -23,11 +23,7 @@ public class ReorderDaysService extends PlanningUseCase {
 
   public void reorder(ReorderDaysCommand command) {
     try {
-      Workout workout =
-          repository
-              .findById(command.workoutId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Workout not found: " + command.workoutId()));
+      Workout workout = repository.getById(command.workoutId());
 
       List<WorkoutDayId> dayIds = command.dayIds().stream().map(WorkoutDayId::new).toList();
 
@@ -45,8 +41,9 @@ public class ReorderDaysService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DAYS_REORDERED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DAYS_REORDERED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

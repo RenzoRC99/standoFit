@@ -8,9 +8,13 @@ public abstract class BaseException extends RuntimeException {
     this.context = clazz != null ? clazz.getSimpleName() : "Unknown";
   }
 
+  protected BaseException(Class<?> clazz, String message, Throwable cause) {
+    super(message, cause);
+    this.context = clazz != null ? clazz.getSimpleName() : "Unknown";
+  }
+
   @Override
   public String getMessage() {
-    return String.format(
-        "%s -> %s : %s", this.getClass().getSimpleName(), context, super.getMessage());
+    return String.format("[%s] %s", context, super.getMessage());
   }
 }

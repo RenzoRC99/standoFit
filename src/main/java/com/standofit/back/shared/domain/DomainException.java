@@ -7,6 +7,10 @@ public class DomainException extends BaseException {
     super(clazz, message);
   }
 
+  protected DomainException(Class<?> clazz, String message, Throwable cause) {
+    super(clazz, message, cause);
+  }
+
   protected DomainException(String message) {
     super(null, message);
   }

@@ -32,8 +32,9 @@ public class DeleteWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_DELETED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_DELETED.getDefaultDescription(),
-              e.getMessage()));
+              resolveErrorDetail(e)));
       throw e;
     }
   }
 }
+

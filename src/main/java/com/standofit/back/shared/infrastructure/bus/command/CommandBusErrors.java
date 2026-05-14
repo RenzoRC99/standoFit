@@ -1,16 +1,23 @@
 package com.standofit.back.shared.infrastructure.bus.command;
 
-public enum CommandBusErrors {
+import com.standofit.back.shared.utils.EnumContract;
+
+public enum CommandBusErrors implements EnumContract {
   COMMAND_HANDLER_NOT_FOUND("No command handler found for: %s"),
   DUPLICATE_COMMAND_HANDLER("Duplicate command handler for: %s");
 
-  private final String messageTemplate;
+  private final String message;
 
-  CommandBusErrors(String messageTemplate) {
-    this.messageTemplate = messageTemplate;
+  CommandBusErrors(String message) {
+    this.message = message;
   }
 
-  public String getMessage(String typeName) {
-    return String.format(messageTemplate, typeName);
+  @Override
+  public String getMessage() {
+    return message;
+  }
+
+  public String getMessage(Object... args) {
+    return args.length > 0 ? String.format(message, args) : message;
   }
 }

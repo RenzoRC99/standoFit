@@ -19,4 +19,8 @@ public enum ValueobjectErrors implements EnumContract {
   public String getMessage() {
     return message;
   }
+
+  public String getMessage(Object... args) {
+    return args.length > 0 ? String.format(message, args) : message;
+  }
 }
