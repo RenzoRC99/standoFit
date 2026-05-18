@@ -1,6 +1,0 @@
-* tenemos que añadir middleware en los buses :
-    logging consistente de todas las operaciones
-    métricas (tiempos, volumen de commands)
-    transacciones automáticas
-    tracing (OpenTelemetry)
-    auditoría de acciones de usuario
