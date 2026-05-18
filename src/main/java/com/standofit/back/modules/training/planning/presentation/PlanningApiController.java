@@ -31,9 +31,9 @@ public class PlanningApiController implements PlanningApi {
   }
 
   @Override
-  public ResponseEntity<UUID> addDayToWorkout(UUID workoutId, AddDayRequest request) {
+  public ResponseEntity<WorkoutCreatedResponse> addDayToWorkout(UUID workoutId, AddDayRequest request) {
     commandBus.dispatch(PlanningCommandMapper.toCommand(workoutId, request));
-    return ResponseEntity.status(HttpStatus.CREATED).body(workoutId);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new WorkoutCreatedResponse(workoutId));
   }
 
   @Override
@@ -55,10 +55,10 @@ public class PlanningApiController implements PlanningApi {
   }
 
   @Override
-  public ResponseEntity<UUID> duplicateWorkout(UUID workoutId, DuplicateWorkoutRequest request) {
+  public ResponseEntity<WorkoutCreatedResponse> duplicateWorkout(UUID workoutId, DuplicateWorkoutRequest request) {
     UUID newWorkoutId =
         commandBus.dispatch(new DuplicateWorkoutCommand(workoutId, request.getNewName()));
-    return ResponseEntity.status(HttpStatus.CREATED).body(newWorkoutId);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new WorkoutCreatedResponse(newWorkoutId));
   }
 
   @Override
@@ -84,9 +84,9 @@ public class PlanningApiController implements PlanningApi {
   }
 
   @Override
-  public ResponseEntity<UUID> planWorkout(PlanWorkoutRequest request) {
+  public ResponseEntity<WorkoutCreatedResponse> planWorkout(PlanWorkoutRequest request) {
     UUID workoutId = commandBus.dispatch(PlanningCommandMapper.toCommand(request));
-    return ResponseEntity.status(HttpStatus.CREATED).body(workoutId);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new WorkoutCreatedResponse(workoutId));
   }
 
   @Override

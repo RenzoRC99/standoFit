@@ -85,11 +85,11 @@ paths:
                 description: URL del plan creado
               example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000001"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                format: uuid
-              example: "70000000-0000-0000-0000-000000000001"
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "70000000-0000-0000-0000-000000000001"
 
   /api/workouts/search:
     post:
@@ -315,11 +315,11 @@ paths:
         '201':
           description: Día añadido
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                format: uuid
-              example: "80000000-0000-0000-0000-000000000003"
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "80000000-0000-0000-0000-000000000003"
         '404':
           description: Plan no encontrado
           content:
@@ -420,11 +420,11 @@ paths:
                 format: uri
               example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000003"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                format: uuid
-              example: "70000000-0000-0000-0000-000000000003"
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "70000000-0000-0000-0000-000000000003"
 
   /api/workouts/{workoutId}/archive:
     post:
@@ -683,3 +683,13 @@ components:
           type: string
         value:
           type: string
+
+    WorkoutCreatedResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "70000000-0000-0000-0000-000000000001"
