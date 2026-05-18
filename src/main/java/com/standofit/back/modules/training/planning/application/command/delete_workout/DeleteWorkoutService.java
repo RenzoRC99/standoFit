@@ -37,4 +37,3 @@ public class DeleteWorkoutService extends PlanningUseCase {
     }
   }
 }
-

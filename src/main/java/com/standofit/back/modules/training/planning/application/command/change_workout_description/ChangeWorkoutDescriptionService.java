@@ -43,4 +43,3 @@ public class ChangeWorkoutDescriptionService extends PlanningUseCase {
     }
   }
 }
-

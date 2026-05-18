@@ -43,4 +43,3 @@ public class RenameWorkoutService extends PlanningUseCase {
     }
   }
 }
-

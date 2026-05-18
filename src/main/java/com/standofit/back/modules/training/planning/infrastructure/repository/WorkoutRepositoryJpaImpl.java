@@ -7,101 +7,98 @@ import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfras
 import com.standofit.back.modules.training.planning.infrastructure.entity.WorkoutJpaEntity;
 import com.standofit.back.modules.training.planning.infrastructure.mapper.WorkoutMapper;
 import com.standofit.back.shared.domain.criteria.Criteria;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Repository
 public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
 
-    private final WorkoutJpaRepository jpaRepository;
-    private final WorkoutMapper mapper;
+  private final WorkoutJpaRepository jpaRepository;
+  private final WorkoutMapper mapper;
 
-    public WorkoutRepositoryJpaImpl(
-            WorkoutJpaRepository jpaRepository,
-            WorkoutMapper mapper) {
-        this.jpaRepository = jpaRepository;
-        this.mapper = mapper;
-    }
+  public WorkoutRepositoryJpaImpl(WorkoutJpaRepository jpaRepository, WorkoutMapper mapper) {
+    this.jpaRepository = jpaRepository;
+    this.mapper = mapper;
+  }
 
-    @Override
-    public Workout save(Workout workout) {
-        try {
-            return mapper.toDomain(jpaRepository.saveAndFlush(mapper.toEntity(workout)));
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.SAVE_FAILED.getMessage(), e);
-        }
+  @Override
+  public Workout save(Workout workout) {
+    try {
+      return mapper.toDomain(jpaRepository.saveAndFlush(mapper.toEntity(workout)));
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.SAVE_FAILED.getMessage(), e);
     }
+  }
 
-    @Override
-    public Optional<Workout> findById(UUID id) {
-        try {
-            return jpaRepository.findById(id).map(mapper::toDomain);
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
-        }
+  @Override
+  public Optional<Workout> findById(UUID id) {
+    try {
+      return jpaRepository.findById(id).map(mapper::toDomain);
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
     }
+  }
 
-    @Override
-    public Workout getById(UUID id) {
-        return findById(id)
-                .orElseThrow(
-                        () ->
-                                new WorkoutInfrastructureException(
-                                        WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(id)));
-    }
+  @Override
+  public Workout getById(UUID id) {
+    return findById(id)
+        .orElseThrow(
+            () ->
+                new WorkoutInfrastructureException(
+                    WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(id)));
+  }
 
-    @Override
-    public List<Workout> findAll() {
-        try {
-            return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
-        }
+  @Override
+  public List<Workout> findAll() {
+    try {
+      return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
     }
+  }
 
-    @Override
-    public List<Workout> searchByCriteria(Criteria criteria) {
-        try {
-            WorkoutSpecification spec = new WorkoutSpecification(criteria);
-            Pageable pageable =
-                    PageRequest.of(criteria.pageInfo().page(), criteria.pageInfo().pageSize());
-            Page<WorkoutJpaEntity> page = jpaRepository.findAll(spec, pageable);
-            return page.getContent().stream().map(mapper::toDomain).toList();
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
-        }
+  @Override
+  public List<Workout> searchByCriteria(Criteria criteria) {
+    try {
+      WorkoutSpecification spec = new WorkoutSpecification(criteria);
+      Pageable pageable =
+          PageRequest.of(criteria.pageInfo().page(), criteria.pageInfo().pageSize());
+      Page<WorkoutJpaEntity> page = jpaRepository.findAll(spec, pageable);
+      return page.getContent().stream().map(mapper::toDomain).toList();
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
     }
+  }
 
-    @Override
-    public long countByCriteria(Criteria criteria) {
-        try {
-            WorkoutSpecification spec = new WorkoutSpecification(criteria);
-            return jpaRepository.count(spec);
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
-        }
+  @Override
+  public long countByCriteria(Criteria criteria) {
+    try {
+      WorkoutSpecification spec = new WorkoutSpecification(criteria);
+      return jpaRepository.count(spec);
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
     }
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        try {
-            jpaRepository.deleteById(id);
-            jpaRepository.flush();
-        } catch (DataAccessException e) {
-            throw new WorkoutInfrastructureException(
-                WorkoutInfrastructureErrors.DELETE_FAILED.getMessage(), e);
-        }
+  @Override
+  public void deleteById(UUID id) {
+    try {
+      jpaRepository.deleteById(id);
+      jpaRepository.flush();
+    } catch (DataAccessException e) {
+      throw new WorkoutInfrastructureException(
+          WorkoutInfrastructureErrors.DELETE_FAILED.getMessage(), e);
     }
+  }
 }

@@ -49,4 +49,3 @@ public class GetWorkoutByIdService extends PlanningUseCase {
     }
   }
 }
-

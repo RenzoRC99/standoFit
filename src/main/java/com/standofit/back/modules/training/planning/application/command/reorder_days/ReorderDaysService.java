@@ -46,4 +46,3 @@ public class ReorderDaysService extends PlanningUseCase {
     }
   }
 }
-

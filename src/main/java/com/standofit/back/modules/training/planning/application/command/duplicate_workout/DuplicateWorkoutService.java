@@ -87,4 +87,3 @@ public class DuplicateWorkoutService extends PlanningUseCase {
     }
   }
 }
-
