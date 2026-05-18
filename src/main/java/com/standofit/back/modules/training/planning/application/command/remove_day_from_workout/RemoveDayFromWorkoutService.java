@@ -44,4 +44,3 @@ public class RemoveDayFromWorkoutService extends PlanningUseCase {
     }
   }
 }
-

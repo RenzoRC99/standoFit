@@ -28,7 +28,7 @@ public class ArchiveWorkoutService extends PlanningUseCase {
               PlanningActivityType.WORKOUT_ARCHIVED,
               command.workoutId().toString(),
               PlanningActivityType.WORKOUT_ARCHIVED.getDefaultDescription()));
-    } catch (Exception e  ) {
+    } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_ARCHIVED,

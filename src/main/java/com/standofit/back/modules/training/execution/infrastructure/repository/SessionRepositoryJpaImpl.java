@@ -16,9 +16,7 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
   private final SessionJpaRepository jpaRepository;
   private final SessionMapper mapper;
 
-  public SessionRepositoryJpaImpl(
-      SessionJpaRepository jpaRepository,
-      SessionMapper mapper) {
+  public SessionRepositoryJpaImpl(SessionJpaRepository jpaRepository, SessionMapper mapper) {
     this.jpaRepository = jpaRepository;
     this.mapper = mapper;
   }
