@@ -1,24 +1,25 @@
 package com.standofit.back.modules.training.execution.application.query.get_session_by_id;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
-import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
+import com.standofit.back.training.execution.domain.entity.SessionMother;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Get Session By Id Handler Tests")
 class GetSessionByIdHandlerTest {
 
   @Mock private SessionRepository repository;
@@ -32,9 +33,10 @@ class GetSessionByIdHandlerTest {
   }
 
   @Test
-  void should_return_session_when_exists() {
-    SessionId sessionId = new SessionId(UUID.randomUUID());
-    Session session = Session.create(sessionId, new SessionDayId(UUID.randomUUID()));
+  @DisplayName("should return session when exists")
+  void shouldReturnSessionWhenExists() {
+    SessionId sessionId = SessionMother.aSessionId();
+    Session session = SessionMother.aSessionWithId(sessionId);
     SessionDto dto =
         new SessionDto(
             session.getId().value(),
@@ -55,7 +57,8 @@ class GetSessionByIdHandlerTest {
   }
 
   @Test
-  void should_throw_when_session_not_found() {
+  @DisplayName("should throw when session not found")
+  void shouldThrowWhenSessionNotFound() {
     SessionId sessionId = new SessionId(UUID.randomUUID());
     when(repository.findById(sessionId)).thenReturn(null);
 

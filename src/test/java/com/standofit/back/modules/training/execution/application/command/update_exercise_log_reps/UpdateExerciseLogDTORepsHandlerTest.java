@@ -1,57 +1,56 @@
 package com.standofit.back.modules.training.execution.application.command.update_exercise_log_reps;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.domain.vo.*;
-import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
-import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Update Exercise Log Reps Handler Tests")
 class UpdateExerciseLogDTORepsHandlerTest {
 
-  @Mock private SessionRepository repository;
+  @Mock private UpdateExerciseLogRepsService service;
 
   private UpdateExerciseLogRepsHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new UpdateExerciseLogRepsHandler(repository);
+    handler = new UpdateExerciseLogRepsHandler(service);
   }
 
   @Test
-  void should_call_repository_to_update_reps() {
-    SessionId sessionId = new SessionId(UUID.randomUUID());
-    SessionDayId dayId = new SessionDayId(UUID.randomUUID());
-    ExerciseLogId logId = new ExerciseLogId(UUID.randomUUID());
-    ExerciseLogReps reps = new ExerciseLogReps(12);
-    UpdateExerciseLogRepsCommand command = new UpdateExerciseLogRepsCommand(sessionId, logId, reps);
-
-    Session session = Session.create(sessionId, dayId);
-    ExerciseLog log =
-        ExerciseLog.create(
-            logId,
-            new ExerciseId(UUID.randomUUID()),
-            new ExerciseLogSets(3),
-            new ExerciseLogReps(10),
-            new ExerciseLogWeight(50));
-    session = session.addLog(log);
-    when(repository.findById(sessionId)).thenReturn(session);
-    when(repository.save(any(Session.class))).thenReturn(session);
+  @DisplayName("should delegate to service")
+  void shouldDelegateToService() {
+    var command =
+        new UpdateExerciseLogRepsCommand(
+            new SessionId(UUID.randomUUID()),
+            new ExerciseLogId(UUID.randomUUID()),
+            new ExerciseLogReps(12));
 
     handler.handle(command);
 
-    verify(repository, times(1)).findById(sessionId);
-    verify(repository, times(1)).save(any(Session.class));
+    verify(service, times(1)).updateReps(command);
+  }
+
+  @Test
+  @DisplayName("should propagate exception from service")
+  void shouldPropagateExceptionFromService() {
+    var command =
+        new UpdateExerciseLogRepsCommand(
+            new SessionId(UUID.randomUUID()),
+            new ExerciseLogId(UUID.randomUUID()),
+            new ExerciseLogReps(12));
+    doThrow(new RuntimeException("Service error")).when(service).updateReps(command);
+
+    assertThrows(RuntimeException.class, () -> handler.handle(command));
   }
 }

@@ -7,17 +7,17 @@ import com.standofit.back.modules.training.execution.application.dto.SessionList
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
-import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
-import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
+import com.standofit.back.training.execution.domain.entity.SessionMother;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Get All Sessions Handler Tests")
 class GetAllSessionsHandlerTest {
 
   @Mock private SessionRepository repository;
@@ -31,9 +31,9 @@ class GetAllSessionsHandlerTest {
   }
 
   @Test
-  void should_return_all_sessions() {
-    Session session =
-        Session.create(new SessionId(UUID.randomUUID()), new SessionDayId(UUID.randomUUID()));
+  @DisplayName("should return all sessions")
+  void shouldReturnAllSessions() {
+    Session session = SessionMother.aSession();
     List<Session> sessions = List.of(session);
     SessionDto sessionDto =
         new SessionDto(

@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.standofit.back.modules.training.planning.application.command.plan_workout.PlanWorkoutCommand;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.query.get_workout_by_id.GetWorkoutByIdQuery;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
+import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +65,7 @@ class WorkoutControllerIntegrationTest {
 
       UUID workoutId = commandBus.dispatch(command);
 
-      WorkoutDto workout = queryBus.ask(new GetWorkoutByIdQuery(workoutId));
+      WorkoutDto workout = queryBus.ask(new GetWorkoutByIdQuery(new WorkoutId(workoutId)));
 
       assertNotNull(workout);
       assertEquals("Test Workout", workout.name());
@@ -77,9 +79,9 @@ class WorkoutControllerIntegrationTest {
     @DisplayName("should return error when workout not found")
     void shouldReturnErrorWhenNotFound() {
       assertThrows(
-          IllegalArgumentException.class,
+          WorkoutInfrastructureException.class,
           () -> {
-            queryBus.ask(new GetWorkoutByIdQuery(UUID.randomUUID()));
+            queryBus.ask(new GetWorkoutByIdQuery(new WorkoutId(UUID.randomUUID())));
           });
     }
   }
