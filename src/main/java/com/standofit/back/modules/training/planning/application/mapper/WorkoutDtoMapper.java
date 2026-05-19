@@ -20,7 +20,7 @@ public class WorkoutDtoMapper {
     return new WorkoutDto(
         workout.getId().value(),
         workout.getName().value(),
-        workout.getDescription() != null ? workout.getDescription().value() : null,
+        workout.getDescription().value(),
         days,
         workout.getCreatedAt().value().toString(),
         workout.getUpdatedAt().value().toString());

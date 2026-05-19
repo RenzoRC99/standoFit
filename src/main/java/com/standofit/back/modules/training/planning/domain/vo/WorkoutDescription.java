@@ -4,7 +4,7 @@ import com.standofit.back.shared.domain.valueobjects.StringVO;
 
 public class WorkoutDescription extends StringVO {
   public WorkoutDescription(String value) {
-    super(value);
+    super(value != null ? value : "");
     ensureLengthRange(0, 500);
   }
 }

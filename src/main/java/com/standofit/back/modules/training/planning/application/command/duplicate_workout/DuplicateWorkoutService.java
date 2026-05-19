@@ -62,9 +62,7 @@ public class DuplicateWorkoutService extends PlanningUseCase {
       Workout duplicated =
           Workout.create(
               newId,
-              original.getDescription() != null
-                  ? new WorkoutDescription(original.getDescription().value())
-                  : new WorkoutDescription(""),
+              new WorkoutDescription(original.getDescription().value()),
               newName,
               duplicatedDays);
 

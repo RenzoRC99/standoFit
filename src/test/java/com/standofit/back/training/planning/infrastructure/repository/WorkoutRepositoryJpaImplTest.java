@@ -43,7 +43,7 @@ class WorkoutRepositoryJpaImplTest {
             new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName("Day 1"), List.of());
 
     return Workout.create(
-        new WorkoutId(UUID.randomUUID()), null, new WorkoutName("Test Workout"), List.of(day));
+        new WorkoutId(UUID.randomUUID()), new WorkoutDescription(null), new WorkoutName("Test Workout"), List.of(day));
   }
 
   private Workout createTestWorkoutWithExercises() {
@@ -61,7 +61,7 @@ class WorkoutRepositoryJpaImplTest {
             new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName("Day 1"), List.of(exercise));
 
     return Workout.create(
-        new WorkoutId(UUID.randomUUID()), null, new WorkoutName("Test Workout"), List.of(day));
+        new WorkoutId(UUID.randomUUID()), new WorkoutDescription(null), new WorkoutName("Test Workout"), List.of(day));
   }
 
   @Nested

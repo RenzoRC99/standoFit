@@ -23,7 +23,7 @@ public class WorkoutMapper {
         new WorkoutJpaEntity(
             workout.getId().value(),
             workout.getName().value(),
-            workout.getDescription() != null ? workout.getDescription().value() : "",
+            workout.getDescription().value(),
             workout.getCreatedAt().value(),
             workout.getUpdatedAt().value());
 
@@ -57,8 +57,7 @@ public class WorkoutMapper {
 
   public Workout toDomain(WorkoutJpaEntity entity) {
     WorkoutName name = new WorkoutName(entity.getName());
-    WorkoutDescription description =
-        entity.getDescription() != null ? new WorkoutDescription(entity.getDescription()) : null;
+    WorkoutDescription description = new WorkoutDescription(entity.getDescription());
 
     List<WorkoutDay> days =
         entity.getDays().stream().map(this::toDomain).collect(Collectors.toList());
