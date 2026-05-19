@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.presentation.controller;
+package com.standofit.back.modules.training.planning.presentation.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 

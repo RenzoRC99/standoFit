@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.domain.entity;
+package com.standofit.back.modules.training.planning.domain.entity;
 
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;

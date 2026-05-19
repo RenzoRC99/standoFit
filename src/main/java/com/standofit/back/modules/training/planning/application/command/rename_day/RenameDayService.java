@@ -6,7 +6,6 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +21,7 @@ public class RenameDayService extends PlanningUseCase {
   public void rename(RenameDayCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
-      Workout updated = workout.renameDays(Map.of(command.dayId(), new WorkoutDayName(command.name())));
+      Workout updated = workout.renameDay(command.dayId(), new WorkoutDayName(command.name()));
       repository.save(updated);
       publishEvent(command.toSuccessEvent());
     } catch (Exception e) {

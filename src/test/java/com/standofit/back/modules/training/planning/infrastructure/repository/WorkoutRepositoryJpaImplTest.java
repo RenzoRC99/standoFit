@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.infrastructure.repository;
+package com.standofit.back.modules.training.planning.infrastructure.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 

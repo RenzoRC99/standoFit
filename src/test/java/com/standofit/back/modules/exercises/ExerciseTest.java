@@ -1,4 +1,4 @@
-package com.standofit.back.exercises;
+package com.standofit.back.modules.exercises;
 
 import static org.junit.jupiter.api.Assertions.*;
 

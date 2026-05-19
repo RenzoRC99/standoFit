@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.domain.entity;
+package com.standofit.back.modules.training.planning.domain.entity;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,7 +10,6 @@ import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercis
 import com.standofit.back.modules.training.planning.domain.vo.*;
 import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -143,6 +142,53 @@ class WorkoutTest {
     }
 
     @Test
+    @DisplayName("should rename a day")
+    void shouldRenameDay() {
+      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(WorkoutDayMother.aWorkoutDay()));
+      WorkoutDayName newName = new WorkoutDayName("New Day Name");
+
+      Workout updated = workout.renameDay(workout.getDays().get(0).getId(), newName);
+
+      assertEquals(newName, updated.getDays().get(0).getName());
+    }
+
+    @Test
+    @DisplayName("should rename only specified day")
+    void shouldRenameOnlySpecifiedDay() {
+      WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
+      WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
+      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
+      WorkoutDayName newName = new WorkoutDayName("Renamed");
+
+      Workout updated = workout.renameDay(day1.getId(), newName);
+
+      assertEquals("Renamed", updated.getDays().get(0).getName().value());
+      assertEquals("Day 2", updated.getDays().get(1).getName().value());
+    }
+
+    @Test
+    @DisplayName("should fail when renaming with null day id")
+    void shouldFailWhenRenamingWithNullDayId() {
+      Workout workout = WorkoutMother.aWorkout();
+
+      assertThatThrownBy(() -> workout.renameDay(null, new WorkoutDayName("New Name")))
+          .isInstanceOf(WorkoutDomainException.class);
+    }
+
+    @Test
+    @DisplayName("should fail when renaming day id not found")
+    void shouldFailWhenRenamingDayIdNotFound() {
+      WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
+      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1));
+
+      var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
+
+      assertThatThrownBy(() -> workout.renameDay(nonExistentId, new WorkoutDayName("New Name")))
+          .isInstanceOf(WorkoutDomainException.class)
+          .hasMessageContaining("not found");
+    }
+
+    @Test
     @DisplayName("should remove days from workout")
     void shouldRemoveDays() {
       Workout workout =
@@ -175,40 +221,6 @@ class WorkoutTest {
       Workout workout = WorkoutMother.aWorkout();
 
       assertThatThrownBy(() -> workout.removeDays(null)).isInstanceOf(WorkoutDomainException.class);
-    }
-
-    @Test
-    @DisplayName("should rename days")
-    void shouldRenameDays() {
-      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(WorkoutDayMother.aWorkoutDay()));
-      WorkoutDayName newName = new WorkoutDayName("New Day Name");
-
-      Workout updated =
-          workout.renameDays(java.util.Map.of(workout.getDays().get(0).getId(), newName));
-
-      assertEquals(newName, updated.getDays().get(0).getName());
-    }
-
-    @Test
-    @DisplayName("should rename only specified days")
-    void shouldRenameOnlySpecifiedDays() {
-      WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
-      WorkoutDay day2 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 2"));
-      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1, day2));
-      WorkoutDayName newName = new WorkoutDayName("Renamed");
-
-      Workout updated = workout.renameDays(java.util.Map.of(day1.getId(), newName));
-
-      assertEquals("Renamed", updated.getDays().get(0).getName().value());
-      assertEquals("Day 2", updated.getDays().get(1).getName().value());
-    }
-
-    @Test
-    @DisplayName("should fail when renaming with null map")
-    void shouldFailWhenRenamingWithNullMap() {
-      Workout workout = WorkoutMother.aWorkout();
-
-      assertThatThrownBy(() -> workout.renameDays(null)).isInstanceOf(WorkoutDomainException.class);
     }
   }
 
@@ -333,25 +345,6 @@ class WorkoutTest {
       var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
 
       assertThatThrownBy(() -> workout.reorderDays(List.of(nonExistentId)))
-          .isInstanceOf(WorkoutDomainException.class)
-          .hasMessageContaining("not found");
-    }
-  }
-
-  @Nested
-  @DisplayName("Business Rules")
-  class BusinessRules {
-
-    @Test
-    @DisplayName("should fail when renaming day id not found")
-    void shouldFailWhenRenamingDayIdNotFound() {
-      WorkoutDay day1 = WorkoutDayMother.aWorkoutDay(new WorkoutDayName("Day 1"));
-      Workout workout = WorkoutMother.aWorkoutWithDays(List.of(day1));
-
-      var nonExistentId = WorkoutDayMother.aWorkoutDayWithoutExercises().getId();
-
-      assertThatThrownBy(
-              () -> workout.renameDays(Map.of(nonExistentId, new WorkoutDayName("New Name"))))
           .isInstanceOf(WorkoutDomainException.class)
           .hasMessageContaining("not found");
     }
