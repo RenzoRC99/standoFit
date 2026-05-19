@@ -4,11 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureException;
-import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
-import com.standofit.back.training.execution.domain.entity.SessionMother;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.List;
 import java.util.UUID;
@@ -23,47 +18,35 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("Get Session By Id Handler Tests")
 class GetSessionByIdHandlerTest {
 
-  @Mock private SessionRepository repository;
-  @Mock private SessionDTOMapper mapper;
+  @Mock private GetSessionByIdService service;
 
   private GetSessionByIdHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new GetSessionByIdHandler(repository, mapper);
+    handler = new GetSessionByIdHandler(service);
   }
 
   @Test
-  @DisplayName("should return session when exists")
-  void shouldReturnSessionWhenExists() {
-    SessionId sessionId = SessionMother.aSessionId();
-    Session session = SessionMother.aSessionWithId(sessionId);
-    SessionDto dto =
-        new SessionDto(
-            session.getId().value(),
-            session.getDayId().value(),
-            session.getStatus().name(),
-            List.of(),
-            "",
-            "",
-            "");
-    when(repository.getById(sessionId)).thenReturn(session);
-    when(mapper.toDTO(session)).thenReturn(dto);
+  @DisplayName("should delegate to service")
+  void shouldDelegateToService() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var query = new GetSessionByIdQuery(sessionId);
+    var dto = new SessionDto(sessionId.value(), UUID.randomUUID(), "IN_PROGRESS", List.of(), "", "", "");
+    when(service.findById(query)).thenReturn(dto);
 
-    SessionDto result = handler.handle(new GetSessionByIdQuery(sessionId));
+    var result = handler.handle(query);
 
     assertNotNull(result);
-    verify(repository, times(1)).getById(sessionId);
-    verify(mapper, times(1)).toDTO(session);
+    verify(service, times(1)).findById(query);
   }
 
   @Test
-  @DisplayName("should throw when session not found")
-  void shouldThrowWhenSessionNotFound() {
-    SessionId sessionId = new SessionId(UUID.randomUUID());
-    when(repository.getById(sessionId)).thenThrow(new SessionInfrastructureException("Session not found"));
+  @DisplayName("should propagate exception from service")
+  void shouldPropagateExceptionFromService() {
+    var query = new GetSessionByIdQuery(new SessionId(UUID.randomUUID()));
+    doThrow(new RuntimeException("Service error")).when(service).findById(query);
 
-    assertThrows(
-        SessionInfrastructureException.class, () -> handler.handle(new GetSessionByIdQuery(sessionId)));
+    assertThrows(RuntimeException.class, () -> handler.handle(query));
   }
 }

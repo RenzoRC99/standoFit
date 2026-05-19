@@ -45,13 +45,13 @@ public class ExecutionApiController implements ExecutionApi {
     if (result.sessions().isEmpty()) {
       return ResponseEntity.noContent().build();
     }
-    return ResponseEntity.ok(toApiSessionListDTO(result));
+    return ResponseEntity.ok(SessionApiMapper.toApi(result));
   }
 
   @Override
   public ResponseEntity<SessionDTO> getSessionById(UUID sessionId) {
     SessionDto result = queryBus.ask(new GetSessionByIdQuery(new SessionId(sessionId)));
-    return ResponseEntity.ok(toApiSessionDTO(result));
+    return ResponseEntity.ok(SessionApiMapper.toApi(result));
   }
 
   @Override
@@ -148,20 +148,5 @@ public class ExecutionApiController implements ExecutionApi {
         new UpdateSessionNotesCommand(
             new SessionId(sessionId), new WorkoutSessionNotes(request.getNotes())));
     return ResponseEntity.noContent().build();
-  }
-
-  private SessionDTO toApiSessionDTO(SessionDto dto) {
-    return new SessionDTO()
-        .id(dto.id())
-        .dayId(dto.dayId())
-        .status(SessionDTO.StatusEnum.valueOf(dto.status()))
-        .notes(dto.notes())
-        .startedAt(dto.startedAt())
-        .finishedAt(dto.finishedAt());
-  }
-
-  private SessionListDTO toApiSessionListDTO(SessionListDto dto) {
-    return new SessionListDTO()
-        .sessions(dto.sessions().stream().map(this::toApiSessionDTO).toList());
   }
 }
