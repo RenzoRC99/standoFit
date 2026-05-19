@@ -21,7 +21,7 @@ public class FinishSessionService extends ExecutionUseCase {
 
   public void finish(FinishSessionCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       repository.save(session.finish());
       publishEvent(
           SessionActivityEvent.success(

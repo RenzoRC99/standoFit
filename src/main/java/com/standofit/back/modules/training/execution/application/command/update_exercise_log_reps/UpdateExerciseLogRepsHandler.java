@@ -20,7 +20,6 @@ public class UpdateExerciseLogRepsHandler
   }
 
   @Override
-  @Transactional
   public Void handle(UpdateExerciseLogRepsCommand command) {
     service.updateReps(command);
     return null;

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureException;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionDTOMapper;
 import com.standofit.back.training.execution.domain.entity.SessionMother;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
@@ -46,13 +47,13 @@ class GetSessionByIdHandlerTest {
             "",
             "",
             "");
-    when(repository.findById(sessionId)).thenReturn(session);
+    when(repository.getById(sessionId)).thenReturn(session);
     when(mapper.toDTO(session)).thenReturn(dto);
 
     SessionDto result = handler.handle(new GetSessionByIdQuery(sessionId));
 
     assertNotNull(result);
-    verify(repository, times(1)).findById(sessionId);
+    verify(repository, times(1)).getById(sessionId);
     verify(mapper, times(1)).toDTO(session);
   }
 
@@ -60,9 +61,9 @@ class GetSessionByIdHandlerTest {
   @DisplayName("should throw when session not found")
   void shouldThrowWhenSessionNotFound() {
     SessionId sessionId = new SessionId(UUID.randomUUID());
-    when(repository.findById(sessionId)).thenReturn(null);
+    when(repository.getById(sessionId)).thenThrow(new SessionInfrastructureException("Session not found"));
 
     assertThrows(
-        IllegalArgumentException.class, () -> handler.handle(new GetSessionByIdQuery(sessionId)));
+        SessionInfrastructureException.class, () -> handler.handle(new GetSessionByIdQuery(sessionId)));
   }
 }

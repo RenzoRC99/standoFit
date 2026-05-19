@@ -21,7 +21,7 @@ public class UpdateExerciseLogWeightService extends ExecutionUseCase {
 
   public void updateWeight(UpdateExerciseLogWeightCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogWeight(command.logId(), command.weight());
       repository.save(updatedSession);
       publishEvent(

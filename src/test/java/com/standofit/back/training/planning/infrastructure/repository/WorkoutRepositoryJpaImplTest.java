@@ -102,7 +102,7 @@ class WorkoutRepositoryJpaImplTest {
     void shouldFindWorkoutById() {
       Workout workout = createTestWorkout();
       Workout saved = repository.save(workout);
-      UUID id = saved.getId().value();
+      WorkoutId id = saved.getId();
 
       var result = repository.findById(id);
 
@@ -114,7 +114,7 @@ class WorkoutRepositoryJpaImplTest {
     @Test
     @DisplayName("should return empty when id not found")
     void shouldReturnEmptyWhenIdNotFound() {
-      var result = repository.findById(UUID.randomUUID());
+      var result = repository.findById(new WorkoutId(UUID.randomUUID()));
 
       assertTrue(result.isEmpty());
     }
@@ -129,17 +129,17 @@ class WorkoutRepositoryJpaImplTest {
     void shouldDeleteWorkoutById() {
       Workout workout = createTestWorkout();
       Workout saved = repository.save(workout);
-      UUID id = saved.getId().value();
+      WorkoutId id = saved.getId();
 
       repository.deleteById(id);
 
-      assertFalse(jpaRepository.existsById(id));
+      assertFalse(jpaRepository.existsById(id.value()));
     }
 
     @Test
     @DisplayName("should not throw when id not found")
     void shouldNotThrowWhenIdNotFound() {
-      assertDoesNotThrow(() -> repository.deleteById(UUID.randomUUID()));
+      assertDoesNotThrow(() -> repository.deleteById(new WorkoutId(UUID.randomUUID())));
     }
   }
 }

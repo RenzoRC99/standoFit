@@ -19,7 +19,6 @@ public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNo
   }
 
   @Override
-  @Transactional
   public Void handle(UpdateSessionNotesCommand command) {
     service.updateNotes(command);
     return null;

@@ -23,20 +23,18 @@ public class ChangeWorkoutDescriptionService extends PlanningUseCase {
   public void changeDescription(ChangeWorkoutDescriptionCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
-
       Workout updated = workout.changeDescription(new WorkoutDescription(command.description()));
-
       repository.save(updated);
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DESCRIPTION_CHANGED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

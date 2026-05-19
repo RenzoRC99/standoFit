@@ -25,6 +25,7 @@ import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,6 +55,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<UUID> startSession(StartSessionRequest request) {
     UUID sessionId =
         commandBus.dispatch(new StartSessionCommand(new SessionDayId(request.getDayId())));
@@ -61,24 +63,28 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> deleteSession(UUID sessionId) {
     commandBus.dispatch(new DeleteSessionCommand(new SessionId(sessionId)));
     return ResponseEntity.noContent().build();
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> finishSession(UUID sessionId) {
     commandBus.dispatch(new FinishSessionCommand(new SessionId(sessionId)));
     return ResponseEntity.noContent().build();
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> cancelSession(UUID sessionId) {
     commandBus.dispatch(new CancelSessionCommand(new SessionId(sessionId)));
     return ResponseEntity.noContent().build();
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> addExerciseLog(UUID sessionId, AddExerciseLogRequest request) {
     commandBus.dispatch(
         new AddExerciseLogCommand(
@@ -92,6 +98,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> removeExerciseLog(UUID sessionId, UUID logId) {
     commandBus.dispatch(
         new RemoveExerciseLogCommand(new SessionId(sessionId), new ExerciseLogId(logId)));
@@ -99,6 +106,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> updateExerciseLogSets(
       UUID sessionId, UUID logId, UpdateSetsRequest request) {
     commandBus.dispatch(
@@ -110,6 +118,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> updateExerciseLogReps(
       UUID sessionId, UUID logId, UpdateRepsRequest request) {
     commandBus.dispatch(
@@ -121,6 +130,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> updateExerciseLogWeight(
       UUID sessionId, UUID logId, UpdateWeightRequest request) {
     commandBus.dispatch(
@@ -132,6 +142,7 @@ public class ExecutionApiController implements ExecutionApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<Void> updateSessionNotes(UUID sessionId, UpdateNotesRequest request) {
     commandBus.dispatch(
         new UpdateSessionNotesCommand(

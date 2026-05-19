@@ -21,7 +21,7 @@ public class AddExerciseLogService extends ExecutionUseCase {
 
   public void addExerciseLog(AddExerciseLogCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       ExerciseLog newLog =
           ExerciseLog.create(
               command.logId(),

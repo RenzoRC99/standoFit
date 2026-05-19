@@ -25,10 +25,7 @@ public class GetSessionByIdHandler implements QueryHandler<GetSessionByIdQuery, 
 
   @Override
   public SessionDto handle(GetSessionByIdQuery query) {
-    Session session = repository.findById(query.sessionId());
-    if (session == null) {
-      throw new IllegalArgumentException("Session not found");
-    }
+    Session session = repository.getById(query.sessionId());
     return mapper.toDTO(session);
   }
 }

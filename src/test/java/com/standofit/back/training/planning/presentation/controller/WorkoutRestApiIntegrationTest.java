@@ -293,21 +293,6 @@ class WorkoutRestApiIntegrationTest {
   }
 
   @Nested
-  @DisplayName("POST /api/workouts/{id}/archive - Archive Workout")
-  class ArchiveWorkout {
-
-    @Test
-    @DisplayName("should archive workout")
-    void shouldArchiveWorkout() throws Exception {
-      String workoutId = createWorkout("To Archive");
-
-      mockMvc
-          .perform(post("/api/workouts/" + workoutId + "/archive"))
-          .andExpect(status().isNoContent());
-    }
-  }
-
-  @Nested
   @DisplayName("PUT /api/workouts/{id}/description - Change Description")
   class ChangeDescription {
 

@@ -30,6 +30,7 @@ public class DuplicateWorkoutService extends PlanningUseCase {
   }
 
   public UUID duplicate(DuplicateWorkoutCommand command) {
+    WorkoutId newId = new WorkoutId(UUID.randomUUID());
     try {
       Workout original = repository.getById(command.workoutId());
 
@@ -62,7 +63,7 @@ public class DuplicateWorkoutService extends PlanningUseCase {
 
       Workout duplicated =
           Workout.create(
-              new WorkoutId(UUID.randomUUID()),
+              newId,
               original.getDescription() != null
                   ? new WorkoutDescription(original.getDescription().value())
                   : new WorkoutDescription(""),
@@ -73,14 +74,14 @@ public class DuplicateWorkoutService extends PlanningUseCase {
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_DUPLICATED,
-              id.toString(),
+              newId.value().toString(),
               PlanningActivityType.WORKOUT_DUPLICATED.getDefaultDescription()));
       return id;
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_DUPLICATED,
-              command.workoutId().toString(),
+              newId.value().toString(),
               PlanningActivityType.WORKOUT_DUPLICATED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

@@ -20,7 +20,6 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
   }
 
   @Override
-  @Transactional
   public UUID handle(StartSessionCommand command) {
     return service.startSession(command);
   }

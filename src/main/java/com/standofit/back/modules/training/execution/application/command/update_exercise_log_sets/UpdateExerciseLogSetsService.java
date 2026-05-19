@@ -21,7 +21,7 @@ public class UpdateExerciseLogSetsService extends ExecutionUseCase {
 
   public void updateSets(UpdateExerciseLogSetsCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogSets(command.logId(), command.sets());
       repository.save(updatedSession);
       publishEvent(

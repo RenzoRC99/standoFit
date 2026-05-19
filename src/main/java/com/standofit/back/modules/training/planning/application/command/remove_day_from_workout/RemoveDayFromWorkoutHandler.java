@@ -20,7 +20,6 @@ public class RemoveDayFromWorkoutHandler
   }
 
   @Override
-  @Transactional
   public Void handle(RemoveDayFromWorkoutCommand command) {
     service.removeDay(command);
     return null;

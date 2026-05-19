@@ -19,7 +19,6 @@ public class DeleteSessionHandler implements CommandHandler<DeleteSessionCommand
   }
 
   @Override
-  @Transactional
   public Void handle(DeleteSessionCommand command) {
     service.delete(command);
     return null;

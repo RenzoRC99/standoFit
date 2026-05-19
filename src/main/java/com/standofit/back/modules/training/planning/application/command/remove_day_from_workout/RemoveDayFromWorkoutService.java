@@ -7,7 +7,6 @@ import com.standofit.back.modules.training.planning.application.mapper.WorkoutDt
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
-import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -24,20 +23,18 @@ public class RemoveDayFromWorkoutService extends PlanningUseCase {
   public void removeDay(RemoveDayFromWorkoutCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
-
-      Workout updated = workout.removeDays(List.of(new WorkoutDayId(command.dayId())));
-
+      Workout updated = workout.removeDays(List.of(command.dayId()));
       repository.save(updated);
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_DAY_REMOVED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DAY_REMOVED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_DAY_REMOVED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DAY_REMOVED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

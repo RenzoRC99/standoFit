@@ -1,17 +1,17 @@
 package com.standofit.back.modules.training.planning.domain.entity;
 
 import com.standofit.back.shared.domain.criteria.Criteria;
+import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface WorkoutRepository {
 
   Workout save(Workout workout);
 
-  Optional<Workout> findById(UUID id);
+  Optional<Workout> findById(WorkoutId id);
 
-  Workout getById(UUID id);
+  Workout getById(WorkoutId id);
 
   List<Workout> findAll();
 
@@ -19,5 +19,5 @@ public interface WorkoutRepository {
 
   long countByCriteria(Criteria criteria);
 
-  void deleteById(UUID id);
+  void deleteById(WorkoutId id);
 }

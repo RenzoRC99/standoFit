@@ -21,7 +21,7 @@ public class UpdateExerciseLogRepsService extends ExecutionUseCase {
 
   public void updateReps(UpdateExerciseLogRepsCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogReps(command.logId(), command.reps());
       repository.save(updatedSession);
       publishEvent(

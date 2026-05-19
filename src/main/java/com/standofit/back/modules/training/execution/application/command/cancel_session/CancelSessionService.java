@@ -21,7 +21,7 @@ public class CancelSessionService extends ExecutionUseCase {
 
   public void cancel(CancelSessionCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       repository.save(session.cancel());
       publishEvent(
           SessionActivityEvent.success(

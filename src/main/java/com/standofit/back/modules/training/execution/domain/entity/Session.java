@@ -3,13 +3,14 @@ package com.standofit.back.modules.training.execution.domain.entity;
 import com.standofit.back.modules.training.execution.domain.SessionDomainErrors;
 import com.standofit.back.modules.training.execution.domain.SessionDomainException;
 import com.standofit.back.modules.training.execution.domain.vo.*;
+import com.standofit.back.shared.domain.aggregate.AggregateRoot;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Session {
+public final class Session extends AggregateRoot {
 
   private final SessionId id;
   private final SessionDayId dayId;

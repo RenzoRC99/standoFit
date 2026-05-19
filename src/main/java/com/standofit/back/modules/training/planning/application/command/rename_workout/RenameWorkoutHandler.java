@@ -19,7 +19,6 @@ public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand
   }
 
   @Override
-  @Transactional
   public Void handle(RenameWorkoutCommand command) {
     service.rename(command);
     return null;

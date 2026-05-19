@@ -45,12 +45,12 @@ class GetAllSessionsHandlerTest {
             "",
             "");
     SessionListDto dto = new SessionListDto(List.of(sessionDto));
-    when(repository.getAll()).thenReturn(sessions);
+    when(repository.findAll()).thenReturn(sessions);
     when(mapper.toListDTO(sessions)).thenReturn(dto);
 
     SessionListDto result = handler.handle(new GetAllSessionsQuery());
 
-    verify(repository, times(1)).getAll();
+    verify(repository, times(1)).findAll();
     verify(mapper, times(1)).toListDTO(sessions);
   }
 }

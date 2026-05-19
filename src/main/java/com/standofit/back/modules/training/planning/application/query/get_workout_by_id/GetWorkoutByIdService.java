@@ -25,7 +25,7 @@ public class GetWorkoutByIdService extends PlanningUseCase {
     try {
       WorkoutDto dto =
           repository
-              .findById(query.workoutId().value())
+              .findById(query.workoutId())
               .map(mapper::toDto)
               .orElseThrow(
                   () ->

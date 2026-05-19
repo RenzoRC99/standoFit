@@ -19,7 +19,6 @@ public class DeleteWorkoutHandler implements CommandHandler<DeleteWorkoutCommand
   }
 
   @Override
-  @Transactional
   public Void handle(DeleteWorkoutCommand command) {
     service.delete(command);
     return null;

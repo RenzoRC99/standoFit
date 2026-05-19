@@ -1,68 +1,61 @@
-package com.standofit.back.modules.training.planning.application.command.add_day_to_workout;
+package com.standofit.back.modules.training.planning.application.command.replace_day_exercises;
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
-import com.standofit.back.modules.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseReps;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseRest;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseSets;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
-import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
+import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AddDayToWorkoutService extends PlanningUseCase {
+public class ReplaceDayExercisesService extends PlanningUseCase {
 
-  public AddDayToWorkoutService(
+  public ReplaceDayExercisesService(
       WorkoutRepository repository,
       WorkoutDtoMapper mapper,
       ApplicationEventBus applicationEventBus) {
     super(repository, mapper, applicationEventBus);
   }
 
-  public void addDay(AddDayToWorkoutCommand command) {
+  public void replace(ReplaceDayExercisesCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
 
-      List<WorkoutExercise> exercises = new ArrayList<>();
-      for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
-        exercises.add(
-            WorkoutExercise.create(
-                new WorkoutExerciseId(UUID.randomUUID()),
-                exInput.exerciseId(),
-                new WorkoutExerciseSets(exInput.sets()),
-                new WorkoutExerciseReps(exInput.reps()),
-                new WorkoutExerciseRest(exInput.restSeconds())));
-      }
+      List<WorkoutExercise> exercises =
+          command.exercises().stream()
+              .map(
+                  ex ->
+                      WorkoutExercise.create(
+                          new WorkoutExerciseId(UUID.randomUUID()),
+                          new ExerciseId(ex.exerciseId()),
+                          new WorkoutExerciseSets(ex.sets()),
+                          new WorkoutExerciseReps(ex.reps()),
+                          new WorkoutExerciseRest(ex.restSeconds())))
+              .toList();
 
-      WorkoutDay newDay =
-          WorkoutDay.create(
-              new WorkoutDayId(UUID.randomUUID()),
-              new WorkoutDayName(command.dayName()),
-              exercises);
-      Workout updatedWorkout = workout.addDays(List.of(newDay));
-      repository.save(updatedWorkout);
+      Workout updated = workout.updateExercisesInDay(command.dayId(), exercises);
+      repository.save(updated);
       publishEvent(
           PlanningActivityEvent.success(
-              PlanningActivityType.WORKOUT_DAY_ADDED,
+              PlanningActivityType.WORKOUT_EXERCISES_REPLACED,
               command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_DAY_ADDED.getDefaultDescription()));
+              PlanningActivityType.WORKOUT_EXERCISES_REPLACED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
-              PlanningActivityType.WORKOUT_DAY_ADDED,
+              PlanningActivityType.WORKOUT_EXERCISES_REPLACED,
               command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_DAY_ADDED.getDefaultDescription(),
+              PlanningActivityType.WORKOUT_EXERCISES_REPLACED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;
     }

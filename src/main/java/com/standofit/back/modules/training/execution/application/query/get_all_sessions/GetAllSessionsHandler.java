@@ -26,7 +26,7 @@ public class GetAllSessionsHandler implements QueryHandler<GetAllSessionsQuery, 
 
   @Override
   public SessionListDto handle(GetAllSessionsQuery query) {
-    List<Session> sessions = repository.getAll();
+    List<Session> sessions = repository.findAll();
     return mapper.toListDTO(sessions);
   }
 }

@@ -7,7 +7,6 @@ import com.standofit.back.modules.training.planning.application.mapper.WorkoutDt
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
-import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -24,22 +23,18 @@ public class ReorderDaysService extends PlanningUseCase {
   public void reorder(ReorderDaysCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
-
-      List<WorkoutDayId> dayIds = command.dayIds().stream().map(WorkoutDayId::new).toList();
-
-      Workout reordered = workout.reorderDays(dayIds);
-
+      Workout reordered = workout.reorderDays(command.dayIds());
       repository.save(reordered);
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_DAYS_REORDERED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DAYS_REORDERED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_DAYS_REORDERED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DAYS_REORDERED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

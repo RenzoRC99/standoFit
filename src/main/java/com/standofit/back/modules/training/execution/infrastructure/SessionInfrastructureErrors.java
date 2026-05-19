@@ -5,7 +5,8 @@ import com.standofit.back.shared.utils.EnumContract;
 public enum SessionInfrastructureErrors implements EnumContract {
   SAVE_FAILED("Failed to save session"),
   FIND_FAILED("Failed to find session"),
-  DELETE_FAILED("Failed to delete session");
+  DELETE_FAILED("Failed to delete session"),
+  SESSION_NOT_FOUND("Session not found: %s");
 
   private final String message;
 

@@ -21,7 +21,7 @@ public class UpdateSessionNotesService extends ExecutionUseCase {
 
   public void updateNotes(UpdateSessionNotesCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.changeNotes(command.notes());
       repository.save(updatedSession);
       publishEvent(

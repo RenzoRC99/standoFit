@@ -19,7 +19,6 @@ public class CancelSessionHandler implements CommandHandler<CancelSessionCommand
   }
 
   @Override
-  @Transactional
   public Void handle(CancelSessionCommand command) {
     service.cancel(command);
     return null;

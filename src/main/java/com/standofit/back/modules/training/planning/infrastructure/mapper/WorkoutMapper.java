@@ -11,7 +11,6 @@ import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -20,14 +19,13 @@ import org.springframework.stereotype.Component;
 public class WorkoutMapper {
 
   public WorkoutJpaEntity toEntity(Workout workout) {
-    Instant now = Instant.now();
     WorkoutJpaEntity entity =
         new WorkoutJpaEntity(
             workout.getId().value(),
             workout.getName().value(),
             workout.getDescription() != null ? workout.getDescription().value() : "",
-            now,
-            now);
+            workout.getCreatedAt().value(),
+            workout.getUpdatedAt().value());
 
     int orderIndex = 0;
     for (WorkoutDay day : workout.getDays()) {
@@ -65,7 +63,13 @@ public class WorkoutMapper {
     List<WorkoutDay> days =
         entity.getDays().stream().map(this::toDomain).collect(Collectors.toList());
 
-    return Workout.create(new WorkoutId(entity.getId()), description, name, days);
+    return Workout.copy(
+        new WorkoutId(entity.getId()),
+        description,
+        name,
+        days,
+        new WorkoutCreatedAt(entity.getCreatedAt()),
+        new WorkoutUpdatedAt(entity.getUpdatedAt()));
   }
 
   public WorkoutDay toDomain(WorkoutDayJpaEntity entity) {

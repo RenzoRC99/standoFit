@@ -36,7 +36,7 @@ public class StartSessionService extends ExecutionUseCase {
       publishEvent(
           SessionActivityEvent.failure(
               ExecutionActivityType.SESSION_STARTED,
-              null,
+              id.toString(),
               ExecutionActivityType.SESSION_STARTED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

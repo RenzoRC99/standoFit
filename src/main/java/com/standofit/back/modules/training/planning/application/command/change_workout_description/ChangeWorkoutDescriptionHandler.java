@@ -20,7 +20,6 @@ public class ChangeWorkoutDescriptionHandler
   }
 
   @Override
-  @Transactional
   public Void handle(ChangeWorkoutDescriptionCommand command) {
     service.changeDescription(command);
     return null;

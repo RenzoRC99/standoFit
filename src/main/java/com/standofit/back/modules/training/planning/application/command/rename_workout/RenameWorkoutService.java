@@ -23,20 +23,18 @@ public class RenameWorkoutService extends PlanningUseCase {
   public void rename(RenameWorkoutCommand command) {
     try {
       Workout workout = repository.getById(command.workoutId());
-
       Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
-
       repository.save(renamed);
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_RENAMED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_RENAMED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

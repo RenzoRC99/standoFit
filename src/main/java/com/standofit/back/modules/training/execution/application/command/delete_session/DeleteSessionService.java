@@ -20,7 +20,7 @@ public class DeleteSessionService extends ExecutionUseCase {
 
   public void delete(DeleteSessionCommand command) {
     try {
-      repository.delete(command.sessionId());
+      repository.deleteById(command.sessionId());
       publishEvent(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_DELETED,

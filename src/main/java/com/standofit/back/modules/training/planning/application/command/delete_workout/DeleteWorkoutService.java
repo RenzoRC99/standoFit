@@ -24,13 +24,13 @@ public class DeleteWorkoutService extends PlanningUseCase {
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_DELETED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DELETED.getDefaultDescription()));
     } catch (Exception e) {
       publishEvent(
           PlanningActivityEvent.failure(
               PlanningActivityType.WORKOUT_DELETED,
-              command.workoutId().toString(),
+              command.workoutId().value().toString(),
               PlanningActivityType.WORKOUT_DELETED.getDefaultDescription(),
               resolveErrorDetail(e)));
       throw e;

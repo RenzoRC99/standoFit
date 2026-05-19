@@ -34,7 +34,6 @@ public class WorkoutsByCriteriaSearcher extends PlanningUseCase {
               filters.items());
 
       var workouts = repository.searchByCriteria(criteria).stream().map(mapper::toDto).toList();
-
       long total = repository.countByCriteria(criteria);
 
       PagedResult<WorkoutDto> result = PagedResult.of(workouts, total, page, pageSize);

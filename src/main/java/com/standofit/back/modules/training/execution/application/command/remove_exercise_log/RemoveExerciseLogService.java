@@ -21,7 +21,7 @@ public class RemoveExerciseLogService extends ExecutionUseCase {
 
   public void removeExerciseLog(RemoveExerciseLogCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.removeLog(command.logId());
       repository.save(updatedSession);
       publishEvent(

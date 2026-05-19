@@ -2,7 +2,7 @@ package com.standofit.back.training.planning.presentation.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.standofit.back.modules.training.planning.application.command.plan_workout.PlanWorkoutCommand;
+import com.standofit.back.modules.training.planning.application.command.create_workout.CreateWorkoutCommand;
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.query.get_workout_by_id.GetWorkoutByIdQuery;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
@@ -29,21 +29,21 @@ class WorkoutControllerIntegrationTest {
   @Autowired private QueryBus queryBus;
 
   @Nested
-  @DisplayName("Plan Workout Command")
-  class PlanWorkout {
+  @DisplayName("Create Workout Command")
+  class CreateWorkout {
 
     @Test
     @DisplayName("should create workout and return id")
     void shouldCreateWorkoutAndReturnId() {
       var command =
-          new PlanWorkoutCommand(
+          new CreateWorkoutCommand(
               "Full Body Workout",
               "A complete full body routine",
               List.of(
-                  new PlanWorkoutCommand.DayInput(
+                  new CreateWorkoutCommand.DayInput(
                       "Monday",
                       List.of(
-                          new PlanWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 10, 60)))));
+                          new CreateWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 10, 60)))));
 
       UUID result = commandBus.dispatch(command);
 
@@ -54,14 +54,14 @@ class WorkoutControllerIntegrationTest {
     @DisplayName("should create and then retrieve workout")
     void shouldCreateAndRetrieveWorkout() {
       var command =
-          new PlanWorkoutCommand(
+          new CreateWorkoutCommand(
               "Test Workout",
               "Description",
               List.of(
-                  new PlanWorkoutCommand.DayInput(
+                  new CreateWorkoutCommand.DayInput(
                       "Day 1",
                       List.of(
-                          new PlanWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 12, 45)))));
+                          new CreateWorkoutCommand.ExerciseInput(UUID.randomUUID(), 3, 12, 45)))));
 
       UUID workoutId = commandBus.dispatch(command);
 
