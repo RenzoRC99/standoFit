@@ -26,7 +26,7 @@ public final class WorkoutDay {
     return new WorkoutDay(id, name, exercises);
   }
 
-  public WorkoutDay copy(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
+  private WorkoutDay copy(WorkoutDayId id, WorkoutDayName name, List<WorkoutExercise> exercises) {
     return new WorkoutDay(id, name, exercises);
   }
 

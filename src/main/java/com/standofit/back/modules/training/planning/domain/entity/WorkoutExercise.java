@@ -35,7 +35,7 @@ public final class WorkoutExercise {
     return new WorkoutExercise(id, exerciseId, sets, reps, restSeconds);
   }
 
-  public WorkoutExercise copy(
+  WorkoutExercise copy(
       WorkoutExerciseId id,
       ExerciseId exerciseId,
       WorkoutExerciseSets sets,

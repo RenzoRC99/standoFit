@@ -247,13 +247,7 @@ class WorkoutTest {
           WorkoutMother.aWorkoutWithDays(
               List.of(WorkoutDayMother.aWorkoutDayWithExercises(List.of(exercise))));
       var dayId = workout.getDays().get(0).getId();
-      WorkoutExercise updatedExercise =
-          exercise.copy(
-              exercise.getId(),
-              exercise.getExerciseId(),
-              new WorkoutExerciseSets(5),
-              new WorkoutExerciseReps(8),
-              new WorkoutExerciseRest(90));
+      WorkoutExercise updatedExercise = exercise.updateSets(new WorkoutExerciseSets(5));
 
       Workout updated = workout.updateExercisesInDay(dayId, List.of(updatedExercise));
 
