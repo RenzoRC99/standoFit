@@ -1,7 +1,9 @@
 package com.standofit.back.modules.training.execution.infrastructure.mapper;
 
+import com.standofit.back.modules.training.execution.application.dto.ExerciseLogDto;
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
+import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +17,19 @@ public class SessionDTOMapper {
         session.getId().value(),
         session.getDayId().value(),
         session.getStatus().name(),
-        List.of(), // exercises
+        session.getLogs().stream().map(this::toExerciseDto).toList(),
         session.getNotes().value(),
         session.getCreatedAt().value().toString(),
         session.getUpdatedAt().value().toString());
+  }
+
+  private ExerciseLogDto toExerciseDto(ExerciseLog log) {
+    return new ExerciseLogDto(
+        log.getId().value(),
+        log.getExerciseId().value(),
+        log.getSets().value(),
+        log.getReps().value(),
+        log.getWeight().value());
   }
 
   public List<SessionDto> toDTO(List<Session> sessions) {

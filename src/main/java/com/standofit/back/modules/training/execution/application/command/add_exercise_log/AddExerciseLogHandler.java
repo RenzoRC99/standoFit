@@ -19,7 +19,6 @@ public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogComma
   }
 
   @Override
-  @Transactional
   public Void handle(AddExerciseLogCommand command) {
     service.addExerciseLog(command);
     return null;

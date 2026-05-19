@@ -19,7 +19,6 @@ public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCom
   }
 
   @Override
-  @Transactional
   public Void handle(AddDayToWorkoutCommand command) {
     service.addDay(command);
     return null;

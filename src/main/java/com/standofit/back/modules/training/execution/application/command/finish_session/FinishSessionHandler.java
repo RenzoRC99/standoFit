@@ -19,7 +19,6 @@ public class FinishSessionHandler implements CommandHandler<FinishSessionCommand
   }
 
   @Override
-  @Transactional
   public Void handle(FinishSessionCommand command) {
     service.finish(command);
     return null;

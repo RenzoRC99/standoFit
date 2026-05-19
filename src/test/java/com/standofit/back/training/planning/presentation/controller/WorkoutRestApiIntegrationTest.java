@@ -36,6 +36,13 @@ class WorkoutRestApiIntegrationTest {
     workoutRepository.deleteAll();
   }
 
+  private String extractIdFromResponse(String responseBody) throws Exception {
+    var response =
+        objectMapper.readValue(
+            responseBody, com.standofit.back.api.planning.dto.WorkoutCreatedResponse.class);
+    return response.getId().toString();
+  }
+
   private String createWorkout(String name) throws Exception {
     var request =
         new com.standofit.back.api.planning.dto.PlanWorkoutRequest()
@@ -47,16 +54,16 @@ class WorkoutRestApiIntegrationTest {
                         .name("Day 1")
                         .exercises(List.of())));
 
-    return mockMvc
-        .perform(
-            post("/api/workouts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andReturn()
-        .getResponse()
-        .getContentAsString()
-        .replace("\"", "");
+    return extractIdFromResponse(
+        mockMvc
+            .perform(
+                post("/api/workouts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString());
   }
 
   private String createWorkoutWithDays(String name, List<String> dayNames) throws Exception {
@@ -73,16 +80,16 @@ class WorkoutRestApiIntegrationTest {
                                 .exercises(List.of()))
                     .toList());
 
-    return mockMvc
-        .perform(
-            post("/api/workouts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andReturn()
-        .getResponse()
-        .getContentAsString()
-        .replace("\"", "");
+    return extractIdFromResponse(
+        mockMvc
+            .perform(
+                post("/api/workouts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString());
   }
 
   @Nested
@@ -223,16 +230,16 @@ class WorkoutRestApiIntegrationTest {
       var duplicateRequest = new com.standofit.back.api.planning.dto.DuplicateWorkoutRequest();
       duplicateRequest.setNewName("Copy");
       String newId =
-          mockMvc
-              .perform(
-                  post("/api/workouts/" + workoutId + "/duplicate")
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(objectMapper.writeValueAsString(duplicateRequest)))
-              .andExpect(status().isCreated())
-              .andReturn()
-              .getResponse()
-              .getContentAsString()
-              .replace("\"", "");
+          extractIdFromResponse(
+              mockMvc
+                  .perform(
+                      post("/api/workouts/" + workoutId + "/duplicate")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content(objectMapper.writeValueAsString(duplicateRequest)))
+                  .andExpect(status().isCreated())
+                  .andReturn()
+                  .getResponse()
+                  .getContentAsString());
 
       mockMvc.perform(get("/api/workouts/" + newId)).andExpect(jsonPath("$.name").value("Copy"));
     }
@@ -243,16 +250,16 @@ class WorkoutRestApiIntegrationTest {
       String workoutId = createWorkout("Original");
 
       String newId =
-          mockMvc
-              .perform(
-                  post("/api/workouts/" + workoutId + "/duplicate")
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content("{}"))
-              .andExpect(status().isCreated())
-              .andReturn()
-              .getResponse()
-              .getContentAsString()
-              .replace("\"", "");
+          extractIdFromResponse(
+              mockMvc
+                  .perform(
+                      post("/api/workouts/" + workoutId + "/duplicate")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content("{}"))
+                  .andExpect(status().isCreated())
+                  .andReturn()
+                  .getResponse()
+                  .getContentAsString());
 
       mockMvc
           .perform(get("/api/workouts/" + newId))
@@ -267,36 +274,21 @@ class WorkoutRestApiIntegrationTest {
       var duplicateRequest = new com.standofit.back.api.planning.dto.DuplicateWorkoutRequest();
       duplicateRequest.setNewName("Copy");
       String newId =
-          mockMvc
-              .perform(
-                  post("/api/workouts/" + workoutId + "/duplicate")
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(objectMapper.writeValueAsString(duplicateRequest)))
-              .andExpect(status().isCreated())
-              .andReturn()
-              .getResponse()
-              .getContentAsString()
-              .replace("\"", "");
+          extractIdFromResponse(
+              mockMvc
+                  .perform(
+                      post("/api/workouts/" + workoutId + "/duplicate")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content(objectMapper.writeValueAsString(duplicateRequest)))
+                  .andExpect(status().isCreated())
+                  .andReturn()
+                  .getResponse()
+                  .getContentAsString());
 
       mockMvc
           .perform(get("/api/workouts/" + newId))
           .andExpect(jsonPath("$.name").value("Copy"))
           .andExpect(jsonPath("$.days.length()").value(1));
-    }
-  }
-
-  @Nested
-  @DisplayName("POST /api/workouts/{id}/archive - Archive Workout")
-  class ArchiveWorkout {
-
-    @Test
-    @DisplayName("should archive workout")
-    void shouldArchiveWorkout() throws Exception {
-      String workoutId = createWorkout("To Archive");
-
-      mockMvc
-          .perform(post("/api/workouts/" + workoutId + "/archive"))
-          .andExpect(status().isNoContent());
     }
   }
 

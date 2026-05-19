@@ -7,9 +7,9 @@ import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfras
 import com.standofit.back.modules.training.planning.infrastructure.entity.WorkoutJpaEntity;
 import com.standofit.back.modules.training.planning.infrastructure.mapper.WorkoutMapper;
 import com.standofit.back.shared.domain.criteria.Criteria;
+import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,9 +38,9 @@ public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
   }
 
   @Override
-  public Optional<Workout> findById(UUID id) {
+  public Optional<Workout> findById(WorkoutId id) {
     try {
-      return jpaRepository.findById(id).map(mapper::toDomain);
+      return jpaRepository.findById(id.value()).map(mapper::toDomain);
     } catch (DataAccessException e) {
       throw new WorkoutInfrastructureException(
           WorkoutInfrastructureErrors.FIND_FAILED.getMessage(), e);
@@ -48,12 +48,12 @@ public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
   }
 
   @Override
-  public Workout getById(UUID id) {
+  public Workout getById(WorkoutId id) {
     return findById(id)
         .orElseThrow(
             () ->
                 new WorkoutInfrastructureException(
-                    WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(id)));
+                    WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(id.value())));
   }
 
   @Override
@@ -92,9 +92,9 @@ public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
   }
 
   @Override
-  public void deleteById(UUID id) {
+  public void deleteById(WorkoutId id) {
     try {
-      jpaRepository.deleteById(id);
+      jpaRepository.deleteById(id.value());
       jpaRepository.flush();
     } catch (DataAccessException e) {
       throw new WorkoutInfrastructureException(

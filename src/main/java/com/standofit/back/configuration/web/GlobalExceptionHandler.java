@@ -1,6 +1,6 @@
-package com.standofit.back.shared.api;
+package com.standofit.back.configuration.web;
 
-import com.standofit.back.shared.api.dto.ErrorDTO;
+import com.standofit.back.configuration.web.dto.ErrorDTO;
 import com.standofit.back.shared.domain.DomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

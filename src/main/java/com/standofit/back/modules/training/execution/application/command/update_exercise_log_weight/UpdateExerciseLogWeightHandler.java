@@ -20,7 +20,6 @@ public class UpdateExerciseLogWeightHandler
   }
 
   @Override
-  @Transactional
   public Void handle(UpdateExerciseLogWeightCommand command) {
     service.updateWeight(command);
     return null;

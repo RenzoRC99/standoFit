@@ -1,4 +1,4 @@
-package com.standofit.back.shared.api.dto;
+package com.standofit.back.configuration.web.dto;
 
 import java.time.Instant;
 

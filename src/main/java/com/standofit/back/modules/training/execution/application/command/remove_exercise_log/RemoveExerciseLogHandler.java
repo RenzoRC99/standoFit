@@ -19,7 +19,6 @@ public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLo
   }
 
   @Override
-  @Transactional
   public Void handle(RemoveExerciseLogCommand command) {
     service.removeExerciseLog(command);
     return null;

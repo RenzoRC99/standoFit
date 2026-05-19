@@ -19,7 +19,6 @@ public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Vo
   }
 
   @Override
-  @Transactional
   public Void handle(ReorderDaysCommand command) {
     service.reorder(command);
     return null;

@@ -1,8 +1,6 @@
-package com.standofit.back.modules.training.planning.application.command.plan_workout;
+package com.standofit.back.modules.training.planning.application.command.create_workout;
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
@@ -20,23 +18,24 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PlanWorkoutService extends PlanningUseCase {
+public class CreateWorkoutService extends PlanningUseCase {
 
-  public PlanWorkoutService(
+  public CreateWorkoutService(
       WorkoutRepository repository,
       WorkoutDtoMapper mapper,
       ApplicationEventBus applicationEventBus) {
     super(repository, mapper, applicationEventBus);
   }
 
-  public UUID plan(PlanWorkoutCommand command) {
+  public UUID create(CreateWorkoutCommand command) {
+    WorkoutId workoutId = new WorkoutId(UUID.randomUUID());
     try {
       List<WorkoutDay> days = new ArrayList<>();
 
-      for (PlanWorkoutCommand.DayInput dayInput : command.days()) {
+      for (CreateWorkoutCommand.DayInput dayInput : command.days()) {
         List<WorkoutExercise> exercises = new ArrayList<>();
 
-        for (PlanWorkoutCommand.ExerciseInput exInput : dayInput.exercises()) {
+        for (CreateWorkoutCommand.ExerciseInput exInput : dayInput.exercises()) {
           WorkoutExercise exercise =
               WorkoutExercise.create(
                   new WorkoutExerciseId(UUID.randomUUID()),
@@ -57,25 +56,15 @@ public class PlanWorkoutService extends PlanningUseCase {
 
       Workout workout =
           Workout.create(
-              new WorkoutId(UUID.randomUUID()),
+              workoutId,
               new WorkoutDescription(command.description()),
               new WorkoutName(command.name()),
               days);
-
       UUID id = repository.save(workout).getId().value();
-      publishEvent(
-          PlanningActivityEvent.success(
-              PlanningActivityType.WORKOUT_PLANNED,
-              id.toString(),
-              PlanningActivityType.WORKOUT_PLANNED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
       return id;
     } catch (Exception e) {
-      publishEvent(
-          PlanningActivityEvent.failure(
-              PlanningActivityType.WORKOUT_PLANNED,
-              null,
-              PlanningActivityType.WORKOUT_PLANNED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

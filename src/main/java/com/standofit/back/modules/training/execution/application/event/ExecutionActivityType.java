@@ -10,7 +10,9 @@ public enum ExecutionActivityType {
   SESSION_EXERCISE_REMOVED("Removed exercise from session"),
   SESSION_EXERCISE_SETS_UPDATED("Updated exercise sets"),
   SESSION_EXERCISE_REPS_UPDATED("Updated exercise reps"),
-  SESSION_EXERCISE_WEIGHT_UPDATED("Updated exercise weight");
+  SESSION_EXERCISE_WEIGHT_UPDATED("Updated exercise weight"),
+  SESSION_QUERIED("Queried session"),
+  SESSIONS_SEARCHED("Searched sessions");
 
   private final String defaultDescription;
 

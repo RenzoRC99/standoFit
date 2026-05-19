@@ -20,7 +20,6 @@ public class DuplicateWorkoutHandler implements CommandHandler<DuplicateWorkoutC
   }
 
   @Override
-  @Transactional
   public UUID handle(DuplicateWorkoutCommand command) {
     return service.duplicate(command);
   }

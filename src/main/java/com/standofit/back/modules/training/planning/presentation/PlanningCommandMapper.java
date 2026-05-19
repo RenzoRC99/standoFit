@@ -3,7 +3,9 @@ package com.standofit.back.modules.training.planning.presentation;
 import com.standofit.back.api.planning.dto.AddDayRequest;
 import com.standofit.back.api.planning.dto.PlanWorkoutRequest;
 import com.standofit.back.modules.training.planning.application.command.add_day_to_workout.AddDayToWorkoutCommand;
-import com.standofit.back.modules.training.planning.application.command.plan_workout.PlanWorkoutCommand;
+import com.standofit.back.modules.training.planning.application.command.create_workout.CreateWorkoutCommand;
+import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
+import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 import java.util.UUID;
 
 public class PlanningCommandMapper {
@@ -14,28 +16,28 @@ public class PlanningCommandMapper {
             .map(
                 e ->
                     new AddDayToWorkoutCommand.ExerciseInput(
-                        e.getExerciseId(), e.getSets(), e.getReps(), e.getRestSeconds()))
+                        new ExerciseId(e.getExerciseId()), e.getSets(), e.getReps(), e.getRestSeconds()))
             .toList();
-    return new AddDayToWorkoutCommand(workoutId, request.getDayName(), exercises);
+    return new AddDayToWorkoutCommand(new WorkoutId(workoutId), request.getDayName(), exercises);
   }
 
-  public static PlanWorkoutCommand toCommand(PlanWorkoutRequest request) {
+  public static CreateWorkoutCommand toCreateCommand(PlanWorkoutRequest request) {
     var days =
         request.getDays().stream()
             .map(
                 day ->
-                    new PlanWorkoutCommand.DayInput(
+                    new CreateWorkoutCommand.DayInput(
                         day.getName(),
                         day.getExercises().stream()
                             .map(
                                 ex ->
-                                    new PlanWorkoutCommand.ExerciseInput(
+                                    new CreateWorkoutCommand.ExerciseInput(
                                         ex.getExerciseId(),
                                         ex.getSets(),
                                         ex.getReps(),
                                         ex.getRestSeconds()))
                             .toList()))
             .toList();
-    return new PlanWorkoutCommand(request.getName(), request.getDescription(), days);
+    return new CreateWorkoutCommand(request.getName(), request.getDescription(), days);
   }
 }

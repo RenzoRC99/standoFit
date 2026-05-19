@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.update
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
@@ -21,21 +20,12 @@ public class UpdateSessionNotesService extends ExecutionUseCase {
 
   public void updateNotes(UpdateSessionNotesCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.changeNotes(command.notes());
       repository.save(updatedSession);
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_NOTES_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_NOTES_UPDATED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_NOTES_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_NOTES_UPDATED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

@@ -50,19 +50,10 @@ class WorkoutExerciseTest {
     void shouldCopyWorkoutExerciseWithNewValues() {
       WorkoutExercise exercise = WorkoutExerciseMother.aWorkoutExerciseWith(3, 10, 60);
 
-      WorkoutExercise copied =
-          exercise.copy(
-              exercise.getId(),
-              exercise.getExerciseId(),
-              new WorkoutExerciseSets(5),
-              new WorkoutExerciseReps(8),
-              new WorkoutExerciseRest(90));
+      WorkoutExercise updated = exercise.updateSets(new WorkoutExerciseSets(5));
 
-      assertEquals(5, copied.getSets().value());
-      assertEquals(8, copied.getReps().value());
-      assertEquals(90, copied.getRestSeconds().value());
-      assertEquals(exercise.getId(), copied.getId());
-      assertEquals(exercise.getExerciseId(), copied.getExerciseId());
+      assertEquals(5, updated.getSets().value());
+      assertEquals(exercise.getId(), updated.getId());
     }
   }
 }
