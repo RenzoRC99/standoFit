@@ -45,15 +45,15 @@ public class ExerciseLog {
     return new ExerciseLog(id, exerciseId, sets, reps, weight);
   }
 
-  ExerciseLog updateSets(ExerciseLogSets sets) {
+  public ExerciseLog updateSets(ExerciseLogSets sets) {
     return copy(id, exerciseId, sets, reps, weight);
   }
 
-  ExerciseLog updateReps(ExerciseLogReps reps) {
+  public ExerciseLog updateReps(ExerciseLogReps reps) {
     return copy(id, exerciseId, sets, reps, weight);
   }
 
-  ExerciseLog updateWeight(ExerciseLogWeight weight) {
+  public ExerciseLog updateWeight(ExerciseLogWeight weight) {
     return copy(id, exerciseId, sets, reps, weight);
   }
 

@@ -59,7 +59,7 @@ public final class Session extends AggregateRoot {
     return new Session(id, dayId, status, logs, notes, createdAt, updatedAt);
   }
 
-  public Session update(
+  private Session update(
       WorkoutSessionStatus status,
       List<ExerciseLog> logs,
       WorkoutSessionNotes notes,
