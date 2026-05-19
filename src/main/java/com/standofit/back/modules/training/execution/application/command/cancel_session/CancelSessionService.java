@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.cancel
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
@@ -23,18 +22,9 @@ public class CancelSessionService extends ExecutionUseCase {
     try {
       Session session = repository.getById(command.sessionId());
       repository.save(session.cancel());
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_CANCELLED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_CANCELLED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_CANCELLED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_CANCELLED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

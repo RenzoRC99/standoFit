@@ -1,8 +1,6 @@
 package com.standofit.back.modules.training.planning.application.command.replace_day_exercises;
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
@@ -45,18 +43,9 @@ public class ReplaceDayExercisesService extends PlanningUseCase {
 
       Workout updated = workout.updateExercisesInDay(command.dayId(), exercises);
       repository.save(updated);
-      publishEvent(
-          PlanningActivityEvent.success(
-              PlanningActivityType.WORKOUT_EXERCISES_REPLACED,
-              command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_EXERCISES_REPLACED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          PlanningActivityEvent.failure(
-              PlanningActivityType.WORKOUT_EXERCISES_REPLACED,
-              command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_EXERCISES_REPLACED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.delete
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
@@ -21,18 +20,9 @@ public class DeleteSessionService extends ExecutionUseCase {
   public void delete(DeleteSessionCommand command) {
     try {
       repository.deleteById(command.sessionId());
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_DELETED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_DELETED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_DELETED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_DELETED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

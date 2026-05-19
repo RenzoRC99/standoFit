@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.start_
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
@@ -26,19 +25,10 @@ public class StartSessionService extends ExecutionUseCase {
     try {
       Session session = Session.create(new SessionId(id), command.dayId());
       repository.save(session);
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_STARTED,
-              id.toString(),
-              ExecutionActivityType.SESSION_STARTED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
       return id;
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_STARTED,
-              id.toString(),
-              ExecutionActivityType.SESSION_STARTED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

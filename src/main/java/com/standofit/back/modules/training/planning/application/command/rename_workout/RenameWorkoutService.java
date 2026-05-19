@@ -1,8 +1,6 @@
 package com.standofit.back.modules.training.planning.application.command.rename_workout;
 
 import com.standofit.back.modules.training.planning.application.PlanningUseCase;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
-import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
@@ -25,18 +23,9 @@ public class RenameWorkoutService extends PlanningUseCase {
       Workout workout = repository.getById(command.workoutId());
       Workout renamed = workout.renameWorkout(new WorkoutName(command.newName()));
       repository.save(renamed);
-      publishEvent(
-          PlanningActivityEvent.success(
-              PlanningActivityType.WORKOUT_RENAMED,
-              command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          PlanningActivityEvent.failure(
-              PlanningActivityType.WORKOUT_RENAMED,
-              command.workoutId().value().toString(),
-              PlanningActivityType.WORKOUT_RENAMED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }
