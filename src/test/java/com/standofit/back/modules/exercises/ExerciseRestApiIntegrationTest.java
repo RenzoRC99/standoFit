@@ -1,4 +1,4 @@
-package com.standofit.back.exercises;
+package com.standofit.back.modules.exercises;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

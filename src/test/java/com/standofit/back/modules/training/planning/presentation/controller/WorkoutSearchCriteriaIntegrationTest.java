@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.presentation.controller;
+package com.standofit.back.modules.training.planning.presentation.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

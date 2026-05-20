@@ -1,4 +1,4 @@
-package com.standofit.back.training.planning.domain.entity;
+package com.standofit.back.modules.training.planning.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

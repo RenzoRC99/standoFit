@@ -17,7 +17,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.standofit.back.shared.utils.CollectionUtils.isNullOrEmpty;
-import static com.standofit.back.shared.utils.CollectionUtils.isNullOrEmptyForMap;
 
 public final class Workout extends AggregateRoot {
 
@@ -131,21 +130,9 @@ public final class Workout extends AggregateRoot {
                 this.createdAt, new WorkoutUpdatedAt(Instant.now()));
     }
 
-    public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
-        if (isNullOrEmptyForMap(dayNames))
-            throw new WorkoutDomainException(
-                    WorkoutDomainErrors.DAY_IDS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
-        List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
-        validateDayIdsExist(ids);
-
-        List<WorkoutDay> updatedDays =
-                this.days.stream()
-                        .map(
-                                day ->
-                                        dayNames.containsKey(day.getId()) ? day.rename(dayNames.get(day.getId())) : day)
-                        .toList();
-
-        return copy(this.id, this.description, this.name, updatedDays,
+    public Workout renameDay(WorkoutDayId dayId, WorkoutDayName newName) {
+        return copy(this.id, this.description, this.name,
+                transformDay(dayId, day -> day.rename(newName)),
                 this.createdAt, new WorkoutUpdatedAt(Instant.now()));
     }
 
