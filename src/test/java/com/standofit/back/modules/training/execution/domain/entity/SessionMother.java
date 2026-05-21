@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.execution.domain.entity;
 
-import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
-import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.vo.SessionCreatedAt;
 import com.standofit.back.modules.training.execution.domain.vo.SessionUpdatedAt;
 import com.standofit.back.modules.training.execution.domain.vo.WorkoutSessionNotes;

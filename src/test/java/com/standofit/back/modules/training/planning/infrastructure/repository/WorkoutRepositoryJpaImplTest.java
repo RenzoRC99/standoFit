@@ -6,8 +6,6 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.vo.*;
-import com.standofit.back.modules.training.planning.infrastructure.repository.WorkoutJpaRepository;
-import com.standofit.back.modules.training.planning.infrastructure.repository.WorkoutRepositoryJpaImpl;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
@@ -43,7 +41,10 @@ class WorkoutRepositoryJpaImplTest {
             new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName("Day 1"), List.of());
 
     return Workout.create(
-        new WorkoutId(UUID.randomUUID()), new WorkoutDescription(null), new WorkoutName("Test Workout"), List.of(day));
+        new WorkoutId(UUID.randomUUID()),
+        new WorkoutDescription(null),
+        new WorkoutName("Test Workout"),
+        List.of(day));
   }
 
   private Workout createTestWorkoutWithExercises() {
@@ -61,7 +62,10 @@ class WorkoutRepositoryJpaImplTest {
             new WorkoutDayId(UUID.randomUUID()), new WorkoutDayName("Day 1"), List.of(exercise));
 
     return Workout.create(
-        new WorkoutId(UUID.randomUUID()), new WorkoutDescription(null), new WorkoutName("Test Workout"), List.of(day));
+        new WorkoutId(UUID.randomUUID()),
+        new WorkoutDescription(null),
+        new WorkoutName("Test Workout"),
+        List.of(day));
   }
 
   @Nested

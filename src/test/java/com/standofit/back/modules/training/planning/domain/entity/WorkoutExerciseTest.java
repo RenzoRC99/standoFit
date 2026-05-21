@@ -3,9 +3,6 @@ package com.standofit.back.modules.training.planning.domain.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
-import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseReps;
-import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseRest;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseSets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

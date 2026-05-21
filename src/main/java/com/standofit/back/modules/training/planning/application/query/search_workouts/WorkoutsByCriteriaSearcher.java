@@ -40,9 +40,10 @@ public class WorkoutsByCriteriaSearcher extends PlanningUseCase {
 
       var workouts = repository.searchByCriteria(criteria);
       var exerciseMaps = enrichmentService.loadExerciseData(workouts);
-      var enriched = workouts.stream()
-          .map(w -> mapper.toDto(w, exerciseMaps.names(), exerciseMaps.muscleGroups()))
-          .toList();
+      var enriched =
+          workouts.stream()
+              .map(w -> mapper.toDto(w, exerciseMaps.names(), exerciseMaps.muscleGroups()))
+              .toList();
       long total = repository.countByCriteria(criteria);
 
       PagedResult<WorkoutDto> result = PagedResult.of(enriched, total, page, pageSize);

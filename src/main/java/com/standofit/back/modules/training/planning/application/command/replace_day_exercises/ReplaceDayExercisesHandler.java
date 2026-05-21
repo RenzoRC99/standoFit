@@ -2,10 +2,10 @@ package com.standofit.back.modules.training.planning.application.command.replace
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class ReplaceDayExercisesHandler implements CommandHandler<ReplaceDayExercisesCommand, Void> {
+public class ReplaceDayExercisesHandler
+    implements CommandHandler<ReplaceDayExercisesCommand, Void> {
 
   private final ReplaceDayExercisesService service;
 

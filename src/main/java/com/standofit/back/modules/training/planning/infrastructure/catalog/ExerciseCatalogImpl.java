@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation of ExerciseCatalog that bridges to the exercises module.
- * This is the only place in planning module that directly references exercises module.
+ * Implementation of ExerciseCatalog that bridges to the exercises module. This is the only place in
+ * planning module that directly references exercises module.
  */
 @Component
 public class ExerciseCatalogImpl implements ExerciseCatalog {
@@ -33,17 +33,15 @@ public class ExerciseCatalogImpl implements ExerciseCatalog {
     Set<String> stringIds = ids.stream().map(UUID::toString).collect(Collectors.toSet());
     List<Exercise> exercises = exerciseRepository.findAllById(stringIds);
 
-    Map<UUID, String> names = exercises.stream()
-        .collect(Collectors.toMap(
-            ex -> UUID.fromString(ex.getId()),
-            Exercise::getName
-        ));
+    Map<UUID, String> names =
+        exercises.stream()
+            .collect(Collectors.toMap(ex -> UUID.fromString(ex.getId()), Exercise::getName));
 
-    Map<UUID, String> muscleGroups = exercises.stream()
-        .collect(Collectors.toMap(
-            ex -> UUID.fromString(ex.getId()),
-            ex -> ex.getMuscleGroup().name()
-        ));
+    Map<UUID, String> muscleGroups =
+        exercises.stream()
+            .collect(
+                Collectors.toMap(
+                    ex -> UUID.fromString(ex.getId()), ex -> ex.getMuscleGroup().name()));
 
     return new ExerciseData(names, muscleGroups);
   }
@@ -55,9 +53,6 @@ public class ExerciseCatalogImpl implements ExerciseCatalog {
 
   private ExerciseInfo toExerciseInfo(Exercise exercise) {
     return new ExerciseInfo(
-        UUID.fromString(exercise.getId()),
-        exercise.getName(),
-        exercise.getMuscleGroup().name()
-    );
+        UUID.fromString(exercise.getId()), exercise.getName(), exercise.getMuscleGroup().name());
   }
 }

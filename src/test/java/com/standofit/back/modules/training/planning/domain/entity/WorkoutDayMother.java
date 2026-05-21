@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.planning.domain.entity;
 
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.standofit.back.modules.training.execution.application.command.update_session_notes;
 
+import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
+import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.vo.WorkoutSessionNotes;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEvent;
 import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.EventfulCommand;
-import com.standofit.back.shared.domain.bus.application_event.ApplicationEvent;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
-import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 
 public record UpdateSessionNotesCommand(SessionId sessionId, WorkoutSessionNotes notes)
     implements Command<Void>, EventfulCommand {

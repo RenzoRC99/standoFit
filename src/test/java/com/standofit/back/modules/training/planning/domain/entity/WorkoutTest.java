@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.standofit.back.modules.training.planning.domain.WorkoutDomainException;
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.vo.*;
 import com.standofit.back.shared.domain.valueobjects.errors.ValueObjectException;
 import java.util.List;

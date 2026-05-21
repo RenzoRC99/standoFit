@@ -31,8 +31,7 @@ class RemoveExerciseLogDTOHandlerTest {
   void shouldDelegateToService() {
     var command =
         new RemoveExerciseLogCommand(
-            new SessionId(UUID.randomUUID()),
-            new ExerciseLogId(UUID.randomUUID()));
+            new SessionId(UUID.randomUUID()), new ExerciseLogId(UUID.randomUUID()));
 
     handler.handle(command);
 
@@ -44,8 +43,7 @@ class RemoveExerciseLogDTOHandlerTest {
   void shouldPropagateExceptionFromService() {
     var command =
         new RemoveExerciseLogCommand(
-            new SessionId(UUID.randomUUID()),
-            new ExerciseLogId(UUID.randomUUID()));
+            new SessionId(UUID.randomUUID()), new ExerciseLogId(UUID.randomUUID()));
     doThrow(new RuntimeException("Service error")).when(service).removeExerciseLog(command);
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));

@@ -32,7 +32,8 @@ class GetSessionByIdHandlerTest {
   void shouldDelegateToService() {
     var sessionId = new SessionId(UUID.randomUUID());
     var query = new GetSessionByIdQuery(sessionId);
-    var dto = new SessionDto(sessionId.value(), UUID.randomUUID(), "IN_PROGRESS", List.of(), "", "", "");
+    var dto =
+        new SessionDto(sessionId.value(), UUID.randomUUID(), "IN_PROGRESS", List.of(), "", "", "");
     when(service.findById(query)).thenReturn(dto);
 
     var result = handler.handle(query);

@@ -5,7 +5,6 @@ import com.standofit.back.modules.training.planning.application.mapper.WorkoutDt
 import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
-import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
