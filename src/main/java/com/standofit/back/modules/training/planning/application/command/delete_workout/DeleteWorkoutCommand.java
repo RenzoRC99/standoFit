@@ -7,8 +7,7 @@ import com.standofit.back.shared.domain.bus.command.Command;
 import com.standofit.back.shared.domain.bus.command.EventfulCommand;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
 
-public record DeleteWorkoutCommand(WorkoutId workoutId)
-    implements Command<Void>, EventfulCommand {
+public record DeleteWorkoutCommand(WorkoutId workoutId) implements Command<Void>, EventfulCommand {
 
   public ApplicationEvent toSuccessEvent() {
     return PlanningActivityEvent.success(

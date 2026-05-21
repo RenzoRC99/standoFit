@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WorkoutJpaRepository
-    extends JpaRepository<WorkoutJpaEntity, UUID>, JpaSpecificationExecutor<WorkoutJpaEntity> {
-}
+    extends JpaRepository<WorkoutJpaEntity, UUID>, JpaSpecificationExecutor<WorkoutJpaEntity> {}

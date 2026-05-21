@@ -36,7 +36,8 @@ public class PlanningApiController implements PlanningApi {
 
   @Override
   @Transactional
-  public ResponseEntity<WorkoutCreatedResponse> addDayToWorkout(UUID workoutId, AddDayRequest request) {
+  public ResponseEntity<WorkoutCreatedResponse> addDayToWorkout(
+      UUID workoutId, AddDayRequest request) {
     commandBus.dispatch(PlanningCommandMapper.toCommand(workoutId, request));
     return ResponseEntity.status(HttpStatus.CREATED).body(new WorkoutCreatedResponse(workoutId));
   }
@@ -44,7 +45,8 @@ public class PlanningApiController implements PlanningApi {
   @Override
   @Transactional
   public ResponseEntity<Void> changeWorkoutDescription(UUID workoutId, DescriptionRequest request) {
-    commandBus.dispatch(new ChangeWorkoutDescriptionCommand(new WorkoutId(workoutId), request.getDescription()));
+    commandBus.dispatch(
+        new ChangeWorkoutDescriptionCommand(new WorkoutId(workoutId), request.getDescription()));
     return ResponseEntity.noContent().build();
   }
 
@@ -54,7 +56,8 @@ public class PlanningApiController implements PlanningApi {
     if (request.getName() != null)
       commandBus.dispatch(new RenameWorkoutCommand(new WorkoutId(workoutId), request.getName()));
     if (request.getDescription() != null)
-      commandBus.dispatch(new ChangeWorkoutDescriptionCommand(new WorkoutId(workoutId), request.getDescription()));
+      commandBus.dispatch(
+          new ChangeWorkoutDescriptionCommand(new WorkoutId(workoutId), request.getDescription()));
     return ResponseEntity.noContent().build();
   }
 
@@ -67,9 +70,11 @@ public class PlanningApiController implements PlanningApi {
 
   @Override
   @Transactional
-  public ResponseEntity<WorkoutCreatedResponse> duplicateWorkout(UUID workoutId, DuplicateWorkoutRequest request) {
+  public ResponseEntity<WorkoutCreatedResponse> duplicateWorkout(
+      UUID workoutId, DuplicateWorkoutRequest request) {
     UUID newWorkoutId =
-        commandBus.dispatch(new DuplicateWorkoutCommand(new WorkoutId(workoutId), request.getNewName()));
+        commandBus.dispatch(
+            new DuplicateWorkoutCommand(new WorkoutId(workoutId), request.getNewName()));
     return ResponseEntity.status(HttpStatus.CREATED).body(new WorkoutCreatedResponse(newWorkoutId));
   }
 
@@ -104,21 +109,31 @@ public class PlanningApiController implements PlanningApi {
 
   @Override
   @Transactional
-  public ResponseEntity<Void> updateWorkoutDay(UUID workoutId, UUID dayId, UpdateDayRequest request) {
+  public ResponseEntity<Void> updateWorkoutDay(
+      UUID workoutId, UUID dayId, UpdateDayRequest request) {
     if (request.getName() != null)
-      commandBus.dispatch(new RenameDayCommand(new WorkoutId(workoutId), new WorkoutDayId(dayId), request.getName()));
+      commandBus.dispatch(
+          new RenameDayCommand(
+              new WorkoutId(workoutId), new WorkoutDayId(dayId), request.getName()));
     if (request.getExercises() != null)
-      commandBus.dispatch(new ReplaceDayExercisesCommand(new WorkoutId(workoutId), new WorkoutDayId(dayId),
-          request.getExercises().stream()
-              .map(e -> new ReplaceDayExercisesCommand.ExerciseInput(e.getExerciseId(), e.getSets(), e.getReps(), e.getRestSeconds()))
-              .toList()));
+      commandBus.dispatch(
+          new ReplaceDayExercisesCommand(
+              new WorkoutId(workoutId),
+              new WorkoutDayId(dayId),
+              request.getExercises().stream()
+                  .map(
+                      e ->
+                          new ReplaceDayExercisesCommand.ExerciseInput(
+                              e.getExerciseId(), e.getSets(), e.getReps(), e.getRestSeconds()))
+                  .toList()));
     return ResponseEntity.noContent().build();
   }
 
   @Override
   @Transactional
   public ResponseEntity<Void> removeDayFromWorkout(UUID workoutId, UUID dayId) {
-    commandBus.dispatch(new RemoveDayFromWorkoutCommand(new WorkoutId(workoutId), new WorkoutDayId(dayId)));
+    commandBus.dispatch(
+        new RemoveDayFromWorkoutCommand(new WorkoutId(workoutId), new WorkoutDayId(dayId)));
     return ResponseEntity.noContent().build();
   }
 
@@ -132,9 +147,7 @@ public class PlanningApiController implements PlanningApi {
   @Override
   @Transactional
   public ResponseEntity<Void> reorderDays(UUID workoutId, ReorderDaysRequest request) {
-    var dayIds = request.getDayIds().stream()
-        .map(WorkoutDayId::new)
-        .collect(Collectors.toList());
+    var dayIds = request.getDayIds().stream().map(WorkoutDayId::new).collect(Collectors.toList());
     commandBus.dispatch(new ReorderDaysCommand(new WorkoutId(workoutId), dayIds));
     return ResponseEntity.noContent().build();
   }

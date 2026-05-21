@@ -1,7 +1,5 @@
 package com.standofit.back.modules.training.planning.domain.entity;
 
-import com.standofit.back.modules.training.planning.domain.entity.Workout;
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutDescription;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutName;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;

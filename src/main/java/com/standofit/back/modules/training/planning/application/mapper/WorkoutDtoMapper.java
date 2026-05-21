@@ -21,9 +21,7 @@ public class WorkoutDtoMapper {
   }
 
   public WorkoutDto toDto(
-      Workout workout,
-      Map<UUID, String> exerciseNames,
-      Map<UUID, String> exerciseMuscleGroups) {
+      Workout workout, Map<UUID, String> exerciseNames, Map<UUID, String> exerciseMuscleGroups) {
     List<WorkoutDayDto> days =
         workout.getDays().stream()
             .map(day -> toDto(day, exerciseNames, exerciseMuscleGroups))
@@ -43,9 +41,7 @@ public class WorkoutDtoMapper {
   }
 
   public WorkoutDayDto toDto(
-      WorkoutDay day,
-      Map<UUID, String> exerciseNames,
-      Map<UUID, String> exerciseMuscleGroups) {
+      WorkoutDay day, Map<UUID, String> exerciseNames, Map<UUID, String> exerciseMuscleGroups) {
     List<WorkoutExerciseDto> exercises =
         day.getExercises().stream()
             .map(ex -> toDto(ex, exerciseNames, exerciseMuscleGroups))

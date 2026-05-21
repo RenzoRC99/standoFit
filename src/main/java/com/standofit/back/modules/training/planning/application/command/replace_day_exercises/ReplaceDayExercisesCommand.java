@@ -13,8 +13,7 @@ public record ReplaceDayExercisesCommand(
     WorkoutId workoutId, WorkoutDayId dayId, List<ExerciseInput> exercises)
     implements Command<Void>, EventfulCommand {
 
-  public record ExerciseInput(
-      java.util.UUID exerciseId, int sets, int reps, int restSeconds) {}
+  public record ExerciseInput(java.util.UUID exerciseId, int sets, int reps, int restSeconds) {}
 
   public ApplicationEvent toSuccessEvent() {
     return PlanningActivityEvent.success(

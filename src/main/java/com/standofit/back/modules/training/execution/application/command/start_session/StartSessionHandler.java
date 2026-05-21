@@ -3,7 +3,6 @@ package com.standofit.back.modules.training.execution.application.command.start_
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class StartSessionHandler implements CommandHandler<StartSessionCommand, UUID> {

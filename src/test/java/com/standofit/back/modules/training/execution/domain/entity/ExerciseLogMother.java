@@ -1,6 +1,5 @@
 package com.standofit.back.modules.training.execution.domain.entity;
 
-import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;

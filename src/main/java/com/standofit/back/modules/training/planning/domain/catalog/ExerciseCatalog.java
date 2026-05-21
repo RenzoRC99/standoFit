@@ -6,9 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Repository interface for accessing exercise catalog data.
- * Defined in planning domain, implemented in infrastructure.
- * This decouples planning module from exercises module.
+ * Repository interface for accessing exercise catalog data. Defined in planning domain, implemented
+ * in infrastructure. This decouples planning module from exercises module.
  */
 public interface ExerciseCatalog {
 
@@ -28,13 +27,9 @@ public interface ExerciseCatalog {
    */
   Optional<ExerciseInfo> findById(UUID id);
 
-  /**
-   * Container for exercise enrichment data returned by findByIds.
-   */
+  /** Container for exercise enrichment data returned by findByIds. */
   record ExerciseData(Map<UUID, String> names, Map<UUID, String> muscleGroups) {}
 
-  /**
-   * Value object containing exercise information needed by planning module.
-   */
+  /** Value object containing exercise information needed by planning module. */
   record ExerciseInfo(UUID id, String name, String muscleGroup) {}
 }

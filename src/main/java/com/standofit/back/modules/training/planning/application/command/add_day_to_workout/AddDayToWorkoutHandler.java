@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.planning.application.command.add_day
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCommand, Void> {

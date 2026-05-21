@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.delete
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DeleteSessionHandler implements CommandHandler<DeleteSessionCommand, Void> {
