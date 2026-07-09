@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.update
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNotesCommand, Void> {
@@ -19,7 +18,6 @@ public class UpdateSessionNotesHandler implements CommandHandler<UpdateSessionNo
   }
 
   @Override
-  @Transactional
   public Void handle(UpdateSessionNotesCommand command) {
     service.updateNotes(command);
     return null;

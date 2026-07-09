@@ -8,6 +8,10 @@ public abstract class StringVO extends BaseVO<String> {
     super(value);
   }
 
+  protected StringVO(String value, String defaultValue) {
+    super(value != null ? value : defaultValue);
+  }
+
   protected void ensureLengthRange(int min, int max) {
     int length = value().length();
     if (length > max || length < min) {

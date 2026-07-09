@@ -35,13 +35,25 @@ public final class WorkoutExercise {
     return new WorkoutExercise(id, exerciseId, sets, reps, restSeconds);
   }
 
-  public WorkoutExercise copy(
+  WorkoutExercise copy(
       WorkoutExerciseId id,
       ExerciseId exerciseId,
       WorkoutExerciseSets sets,
       WorkoutExerciseReps reps,
       WorkoutExerciseRest restSeconds) {
     return new WorkoutExercise(id, exerciseId, sets, reps, restSeconds);
+  }
+
+  public WorkoutExercise updateSets(WorkoutExerciseSets sets) {
+    return copy(this.id, this.exerciseId, sets, this.reps, this.restSeconds);
+  }
+
+  public WorkoutExercise updateReps(WorkoutExerciseReps reps) {
+    return copy(this.id, this.exerciseId, this.sets, reps, this.restSeconds);
+  }
+
+  public WorkoutExercise updateRestSeconds(WorkoutExerciseRest restSeconds) {
+    return copy(this.id, this.exerciseId, this.sets, this.reps, restSeconds);
   }
 
   public WorkoutExerciseId getId() {

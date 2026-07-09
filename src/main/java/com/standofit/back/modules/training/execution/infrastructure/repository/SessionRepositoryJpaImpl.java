@@ -7,6 +7,7 @@ import com.standofit.back.modules.training.execution.infrastructure.SessionInfra
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionMapper;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
@@ -32,9 +33,9 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
   }
 
   @Override
-  public Session findById(SessionId id) {
+  public Optional<Session> findById(SessionId id) {
     try {
-      return jpaRepository.findById(id.value()).map(mapper::toDomain).orElse(null);
+      return jpaRepository.findById(id.value()).map(mapper::toDomain);
     } catch (DataAccessException e) {
       throw new SessionInfrastructureException(
           SessionInfrastructureErrors.FIND_FAILED.getMessage(), e);
@@ -42,18 +43,32 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
   }
 
   @Override
-  public void delete(SessionId id) {
+  public Session getById(SessionId id) {
+    return findById(id)
+        .orElseThrow(
+            () ->
+                new SessionInfrastructureException(
+                    SessionInfrastructureErrors.SESSION_NOT_FOUND.getMessage(id.value())));
+  }
+
+  @Override
+  public List<Session> findAll() {
     try {
-      jpaRepository.deleteById(id.value());
-      jpaRepository.flush();
-    } catch (Exception e) {
+      return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+    } catch (DataAccessException e) {
       throw new SessionInfrastructureException(
-          SessionInfrastructureErrors.DELETE_FAILED.getMessage(), e);
+          SessionInfrastructureErrors.FIND_FAILED.getMessage(), e);
     }
   }
 
   @Override
-  public List<Session> getAll() {
-    return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+  public void deleteById(SessionId id) {
+    try {
+      jpaRepository.deleteById(id.value());
+      jpaRepository.flush();
+    } catch (DataAccessException e) {
+      throw new SessionInfrastructureException(
+          SessionInfrastructureErrors.DELETE_FAILED.getMessage(), e);
+    }
   }
 }

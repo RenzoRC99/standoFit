@@ -3,7 +3,6 @@ package com.standofit.back.modules.training.planning.application.command.duplica
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DuplicateWorkoutHandler implements CommandHandler<DuplicateWorkoutCommand, UUID> {
@@ -20,7 +19,6 @@ public class DuplicateWorkoutHandler implements CommandHandler<DuplicateWorkoutC
   }
 
   @Override
-  @Transactional
   public UUID handle(DuplicateWorkoutCommand command) {
     return service.duplicate(command);
   }

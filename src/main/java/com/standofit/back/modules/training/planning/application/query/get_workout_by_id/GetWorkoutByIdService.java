@@ -5,6 +5,8 @@ import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityEvent;
 import com.standofit.back.modules.training.planning.application.event.PlanningActivityType;
 import com.standofit.back.modules.training.planning.application.mapper.WorkoutDtoMapper;
+import com.standofit.back.modules.training.planning.application.service.ExerciseEnrichmentService;
+import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
@@ -14,24 +16,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class GetWorkoutByIdService extends PlanningUseCase {
 
+  private final ExerciseEnrichmentService enrichmentService;
+
   public GetWorkoutByIdService(
       WorkoutRepository repository,
       WorkoutDtoMapper mapper,
-      ApplicationEventBus applicationEventBus) {
+      ApplicationEventBus applicationEventBus,
+      ExerciseEnrichmentService enrichmentService) {
     super(repository, mapper, applicationEventBus);
+    this.enrichmentService = enrichmentService;
   }
 
   public WorkoutDto findById(GetWorkoutByIdQuery query) {
     try {
-      WorkoutDto dto =
+      Workout workout =
           repository
-              .findById(query.workoutId().value())
-              .map(mapper::toDto)
+              .findById(query.workoutId())
               .orElseThrow(
                   () ->
                       new WorkoutInfrastructureException(
                           WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(
                               query.workoutId().value())));
+
+      var exerciseMaps = enrichmentService.loadExerciseData(workout);
+      WorkoutDto dto = mapper.toDto(workout, exerciseMaps.names(), exerciseMaps.muscleGroups());
       publishEvent(
           PlanningActivityEvent.success(
               PlanningActivityType.WORKOUT_QUERIED,

@@ -8,4 +8,11 @@ import java.util.UUID;
  * @author standofit
  * @version 1.0
  */
-public record WorkoutExerciseDto(UUID id, UUID exerciseId, int sets, int reps, int restSeconds) {}
+public record WorkoutExerciseDto(
+    UUID id,
+    UUID exerciseId,
+    String exerciseName,
+    String muscleGroup,
+    int sets,
+    int reps,
+    int restSeconds) {}

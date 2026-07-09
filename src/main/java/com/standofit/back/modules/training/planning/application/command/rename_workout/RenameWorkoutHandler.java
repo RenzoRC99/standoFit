@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.planning.application.command.rename_
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand, Void> {
@@ -19,7 +18,6 @@ public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand
   }
 
   @Override
-  @Transactional
   public Void handle(RenameWorkoutCommand command) {
     service.rename(command);
     return null;

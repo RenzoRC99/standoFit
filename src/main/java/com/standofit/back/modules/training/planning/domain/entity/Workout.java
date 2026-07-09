@@ -1,7 +1,6 @@
 package com.standofit.back.modules.training.planning.domain.entity;
 
 import static com.standofit.back.shared.utils.CollectionUtils.isNullOrEmpty;
-import static com.standofit.back.shared.utils.CollectionUtils.isNullOrEmptyForMap;
 
 import com.standofit.back.modules.training.planning.domain.WorkoutDomainErrors;
 import com.standofit.back.modules.training.planning.domain.WorkoutDomainException;
@@ -27,7 +26,7 @@ public final class Workout extends AggregateRoot {
   private final WorkoutCreatedAt createdAt;
   private final WorkoutUpdatedAt updatedAt;
 
-  Workout(
+  private Workout(
       WorkoutId id,
       WorkoutName name,
       WorkoutDescription description,
@@ -61,10 +60,14 @@ public final class Workout extends AggregateRoot {
         new WorkoutUpdatedAt(Instant.now()));
   }
 
-  Workout copy(
-      WorkoutId id, WorkoutName name, WorkoutDescription description, List<WorkoutDay> days) {
-    return new Workout(
-        id, name, description, days, this.createdAt, new WorkoutUpdatedAt(Instant.now()));
+  public static Workout copy(
+      WorkoutId id,
+      WorkoutDescription description,
+      WorkoutName name,
+      List<WorkoutDay> days,
+      WorkoutCreatedAt createdAt,
+      WorkoutUpdatedAt updatedAt) {
+    return new Workout(id, name, description, days, createdAt, updatedAt);
   }
 
   public WorkoutId getId() {
@@ -92,11 +95,23 @@ public final class Workout extends AggregateRoot {
   }
 
   public Workout renameWorkout(WorkoutName name) {
-    return copy(this.id, name, this.description, this.days);
+    return copy(
+        this.id,
+        this.description,
+        name,
+        this.days,
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout changeDescription(WorkoutDescription description) {
-    return copy(this.id, this.name, description, this.days);
+    return copy(
+        this.id,
+        description,
+        this.name,
+        this.days,
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout addDays(List<WorkoutDay> newDays) {
@@ -107,7 +122,13 @@ public final class Workout extends AggregateRoot {
     List<WorkoutDay> updatedDays = new ArrayList<>(this.days);
     updatedDays.addAll(newDays);
 
-    return copy(this.id, this.name, this.description, updatedDays);
+    return copy(
+        this.id,
+        this.description,
+        this.name,
+        updatedDays,
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout removeDays(List<WorkoutDayId> dayIds) {
@@ -119,24 +140,23 @@ public final class Workout extends AggregateRoot {
     List<WorkoutDay> updatedDays =
         this.days.stream().filter(day -> !dayIds.contains(day.getId())).toList();
 
-    return copy(this.id, this.name, this.description, updatedDays);
+    return copy(
+        this.id,
+        this.description,
+        this.name,
+        updatedDays,
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
-  public Workout renameDays(Map<WorkoutDayId, WorkoutDayName> dayNames) {
-    if (isNullOrEmptyForMap(dayNames))
-      throw new WorkoutDomainException(
-          WorkoutDomainErrors.DAY_IDS_CANNOT_BE_NULL_OR_EMPTY.getMessage());
-    List<WorkoutDayId> ids = new ArrayList<>(dayNames.keySet());
-    validateDayIdsExist(ids);
-
-    List<WorkoutDay> updatedDays =
-        this.days.stream()
-            .map(
-                day ->
-                    dayNames.containsKey(day.getId()) ? day.rename(dayNames.get(day.getId())) : day)
-            .toList();
-
-    return copy(this.id, this.name, this.description, updatedDays);
+  public Workout renameDay(WorkoutDayId dayId, WorkoutDayName newName) {
+    return copy(
+        this.id,
+        this.description,
+        this.name,
+        transformDay(dayId, day -> day.rename(newName)),
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout addExercisesToDay(WorkoutDayId dayId, List<WorkoutExercise> newExercises) {
@@ -146,9 +166,11 @@ public final class Workout extends AggregateRoot {
 
     return copy(
         this.id,
-        this.name,
         this.description,
-        transformDay(dayId, day -> day.addExercises(newExercises)));
+        this.name,
+        transformDay(dayId, day -> day.addExercises(newExercises)),
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout updateExercisesInDay(WorkoutDayId dayId, List<WorkoutExercise> updatedExercises) {
@@ -158,9 +180,11 @@ public final class Workout extends AggregateRoot {
 
     return copy(
         this.id,
-        this.name,
         this.description,
-        transformDay(dayId, day -> day.updateExercises(updatedExercises)));
+        this.name,
+        transformDay(dayId, day -> day.updateExercises(updatedExercises)),
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout removeExercisesFromDay(WorkoutDayId dayId, List<WorkoutExerciseId> exerciseIds) {
@@ -169,9 +193,11 @@ public final class Workout extends AggregateRoot {
 
     return copy(
         this.id,
-        this.name,
         this.description,
-        transformDay(dayId, day -> day.removeExercises(exerciseIds)));
+        this.name,
+        transformDay(dayId, day -> day.removeExercises(exerciseIds)),
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   public Workout reorderDays(List<WorkoutDayId> orderedIds) {
@@ -190,7 +216,13 @@ public final class Workout extends AggregateRoot {
 
     List<WorkoutDay> reordered = orderedIds.stream().map(daysById::get).toList();
 
-    return copy(this.id, this.name, this.description, reordered);
+    return copy(
+        this.id,
+        this.description,
+        this.name,
+        reordered,
+        this.createdAt,
+        new WorkoutUpdatedAt(Instant.now()));
   }
 
   private List<WorkoutDay> transformDay(

@@ -32,6 +32,8 @@ public class WorkoutApiMapper {
     return new WorkoutExerciseDTO()
         .id(dto.id())
         .exerciseId(dto.exerciseId())
+        .exerciseName(dto.exerciseName())
+        .muscleGroup(dto.muscleGroup())
         .sets(dto.sets())
         .reps(dto.reps())
         .restSeconds(dto.restSeconds());

@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.cancel
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class CancelSessionHandler implements CommandHandler<CancelSessionCommand, Void> {
@@ -19,7 +18,6 @@ public class CancelSessionHandler implements CommandHandler<CancelSessionCommand
   }
 
   @Override
-  @Transactional
   public Void handle(CancelSessionCommand command) {
     service.cancel(command);
     return null;

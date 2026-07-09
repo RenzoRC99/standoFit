@@ -1,8 +1,6 @@
 package com.standofit.back.modules.training.execution.application.command.update_exercise_log_sets;
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
-import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
@@ -21,21 +19,12 @@ public class UpdateExerciseLogSetsService extends ExecutionUseCase {
 
   public void updateSets(UpdateExerciseLogSetsCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogSets(command.logId(), command.sets());
       repository.save(updatedSession);
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_EXERCISE_SETS_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_EXERCISE_SETS_UPDATED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_EXERCISE_SETS_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_EXERCISE_SETS_UPDATED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

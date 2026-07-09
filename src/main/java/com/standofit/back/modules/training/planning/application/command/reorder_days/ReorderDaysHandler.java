@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.planning.application.command.reorder
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Void> {
@@ -19,7 +18,6 @@ public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Vo
   }
 
   @Override
-  @Transactional
   public Void handle(ReorderDaysCommand command) {
     service.reorder(command);
     return null;

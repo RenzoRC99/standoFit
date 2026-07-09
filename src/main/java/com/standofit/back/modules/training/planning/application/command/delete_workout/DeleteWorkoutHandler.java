@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.planning.application.command.delete_
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DeleteWorkoutHandler implements CommandHandler<DeleteWorkoutCommand, Void> {
@@ -19,7 +18,6 @@ public class DeleteWorkoutHandler implements CommandHandler<DeleteWorkoutCommand
   }
 
   @Override
-  @Transactional
   public Void handle(DeleteWorkoutCommand command) {
     service.delete(command);
     return null;

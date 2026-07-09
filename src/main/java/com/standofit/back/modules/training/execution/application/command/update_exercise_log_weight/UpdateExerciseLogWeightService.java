@@ -1,8 +1,6 @@
 package com.standofit.back.modules.training.execution.application.command.update_exercise_log_weight;
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
-import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
-import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
@@ -21,21 +19,12 @@ public class UpdateExerciseLogWeightService extends ExecutionUseCase {
 
   public void updateWeight(UpdateExerciseLogWeightCommand command) {
     try {
-      Session session = repository.findById(command.sessionId());
+      Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogWeight(command.logId(), command.weight());
       repository.save(updatedSession);
-      publishEvent(
-          SessionActivityEvent.success(
-              ExecutionActivityType.SESSION_EXERCISE_WEIGHT_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_EXERCISE_WEIGHT_UPDATED.getDefaultDescription()));
+      publishEvent(command.toSuccessEvent());
     } catch (Exception e) {
-      publishEvent(
-          SessionActivityEvent.failure(
-              ExecutionActivityType.SESSION_EXERCISE_WEIGHT_UPDATED,
-              command.sessionId().value().toString(),
-              ExecutionActivityType.SESSION_EXERCISE_WEIGHT_UPDATED.getDefaultDescription(),
-              resolveErrorDetail(e)));
+      publishEvent(command.toFailureEvent(resolveErrorDetail(e)));
       throw e;
     }
   }

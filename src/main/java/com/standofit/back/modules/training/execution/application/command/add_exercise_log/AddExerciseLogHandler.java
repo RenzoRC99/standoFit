@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.add_ex
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogCommand, Void> {
@@ -19,7 +18,6 @@ public class AddExerciseLogHandler implements CommandHandler<AddExerciseLogComma
   }
 
   @Override
-  @Transactional
   public Void handle(AddExerciseLogCommand command) {
     service.addExerciseLog(command);
     return null;

@@ -1,57 +1,51 @@
 package com.standofit.back.modules.training.execution.application.command.update_session_notes;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.standofit.back.modules.training.execution.domain.entity.Session;
-import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.WorkoutSessionNotes;
-import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Update Session Notes Handler Tests")
 class UpdateSessionNotesHandlerTest {
 
-  @Mock private SessionRepository repository;
+  @Mock private UpdateSessionNotesService service;
 
   private UpdateSessionNotesHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new UpdateSessionNotesHandler(repository);
+    handler = new UpdateSessionNotesHandler(service);
   }
 
   @Test
-  void should_update_notes() {
-    SessionId sessionId = new SessionId(java.util.UUID.randomUUID());
-    SessionDayId dayId = new SessionDayId(java.util.UUID.randomUUID());
-    WorkoutSessionNotes notes = new WorkoutSessionNotes("New notes");
-    UpdateSessionNotesCommand command = new UpdateSessionNotesCommand(sessionId, notes);
-
-    Session session = Session.create(sessionId, dayId);
-    when(repository.findById(sessionId)).thenReturn(session);
-    when(repository.save(any(Session.class))).thenReturn(session);
+  @DisplayName("should delegate to service")
+  void shouldDelegateToService() {
+    var command =
+        new UpdateSessionNotesCommand(
+            new SessionId(UUID.randomUUID()), new WorkoutSessionNotes("Updated notes"));
 
     handler.handle(command);
 
-    verify(repository, times(1)).findById(sessionId);
-    verify(repository, times(1)).save(any(Session.class));
+    verify(service, times(1)).updateNotes(command);
   }
 
   @Test
-  void should_throw_when_session_not_found() {
-    SessionId sessionId = new SessionId(java.util.UUID.randomUUID());
-    WorkoutSessionNotes notes = new WorkoutSessionNotes("Notes");
-    UpdateSessionNotesCommand command = new UpdateSessionNotesCommand(sessionId, notes);
+  @DisplayName("should propagate exception from service")
+  void shouldPropagateExceptionFromService() {
+    var command =
+        new UpdateSessionNotesCommand(
+            new SessionId(UUID.randomUUID()), new WorkoutSessionNotes("Updated notes"));
+    doThrow(new RuntimeException("Service error")).when(service).updateNotes(command);
 
-    when(repository.findById(sessionId)).thenReturn(null);
-
-    assertThrows(NullPointerException.class, () -> handler.handle(command));
+    assertThrows(RuntimeException.class, () -> handler.handle(command));
   }
 }

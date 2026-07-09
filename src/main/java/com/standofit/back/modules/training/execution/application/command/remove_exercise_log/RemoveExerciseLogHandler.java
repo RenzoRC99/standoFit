@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.remove
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLogCommand, Void> {
@@ -19,7 +18,6 @@ public class RemoveExerciseLogHandler implements CommandHandler<RemoveExerciseLo
   }
 
   @Override
-  @Transactional
   public Void handle(RemoveExerciseLogCommand command) {
     service.removeExerciseLog(command);
     return null;

@@ -27,7 +27,6 @@ paths:
                   - id: "70000000-0000-0000-0000-000000000001"
                     name: "Push Pull Legs"
                     description: "Rutina PPL para ganar masa muscular"
-                    archived: false
                     days:
                       - id: "80000000-0000-0000-0000-000000000001"
                         name: "Push Day"
@@ -42,7 +41,6 @@ paths:
                   - id: "70000000-0000-0000-0000-000000000002"
                     name: "Full Body"
                     description: "Rutina de cuerpo completo"
-                    archived: true
                     days:
                       - id: "80000000-0000-0000-0000-000000000002"
                         name: "Día 1"
@@ -85,11 +83,11 @@ paths:
                 description: URL del plan creado
               example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000001"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                format: uuid
-              example: "70000000-0000-0000-0000-000000000001"
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "70000000-0000-0000-0000-000000000001"
 
   /api/workouts/search:
     post:
@@ -112,9 +110,6 @@ paths:
                 - field: "name"
                   operator: "LIKE"
                   value: "push"
-                - field: "archived"
-                  operator: "EQUALS"
-                  value: "false"
       responses:
         '200':
           description: Resultados de búsqueda
@@ -127,7 +122,6 @@ paths:
                   - id: "70000000-0000-0000-0000-000000000001"
                     name: "Push Pull Legs"
                     description: "Rutina PPL"
-                    archived: false
                     days:
                       - id: "80000000-0000-0000-0000-000000000001"
                         name: "Push Day"
@@ -169,7 +163,6 @@ paths:
                 id: "70000000-0000-0000-0000-000000000001"
                 name: "Push Pull Legs"
                 description: "Rutina PPL para ganar masa muscular"
-                archived: false
                 days:
                   - id: "80000000-0000-0000-0000-000000000001"
                     name: "Push Day"
@@ -194,6 +187,37 @@ paths:
                         restSeconds: 120
                 createdAt: "2026-01-15T10:30:00Z"
                 updatedAt: "2026-01-20T14:20:00Z"
+        '404':
+          description: Plan no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
+    put:
+      summary: Actualizar metadatos del plan (nombre y/o descripción)
+      operationId: updateWorkout
+      tags:
+        - Workouts
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkoutRequest'
+            example:
+              name: "Nuevo nombre"
+              description: "Nueva descripción"
+      responses:
+        '204':
+          description: Plan actualizado
         '404':
           description: Plan no encontrado
           content:
@@ -315,11 +339,11 @@ paths:
         '201':
           description: Día añadido
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                format: uuid
-              example: "80000000-0000-0000-0000-000000000003"
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "80000000-0000-0000-0000-000000000003"
         '404':
           description: Plan no encontrado
           content:
@@ -328,6 +352,47 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/workouts/{workoutId}/days/{dayId}:
+    put:
+      summary: Actualizar día del plan (nombre y/o ejercicios)
+      operationId: updateWorkoutDay
+      tags:
+        - Workout Days
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: dayId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDayRequest'
+            example:
+              name: "Push Day V2"
+              exercises:
+                - exerciseId: "10000000-0000-0000-0000-000000000001"
+                  sets: 4
+                  reps: 10
+                  restSeconds: 90
+      responses:
+        '204':
+          description: Día actualizado
+        '404':
+          description: Plan o día no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+
     delete:
       summary: Eliminar día del plan
       operationId: removeDayFromWorkout
@@ -420,34 +485,11 @@ paths:
                 format: uri
               example: "http://localhost:8080/api/workouts/70000000-0000-0000-0000-000000000003"
           content:
-            text/plain:
-              schema:
-                type: string
-                format: uuid
-              example: "70000000-0000-0000-0000-000000000003"
-
-  /api/workouts/{workoutId}/archive:
-    post:
-      summary: Archivar plan
-      operationId: archiveWorkout
-      tags:
-        - Workouts
-      parameters:
-        - name: workoutId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Plan archivado
-        '404':
-          description: Plan no encontrado
-          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDTO'
+                $ref: '#/components/schemas/WorkoutCreatedResponse'
+              example:
+                id: "70000000-0000-0000-0000-000000000003"
 
 components:
   schemas:
@@ -475,8 +517,6 @@ components:
           type: string
         description:
           type: string
-        archived:
-          type: boolean
         days:
           type: array
           items:
@@ -508,6 +548,10 @@ components:
         exerciseId:
           type: string
           format: uuid
+        exerciseName:
+          type: string
+        muscleGroup:
+          type: string
         sets:
           type: integer
         reps:
@@ -683,3 +727,35 @@ components:
           type: string
         value:
           type: string
+
+    UpdateWorkoutRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nuevo nombre del plan (null si no cambia)
+        description:
+          type: string
+          description: Nueva descripción del plan (null si no cambia)
+
+    UpdateDayRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nuevo nombre del día (null si no cambia)
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseInputDTO'
+          description: Lista completa de ejercicios que reemplaza a la actual (null si no cambia)
+
+    WorkoutCreatedResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "70000000-0000-0000-0000-000000000001"

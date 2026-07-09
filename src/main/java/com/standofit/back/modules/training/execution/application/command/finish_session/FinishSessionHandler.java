@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.execution.application.command.finish
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class FinishSessionHandler implements CommandHandler<FinishSessionCommand, Void> {
@@ -19,7 +18,6 @@ public class FinishSessionHandler implements CommandHandler<FinishSessionCommand
   }
 
   @Override
-  @Transactional
   public Void handle(FinishSessionCommand command) {
     service.finish(command);
     return null;

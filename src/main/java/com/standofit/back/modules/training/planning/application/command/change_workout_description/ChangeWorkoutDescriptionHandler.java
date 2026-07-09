@@ -2,7 +2,6 @@ package com.standofit.back.modules.training.planning.application.command.change_
 
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ChangeWorkoutDescriptionHandler
@@ -20,7 +19,6 @@ public class ChangeWorkoutDescriptionHandler
   }
 
   @Override
-  @Transactional
   public Void handle(ChangeWorkoutDescriptionCommand command) {
     service.changeDescription(command);
     return null;
