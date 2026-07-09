@@ -16,7 +16,10 @@ public class PlanningCommandMapper {
             .map(
                 e ->
                     new AddDayToWorkoutCommand.ExerciseInput(
-                        new ExerciseId(e.getExerciseId()), e.getSets(), e.getReps(), e.getRestSeconds()))
+                        new ExerciseId(e.getExerciseId()),
+                        e.getSets(),
+                        e.getReps(),
+                        e.getRestSeconds()))
             .toList();
     return new AddDayToWorkoutCommand(new WorkoutId(workoutId), request.getDayName(), exercises);
   }

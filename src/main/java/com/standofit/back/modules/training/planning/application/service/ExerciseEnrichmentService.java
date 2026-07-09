@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
- * Service for enriching workout data with exercise details from the exercises catalog.
- * Uses ExerciseCatalog interface to maintain module boundary.
+ * Service for enriching workout data with exercise details from the exercises catalog. Uses
+ * ExerciseCatalog interface to maintain module boundary.
  */
 @Component
 public class ExerciseEnrichmentService {
@@ -28,11 +28,12 @@ public class ExerciseEnrichmentService {
    * @return ExerciseMaps containing name and muscleGroup lookups by exerciseId
    */
   public ExerciseMaps loadExerciseData(Collection<Workout> workouts) {
-    Set<UUID> exerciseIds = workouts.stream()
-        .flatMap(w -> w.getDays().stream())
-        .flatMap(d -> d.getExercises().stream())
-        .map(ex -> ex.getExerciseId().value())
-        .collect(Collectors.toSet());
+    Set<UUID> exerciseIds =
+        workouts.stream()
+            .flatMap(w -> w.getDays().stream())
+            .flatMap(d -> d.getExercises().stream())
+            .map(ex -> ex.getExerciseId().value())
+            .collect(Collectors.toSet());
 
     var data = exerciseCatalog.findByIds(exerciseIds);
     return new ExerciseMaps(data.names(), data.muscleGroups());
@@ -48,8 +49,7 @@ public class ExerciseEnrichmentService {
     return loadExerciseData(java.util.List.of(workout));
   }
 
-  /**
-   * Container for exercise enrichment data.
-   */
-  public record ExerciseMaps(java.util.Map<UUID, String> names, java.util.Map<UUID, String> muscleGroups) {}
+  /** Container for exercise enrichment data. */
+  public record ExerciseMaps(
+      java.util.Map<UUID, String> names, java.util.Map<UUID, String> muscleGroups) {}
 }

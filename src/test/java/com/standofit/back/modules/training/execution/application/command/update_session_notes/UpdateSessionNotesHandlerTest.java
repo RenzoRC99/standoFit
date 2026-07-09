@@ -31,8 +31,7 @@ class UpdateSessionNotesHandlerTest {
   void shouldDelegateToService() {
     var command =
         new UpdateSessionNotesCommand(
-            new SessionId(UUID.randomUUID()),
-            new WorkoutSessionNotes("Updated notes"));
+            new SessionId(UUID.randomUUID()), new WorkoutSessionNotes("Updated notes"));
 
     handler.handle(command);
 
@@ -44,8 +43,7 @@ class UpdateSessionNotesHandlerTest {
   void shouldPropagateExceptionFromService() {
     var command =
         new UpdateSessionNotesCommand(
-            new SessionId(UUID.randomUUID()),
-            new WorkoutSessionNotes("Updated notes"));
+            new SessionId(UUID.randomUUID()), new WorkoutSessionNotes("Updated notes"));
     doThrow(new RuntimeException("Service error")).when(service).updateNotes(command);
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));

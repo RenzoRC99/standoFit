@@ -1,6 +1,5 @@
 package com.standofit.back.modules.training.planning.domain.entity;
 
-import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseReps;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseRest;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseSets;

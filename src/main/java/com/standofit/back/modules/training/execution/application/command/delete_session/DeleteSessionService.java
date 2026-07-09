@@ -1,7 +1,6 @@
 package com.standofit.back.modules.training.execution.application.command.delete_session;
 
 import com.standofit.back.modules.training.execution.application.ExecutionUseCase;
-import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.mapper.SessionDtoMapper;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
