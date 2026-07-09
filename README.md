@@ -1,251 +1,130 @@
-# StandoFit
+# StandoFit API
 
-Backend API para gestión de planes de entrenamiento físico y sesiones de ejecución.
-
----
-
-## 1. TECH STACK
-
-**Framework**: Spring Boot 3.4.0  
-**Lenguaje**: Java 21  
-**Build**: Gradle  
-**Arquitectura**: DDD + Hexagonal + CQRS  
-**Testing**: JUnit 5, Mockito, MockMvc, WebFlux  
-**BD**: H2 (in-memory)  
-**OpenAPI**: OpenAPI Generator (specs en `docs/`)  
-**Formato**: Spotless (Google Java Format)  
-**Cobertura**: JaCoCo  
+API REST para gestión de entrenamientos físicos. Planifica tus semanas, ejecuta los ejercicios en el gimnasio y lleva un registro de tu progreso.
 
 ---
 
-## 2. MÓDULOS
+## ¿Qué hace?
 
-### 2.1 Planning (`modules/training/planning/`)
+StandoFit te permite tres cosas:
 
-Workouts, días y ejercicios planificados. DDD hexagonal con CQRS.
+1. **Planificar** — Creas rutinas de entrenamiento con días y ejercicios (series, repeticiones, descanso)
+2. **Ejecutar** — Inicias una sesión desde un día planificado y registras series, repeticiones y peso en tiempo real
+3. **Seguir** — Consultas el histórico de sesiones completadas y tu progreso
 
-**Aggregate Root**: `Workout`  
-**Child entities**: `WorkoutDay`, `WorkoutExercise`  
-
-**Commands (cada uno implementa `EventfulCommand` — conoce su evento):**
-
-| Command | Propósito |
-|---------|-----------|
-| `CreateWorkoutCommand` | Crear nuevo workout |
-| `RenameWorkoutCommand` | Renombrar workout |
-| `ChangeWorkoutDescriptionCommand` | Cambiar descripción |
-| `DeleteWorkoutCommand` | Eliminar workout |
-| `DuplicateWorkoutCommand` | Duplicar workout |
-| `AddDayToWorkoutCommand` | Añadir día |
-| `RemoveDayFromWorkoutCommand` | Quitar día |
-| `ReorderDaysCommand` | Reordenar días |
-| `RenameDayCommand` | Renombrar un día |
-| `ReplaceDayExercisesCommand` | Reemplazar ejercicios de un día |
-
-**Queries:**
-
-| Query | Propósito |
-|-------|-----------|
-| `GetWorkoutByIdQuery` | Obtener workout por ID |
-| `SearchWorkoutsQuery` | Búsqueda con filtros, orden y paginación |
-
-### 2.2 Execution (`modules/training/execution/`)
-
-Sesiones de entrenamiento y logs de ejercicios ejecutados. DDD hexagonal con CQRS.
-
-**Aggregate Root**: `Session`  
-**Child entity**: `ExerciseLog`
-
-**Commands:**
-
-| Command | Propósito |
-|---------|-----------|
-| `StartSessionCommand` | Iniciar sesión |
-| `FinishSessionCommand` | Finalizar sesión |
-| `CancelSessionCommand` | Cancelar sesión |
-| `DeleteSessionCommand` | Eliminar sesión |
-| `AddExerciseLogCommand` | Añadir ejercicio a la sesión |
-| `RemoveExerciseLogCommand` | Quitar ejercicio |
-| `UpdateExerciseLogSetsCommand` | Actualizar series |
-| `UpdateExerciseLogRepsCommand` | Actualizar repeticiones |
-| `UpdateExerciseLogWeightCommand` | Actualizar peso |
-| `UpdateSessionNotesCommand` | Actualizar notas |
-
-**Queries:**
-
-| Query | Propósito |
-|-------|-----------|
-| `GetSessionByIdQuery` | Obtener sesión por ID |
-| `GetAllSessionsQuery` | Listar todas las sesiones |
-
-### 2.3 Exercises (`modules/exercises/`)
-
-Catálogo de ejercicios. CRUD simple (sin DDD).  
-**Entidad**: `Exercise` (JPA)  
-**Grupos musculares**: `CHEST`, `BACK`, `SHOULDERS`, `BICEPS`, `TRICEPS`, `LEGS`, `CORE`, `FULL_BODY`
+Está pensado para que una aplicación frontend (web o móvil) cargue tu plan de entrenamiento y te permita ir marcando ejercicios mientras entrenas, con actualizaciones rápidas y sin recargar páginas.
 
 ---
 
-## 3. ESTRUCTURA
+## Tecnologías utilizadas
 
-```
-standoFit/
-├── docs/
-│   ├── openapi-planning.yaml
-│   └── openapi-execution.yaml
-├── src/main/java/com/standofit/back/
-│   ├── modules/training/
-│   │   ├── planning/                    # DDD hexagonal
-│   │   │   ├── domain/entity/           # Workout, WorkoutDay, WorkoutExercise, WorkoutRepository
-│   │   │   ├── domain/vo/               # WorkoutName, WorkoutCreatedAt, WorkoutExerciseSets, etc.
-│   │   │   ├── application/command/     # 10 commands + handlers + services
-│   │   │   ├── application/query/       # 2 queries + handlers
-│   │   │   ├── application/event/       # PlanningActivityEvent, PlanningActivityType
-│   │   │   ├── application/dto/         # WorkoutDto, WorkoutDayDto, WorkoutExerciseDto
-│   │   │   ├── application/mapper/      # WorkoutDtoMapper
-│   │   │   ├── infrastructure/repository/
-│   │   │   ├── infrastructure/mapper/   # WorkoutMapper (domain ↔ JPA)
-│   │   │   ├── infrastructure/entity/   # WorkoutJpaEntity, WorkoutDayJpaEntity, WorkoutExerciseJpaEntity
-│   │   │   └── presentation/            # Controller + mappers (API ↔ application)
-│   │   └── execution/                   # DDD hexagonal (misma estructura)
-│   │       ├── domain/entity/           # Session, ExerciseLog, SessionRepository
-│   │       ├── application/command/     # 10 commands
-│   │       └── ...
-│   └── exercises/                       # CRUD simple
-├── configuration/
-│   └── bus/ApplicationBusConfiguration.java
-├── shared/
-│   ├── domain/bus/command/              # Command, CommandBus, CommandHandler, EventfulCommand
-│   ├── domain/bus/query/                # Query, QueryBus, QueryHandler
-│   ├── domain/bus/application_event/    # ApplicationEvent, ApplicationEventBus
-│   ├── domain/criteria/                 # Filter, Criteria, PagedResult
-│   ├── domain/valueobjects/             # StringVO, IntegerVO, DateTimeVO, ids (WorkoutId, SessionId, etc.)
-│   ├── domain/aggregate/                # AggregateRoot
-│   └── infrastructure/bus/              # InMemoryCommandBus, InMemoryQueryBus, InMemoryApplicationEventBus
-└── src/test/                            # Tests unitarios + integración
-```
+| Tecnología | Para qué se usa |
+|---|---|
+| **Java 21** | Lenguaje principal del servidor. Elegido por su madurez, rendimiento y ecosistema empresarial. |
+| **Spring Boot 3.4** | Framework que facilita crear APIs REST. Es el estándar de la industria para Java en backend. |
+| **Gradle** | Herramienta que compila el código, gestiona librerías externas y ejecuta tests automáticamente. |
+| **PostgreSQL** | Base de datos principal en producción. Almacena workouts, sesiones, ejercicios, etc. |
+| **H2** | Base de datos en memoria para desarrollo local y tests. No requiere instalación. |
+| **OpenAPI** | Especificación técnica de los endpoints. Permite que el frontend genere automáticamente su código para conectarse a la API. |
+| **JaCoCo** | Mide qué porcentaje del código está cubierto por tests automáticos. |
+| **Spotless** | Mantiene el formato del código uniforme (espacios, imports, etc.) sin esfuerzo manual. |
 
 ---
 
-## 4. ARQUITECTURA
+## Partes del proyecto
 
-### Domain Layer
-- Entidades inmutables con `private` constructor y factories estáticas
-- Value objects con validación en construcción
-- Métodos de dominio retornan nuevas instancias (copy-on-write)
-- `Workout.copy()` / `Session.copy()` públicas para reconstrucción desde BD
+### Planning (planificación de rutinas)
+Crea workouts con tantos días como quieras. Cada día contiene una lista de ejercicios con series (sets), repeticiones (reps), peso y tiempo de descanso. Puedes renombrar, reordenar días, duplicar rutinas completas, etc.
 
-### Application Layer
-- CQRS estricto: commands (write) + queries (read)
-- `EventfulCommand`: cada comando define `toSuccessEvent()` y `toFailureEvent()`
-- Servicios sin repetir try/catch — los comandos saben su evento
-- `@Transactional` en controllers (no en handlers)
+### Execution (ejecución de sesiones)
+Cuando vas al gimnasio, inicias una sesión desde un día planificado. Durante el entrenamiento vas registrando cada ejercicio que haces: series completadas, repeticiones y peso utilizado. Puedes pausar, añadir notas, finalizar o cancelar la sesión.
 
-### Infrastructure Layer
-- Buses en memoria con registro automático vía Spring
-- JPA Entities con cascade y orphanRemoval
-- Mappers: dominio ↔ JPA (preservan timestamps)
-
-### Presentation Layer
-- Controllers implementan interfaces generadas por OpenAPI
-- Endpoints compuestos: el controller orquesta múltiples comandos con `if`
+### Exercises (catálogo de ejercicios)
+Lista global de ejercicios con nombre, descripción y grupo muscular (pecho, espalda, hombros, brazos, piernas, abdominales). Sirve como fuente de datos para los otros módulos.
 
 ---
 
-## 5. API REST
+## Cómo ejecutarlo localmente
 
-### Planning
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/workouts` | Crear workout |
-| GET | `/api/workouts` | Listar todos |
-| POST | `/api/workouts/search` | Buscar con filtros |
-| GET | `/api/workouts/{id}` | Obtener por ID |
-| PUT | `/api/workouts/{id}` | Actualizar nombre y/o descripción |
-| DELETE | `/api/workouts/{id}` | Eliminar |
-| POST | `/api/workouts/{id}/duplicate` | Duplicar |
-| POST | `/api/workouts/{id}/days` | Añadir día |
-| PUT | `/api/workouts/{id}/days/{dayId}` | Editar día (nombre y/o ejercicios) |
-| DELETE | `/api/workouts/{id}/days/{dayId}` | Eliminar día |
-| PUT | `/api/workouts/{id}/days/reorder` | Reordenar días |
-
-### Execution
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/sessions` | Iniciar sesión |
-| GET | `/api/sessions` | Listar todas |
-| GET | `/api/sessions/{id}` | Obtener por ID |
-| DELETE | `/api/sessions/{id}` | Eliminar |
-| POST | `/api/sessions/{id}/finish` | Finalizar |
-| POST | `/api/sessions/{id}/cancel` | Cancelar |
-| POST | `/api/sessions/{id}/logs` | Añadir ejercicio |
-| DELETE | `/api/sessions/{id}/logs/{logId}` | Quitar ejercicio |
-| PATCH | `/api/sessions/{id}/logs/{logId}/sets` | Actualizar series |
-| PATCH | `/api/sessions/{id}/logs/{logId}/reps` | Actualizar reps |
-| PATCH | `/api/sessions/{id}/logs/{logId}/weight` | Actualizar peso |
-| PUT | `/api/sessions/{id}/notes` | Actualizar notas |
-
-### Exercises
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/exercises` | Listar |
-| GET | `/api/exercises/{id}` | Por ID |
-| GET | `/api/exercises/muscle-group/{group}` | Por grupo muscular |
-| GET | `/api/exercises/search?name=` | Por nombre |
-| POST | `/api/exercises` | Crear |
-| PUT | `/api/exercises/{id}` | Actualizar |
-| DELETE | `/api/exercises/{id}` | Eliminar |
-
----
-
-## 6. DECISIONES ARQUITECTÓNICAS
-
-- **CQRS**: Commands y Queries separados con buses dedicados
-- **EventfulCommand**: cada comando conoce su evento — los servicios no crean eventos manualmente
-- **Endpoints compuestos**: el controller orquesta N comandos en una request (evita que el frontend haga mil llamadas)
-- **@Transactional en controllers**: los handlers no tienen tx propia — la tx la define quien orquesta
-- **Inmutabilidad**: todas las entidades son inmutables; las mutaciones retornan nuevas instancias
-- **Timestamps preservados**: el mapper pasa los timestamps reales del dominio a JPA y viceversa
-- **Value objects con validación**: cada VO valida su invariante en el constructor (StringVO no vacío, IntegerVO rangos, etc.)
-- **Ids tipados**: WorkoutId, SessionId, etc. — no UUIDs sueltos
-- **Mother Pattern**: Object Mothers para tests (`WorkoutMother`, `SessionMother`, etc.)
-- **Criteria + Specification**: búsquedas dinámicas con filtros y paginación
-
----
-
-## 7. GETTING STARTED
+Necesitas **Java 21** instalado.
 
 ```bash
-# Requisitos: Java 21+
-
-# Ejecutar
+# Iniciar el servidor
 ./gradlew bootRun
 
-# Tests
+# El servidor arranca en http://localhost:8080
+# Probarlo:
+curl http://localhost:8080/api/workouts
+```
+
+```bash
+# Ejecutar tests
 ./gradlew test
 
-# Cobertura
+# Generar reporte de cobertura
 ./gradlew jacocoTestReport
-
-# Formato
-./gradlew spotlessApply
+# El reporte HTML queda en build/reports/jacoco/test/html/
 ```
+
+Por defecto usa H2 (base de datos en memoria). Para usar PostgreSQL, configura las variables de entorno correspondientes.
 
 ---
 
-## 8. ESTADO
+## Endpoints principales
 
-**Módulos completos:**
-- Planning (workouts, días, ejercicios planificados)
-- Execution (sesiones, logs de ejercicios)
-- Exercises (catálogo CRUD)
+### Workouts (rutinas)
 
-**Infraestructura:**
-- CQRS con buses en memoria
-- OpenAPI specs + generación automática de interfaces
-- Tests unitarios e integración
-- GlobalExceptionHandler
-- Postman collection
+| Método | Endpoint | Qué hace |
+|---|---|---|
+| GET | `/api/workouts` | Listar todas las rutinas |
+| GET | `/api/workouts/{id}` | Ver detalle de una rutina |
+| POST | `/api/workouts` | Crear rutina con días y ejercicios |
+| PUT | `/api/workouts/{id}` | Actualizar nombre y/o descripción |
+| DELETE | `/api/workouts/{id}` | Eliminar rutina |
+| POST | `/api/workouts/{id}/duplicate` | Duplicar rutina con otro nombre |
+| POST | `/api/workouts/{id}/days` | Añadir un día con ejercicios |
+| PUT | `/api/workouts/{id}/days/{dayId}` | Editar nombre y/o ejercicios de un día |
+| DELETE | `/api/workouts/{id}/days/{dayId}` | Eliminar un día |
+| PUT | `/api/workouts/{id}/days/reorder` | Reordenar los días |
+
+### Sesiones (entrenamiento)
+
+| Método | Endpoint | Qué hace |
+|---|---|---|
+| POST | `/api/sessions` | Iniciar una sesión de entrenamiento |
+| GET | `/api/sessions` | Historial de sesiones |
+| GET | `/api/sessions/{id}` | Detalle de una sesión |
+| POST | `/api/sessions/{id}/finish` | Marcar sesión como completada |
+| POST | `/api/sessions/{id}/cancel` | Cancelar sesión |
+| DELETE | `/api/sessions/{id}` | Eliminar sesión |
+| PUT | `/api/sessions/{id}/notes` | Actualizar notas de la sesión |
+| POST | `/api/sessions/{id}/logs` | Añadir un ejercicio realizado |
+| DELETE | `/api/sessions/{id}/logs/{logId}` | Quitar un ejercicio de la sesión |
+| PATCH | `/api/sessions/{id}/logs/{logId}/sets` | Actualizar series de un ejercicio |
+| PATCH | `/api/sessions/{id}/logs/{logId}/reps` | Actualizar repeticiones |
+| PATCH | `/api/sessions/{id}/logs/{logId}/weight` | Actualizar peso |
+
+### Ejercicios (catálogo)
+
+| Método | Endpoint | Qué hace |
+|---|---|---|
+| GET | `/api/exercises` | Listar todos los ejercicios |
+| GET | `/api/exercises/{id}` | Ver detalle de un ejercicio |
+| GET | `/api/exercises/muscle-group/{group}` | Filtrar por grupo muscular |
+| GET | `/api/exercises/search?name=` | Buscar por nombre |
+| POST | `/api/exercises` | Crear un nuevo ejercicio |
+| PUT | `/api/exercises/{id}` | Actualizar un ejercicio |
+| DELETE | `/api/exercises/{id}` | Eliminar un ejercicio |
+
+---
+
+## Arquitectura (para curiosos)
+
+El código está organizado en capas para que sea mantenible a largo plazo:
+
+- **Domain** — Contiene las reglas de negocio. No depende de frameworks ni bases de datos.
+- **Application** — Orquesta las operaciones (commands y queries). Cada acción tiene un flujo claro y predecible.
+- **Infrastructure** — Implementa la comunicación con la base de datos y otras tecnologías externas.
+- **Presentation** — Expone los endpoints REST y traduce los datos entre JSON y el formato interno.
+
+Esto permite cambiar la base de datos, el framework o añadir funcionalidades sin reescribir todo el código.
