@@ -58,35 +58,55 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @DisplayName("full workout lifecycle: create, read, update, add/reorder/remove day, duplicate, delete")
+  @DisplayName(
+      "full workout lifecycle: create, read, update, add/reorder/remove day, duplicate, delete")
   void fullWorkoutLifecycle() throws Exception {
-    var request = new PlanWorkoutRequest()
-        .name("Upper/Lower Split")
-        .description("A complete split routine")
-        .days(List.of(
-            new DayInputDTO()
-                .name("Upper Body")
-                .exercises(List.of(
-                    new ExerciseInputDTO().exerciseId(chestExerciseId).sets(4).reps(10).restSeconds(90),
-                    new ExerciseInputDTO().exerciseId(backExerciseId).sets(3).reps(12).restSeconds(60)
-                )),
-            new DayInputDTO()
-                .name("Lower Body")
-                .exercises(List.of(
-                    new ExerciseInputDTO().exerciseId(legsExerciseId).sets(5).reps(8).restSeconds(120)
-                ))
-        ));
+    var request =
+        new PlanWorkoutRequest()
+            .name("Upper/Lower Split")
+            .description("A complete split routine")
+            .days(
+                List.of(
+                    new DayInputDTO()
+                        .name("Upper Body")
+                        .exercises(
+                            List.of(
+                                new ExerciseInputDTO()
+                                    .exerciseId(chestExerciseId)
+                                    .sets(4)
+                                    .reps(10)
+                                    .restSeconds(90),
+                                new ExerciseInputDTO()
+                                    .exerciseId(backExerciseId)
+                                    .sets(3)
+                                    .reps(12)
+                                    .restSeconds(60))),
+                    new DayInputDTO()
+                        .name("Lower Body")
+                        .exercises(
+                            List.of(
+                                new ExerciseInputDTO()
+                                    .exerciseId(legsExerciseId)
+                                    .sets(5)
+                                    .reps(8)
+                                    .restSeconds(120)))));
 
-    var createResponse = mockMvc.perform(post("/api/workouts")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").isNotEmpty())
-        .andReturn().getResponse().getContentAsString();
+    var createResponse =
+        mockMvc
+            .perform(
+                post("/api/workouts")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").isNotEmpty())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     String workoutId = extractIdFromResponse(createResponse);
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
+    mockMvc
+        .perform(get("/api/workouts/" + workoutId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Upper/Lower Split"))
         .andExpect(jsonPath("$.description").value("A complete split routine"))
@@ -99,80 +119,113 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(jsonPath("$.days[1].exercises.length()").value(1))
         .andExpect(jsonPath("$.days[1].exercises[0].exerciseName").value("Squat"));
 
-    mockMvc.perform(put("/api/workouts/" + workoutId + "/name")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(new RenameRequest("Upper/Lower Split V2"))))
+    mockMvc
+        .perform(
+            put("/api/workouts/" + workoutId + "/name")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(new RenameRequest("Upper/Lower Split V2"))))
         .andExpect(status().isNoContent());
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
+    mockMvc
+        .perform(get("/api/workouts/" + workoutId))
         .andExpect(jsonPath("$.name").value("Upper/Lower Split V2"));
 
-    mockMvc.perform(put("/api/workouts/" + workoutId + "/description")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(new DescriptionRequest("Updated description"))))
+    mockMvc
+        .perform(
+            put("/api/workouts/" + workoutId + "/description")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(new DescriptionRequest("Updated description"))))
         .andExpect(status().isNoContent());
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
+    mockMvc
+        .perform(get("/api/workouts/" + workoutId))
         .andExpect(jsonPath("$.description").value("Updated description"));
 
-    mockMvc.perform(post("/api/workouts/" + workoutId + "/days")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(
-                new AddDayRequest()
-                    .dayName("Arms")
-                    .exercises(List.of(
-                        new ExerciseInputDTO().exerciseId(chestExerciseId).sets(3).reps(10).restSeconds(60)
-                    ))
-            )))
+    mockMvc
+        .perform(
+            post("/api/workouts/" + workoutId + "/days")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        new AddDayRequest()
+                            .dayName("Arms")
+                            .exercises(
+                                List.of(
+                                    new ExerciseInputDTO()
+                                        .exerciseId(chestExerciseId)
+                                        .sets(3)
+                                        .reps(10)
+                                        .restSeconds(60))))))
         .andExpect(status().isCreated());
 
-    var workoutAfterAdd = mockMvc.perform(get("/api/workouts/" + workoutId))
-        .andExpect(jsonPath("$.days.length()").value(3))
-        .andReturn();
-    var daysNode = objectMapper.readTree(workoutAfterAdd.getResponse().getContentAsString()).get("days");
+    var workoutAfterAdd =
+        mockMvc
+            .perform(get("/api/workouts/" + workoutId))
+            .andExpect(jsonPath("$.days.length()").value(3))
+            .andReturn();
+    var daysNode =
+        objectMapper.readTree(workoutAfterAdd.getResponse().getContentAsString()).get("days");
     String day1Id = daysNode.get(0).get("id").asText();
     String day2Id = daysNode.get(1).get("id").asText();
     String day3Id = daysNode.get(2).get("id").asText();
 
-    mockMvc.perform(put("/api/workouts/" + workoutId + "/days/reorder")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(
-                new ReorderDaysRequest()
-                    .dayIds(List.of(UUID.fromString(day3Id), UUID.fromString(day2Id), UUID.fromString(day1Id)))
-            )))
+    mockMvc
+        .perform(
+            put("/api/workouts/" + workoutId + "/days/reorder")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        new ReorderDaysRequest()
+                            .dayIds(
+                                List.of(
+                                    UUID.fromString(day3Id),
+                                    UUID.fromString(day2Id),
+                                    UUID.fromString(day1Id))))))
         .andExpect(status().isNoContent());
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
+    mockMvc
+        .perform(get("/api/workouts/" + workoutId))
         .andExpect(jsonPath("$.days[0].name").value("Arms"))
         .andExpect(jsonPath("$.days[2].name").value("Upper Body"));
 
-    mockMvc.perform(delete("/api/workouts/" + workoutId + "/days/" + day1Id))
+    mockMvc
+        .perform(delete("/api/workouts/" + workoutId + "/days/" + day1Id))
         .andExpect(status().isNoContent());
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
+    mockMvc
+        .perform(get("/api/workouts/" + workoutId))
         .andExpect(jsonPath("$.days.length()").value(2));
 
-    var duplicateResponse = mockMvc.perform(post("/api/workouts/" + workoutId + "/duplicate")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(new DuplicateWorkoutRequest().newName("Upper/Lower Split V2 (Copy)"))))
-        .andExpect(status().isCreated())
-        .andReturn().getResponse().getContentAsString();
+    var duplicateResponse =
+        mockMvc
+            .perform(
+                post("/api/workouts/" + workoutId + "/duplicate")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        objectMapper.writeValueAsString(
+                            new DuplicateWorkoutRequest().newName("Upper/Lower Split V2 (Copy)"))))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     String copyId = extractIdFromResponse(duplicateResponse);
 
-    mockMvc.perform(get("/api/workouts/" + copyId))
+    mockMvc
+        .perform(get("/api/workouts/" + copyId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Upper/Lower Split V2 (Copy)"))
         .andExpect(jsonPath("$.days.length()").value(2))
         .andExpect(jsonPath("$.description").value("Updated description"));
 
-    mockMvc.perform(delete("/api/workouts/" + workoutId))
-        .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/workouts/" + workoutId)).andExpect(status().isNoContent());
 
-    mockMvc.perform(get("/api/workouts/" + workoutId))
-        .andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/workouts/" + workoutId)).andExpect(status().isNotFound());
 
-    mockMvc.perform(get("/api/workouts/" + copyId))
+    mockMvc
+        .perform(get("/api/workouts/" + copyId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Upper/Lower Split V2 (Copy)"));
   }
@@ -180,17 +233,18 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
   @Test
   @DisplayName("should return 404 when workout not found")
   void shouldReturn404WhenNotFound() throws Exception {
-    mockMvc.perform(get("/api/workouts/" + UUID.randomUUID()))
-        .andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/workouts/" + UUID.randomUUID())).andExpect(status().isNotFound());
   }
 
   @Test
   @DisplayName("should return 404 when operating on non-existent workout")
   void shouldReturn404OnNonExistentWorkout() throws Exception {
     var fakeId = UUID.randomUUID();
-    mockMvc.perform(put("/api/workouts/" + fakeId + "/name")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(new RenameRequest("New Name"))))
+    mockMvc
+        .perform(
+            put("/api/workouts/" + fakeId + "/name")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RenameRequest("New Name"))))
         .andExpect(status().isNotFound());
   }
 }

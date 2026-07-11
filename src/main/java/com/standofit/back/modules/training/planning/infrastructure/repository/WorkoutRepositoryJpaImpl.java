@@ -50,8 +50,7 @@ public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
 
   @Override
   public Workout getById(WorkoutId id) {
-    return findById(id)
-        .orElseThrow(() -> new WorkoutNotFoundException(id.value().toString()));
+    return findById(id).orElseThrow(() -> new WorkoutNotFoundException(id.value().toString()));
   }
 
   @Override
