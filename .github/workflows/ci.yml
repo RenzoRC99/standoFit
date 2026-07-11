@@ -31,8 +31,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Format code (Spotless)
-        run: ./gradlew spotlessApply --no-daemon
+      - name: Check formatting (Spotless)
+        run: ./gradlew spotlessCheck --no-daemon
 
       - name: Build & run tests with coverage
         run: ./gradlew build jacocoTestReport --no-daemon

@@ -27,6 +27,7 @@ sourceSets {
 }
 
 compileJava.dependsOn 'openApiGenerate', 'openApiGeneratePlanning'
+compileJava.dependsOn 'spotlessApply'
 
 compileJava.mustRunAfter 'openApiGenerate', 'openApiGeneratePlanning'
 
