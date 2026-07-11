@@ -4,6 +4,7 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutNotFoundException;
 import com.standofit.back.modules.training.planning.infrastructure.entity.WorkoutJpaEntity;
 import com.standofit.back.modules.training.planning.infrastructure.mapper.WorkoutMapper;
 import com.standofit.back.shared.domain.criteria.Criteria;
@@ -50,10 +51,7 @@ public class WorkoutRepositoryJpaImpl implements WorkoutRepository {
   @Override
   public Workout getById(WorkoutId id) {
     return findById(id)
-        .orElseThrow(
-            () ->
-                new WorkoutInfrastructureException(
-                    WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(id.value())));
+        .orElseThrow(() -> new WorkoutNotFoundException(id.value().toString()));
   }
 
   @Override
