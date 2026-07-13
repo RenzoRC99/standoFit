@@ -442,6 +442,10 @@ components:
             - CANCELLED
         notes:
           type: string
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseLogDTO'
         startedAt:
           type: string
         finishedAt:
