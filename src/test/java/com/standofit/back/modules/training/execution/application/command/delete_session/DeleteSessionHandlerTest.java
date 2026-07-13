@@ -3,6 +3,8 @@ package com.standofit.back.modules.training.execution.application.command.delete
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,31 +18,36 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("Delete Session Handler Tests")
 class DeleteSessionHandlerTest {
 
-  @Mock private DeleteSessionService service;
+  @Mock private SessionRepository repository;
+  @Mock private ApplicationEventBus eventBus;
 
   private DeleteSessionHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new DeleteSessionHandler(service);
+    handler = new DeleteSessionHandler(repository, eventBus);
   }
 
   @Test
-  @DisplayName("should delegate to service")
-  void shouldDelegateToService() {
-    var command = new DeleteSessionCommand(new SessionId(UUID.randomUUID()));
+  @DisplayName("should delete session on success")
+  void shouldDeleteSession() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var command = new DeleteSessionCommand(sessionId);
 
     handler.handle(command);
 
-    verify(service, times(1)).delete(command);
+    verify(repository, times(1)).deleteById(sessionId);
+    verify(eventBus, times(1)).publish(any());
   }
 
   @Test
-  @DisplayName("should propagate exception from service")
-  void shouldPropagateExceptionFromService() {
-    var command = new DeleteSessionCommand(new SessionId(UUID.randomUUID()));
-    doThrow(new RuntimeException("Service error")).when(service).delete(command);
+  @DisplayName("should publish failure event and propagate exception")
+  void shouldPublishFailureAndPropagate() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var command = new DeleteSessionCommand(sessionId);
+    doThrow(new RuntimeException("DB error")).when(repository).deleteById(sessionId);
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));
+    verify(eventBus, times(1)).publish(any());
   }
 }

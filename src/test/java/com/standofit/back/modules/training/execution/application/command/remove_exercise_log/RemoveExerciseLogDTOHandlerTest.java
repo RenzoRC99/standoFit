@@ -1,9 +1,19 @@
 package com.standofit.back.modules.training.execution.application.command.remove_exercise_log;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
+import com.standofit.back.modules.training.execution.domain.entity.Session;
+import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
+import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
+import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
+import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,35 +27,50 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("Remove Exercise Log Handler Tests")
 class RemoveExerciseLogDTOHandlerTest {
 
-  @Mock private RemoveExerciseLogService service;
+  @Mock private SessionRepository repository;
+  @Mock private ApplicationEventBus eventBus;
 
   private RemoveExerciseLogHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new RemoveExerciseLogHandler(service);
+    handler = new RemoveExerciseLogHandler(repository, eventBus);
   }
 
   @Test
-  @DisplayName("should delegate to service")
-  void shouldDelegateToService() {
-    var command =
-        new RemoveExerciseLogCommand(
-            new SessionId(UUID.randomUUID()), new ExerciseLogId(UUID.randomUUID()));
+  @DisplayName("should remove exercise log and save session on success")
+  void shouldRemoveLogAndSave() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var logId = new ExerciseLogId(UUID.randomUUID());
+    var command = new RemoveExerciseLogCommand(sessionId, logId);
+    var session = Session.create(sessionId, new SessionDayId(UUID.randomUUID()));
+    var logToAdd =
+        ExerciseLog.create(
+            logId,
+            new ExerciseId(UUID.randomUUID()),
+            new ExerciseLogSets(3),
+            new ExerciseLogReps(10),
+            new ExerciseLogWeight(50));
+    session = session.addLog(logToAdd);
+    when(repository.getById(sessionId)).thenReturn(session);
+    when(repository.save(any(Session.class))).thenReturn(session);
 
     handler.handle(command);
 
-    verify(service, times(1)).removeExerciseLog(command);
+    verify(repository, times(1)).getById(sessionId);
+    verify(repository, times(1)).save(any(Session.class));
+    verify(eventBus, times(1)).publish(any());
   }
 
   @Test
-  @DisplayName("should propagate exception from service")
-  void shouldPropagateExceptionFromService() {
-    var command =
-        new RemoveExerciseLogCommand(
-            new SessionId(UUID.randomUUID()), new ExerciseLogId(UUID.randomUUID()));
-    doThrow(new RuntimeException("Service error")).when(service).removeExerciseLog(command);
+  @DisplayName("should publish failure event and propagate exception")
+  void shouldPublishFailureAndPropagate() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var logId = new ExerciseLogId(UUID.randomUUID());
+    var command = new RemoveExerciseLogCommand(sessionId, logId);
+    doThrow(new RuntimeException("Session not found")).when(repository).getById(sessionId);
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));
+    verify(eventBus, times(1)).publish(any());
   }
 }

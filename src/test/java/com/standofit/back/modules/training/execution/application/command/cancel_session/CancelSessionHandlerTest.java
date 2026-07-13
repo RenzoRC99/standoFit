@@ -1,8 +1,12 @@
 package com.standofit.back.modules.training.execution.application.command.cancel_session;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.standofit.back.modules.training.execution.domain.entity.Session;
+import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,31 +20,43 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("Cancel Session Handler Tests")
 class CancelSessionHandlerTest {
 
-  @Mock private CancelSessionService service;
+  @Mock private SessionRepository repository;
+  @Mock private ApplicationEventBus eventBus;
 
   private CancelSessionHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new CancelSessionHandler(service);
+    handler = new CancelSessionHandler(repository, eventBus);
   }
 
   @Test
-  @DisplayName("should delegate to service")
-  void shouldDelegateToService() {
-    var command = new CancelSessionCommand(new SessionId(UUID.randomUUID()));
+  @DisplayName("should cancel session and save on success")
+  void shouldCancelAndSave() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var command = new CancelSessionCommand(sessionId);
+    var session =
+        Session.create(
+            sessionId,
+            new com.standofit.back.shared.domain.valueobjects.ids.SessionDayId(UUID.randomUUID()));
+    when(repository.getById(sessionId)).thenReturn(session);
+    when(repository.save(any(Session.class))).thenReturn(session);
 
     handler.handle(command);
 
-    verify(service, times(1)).cancel(command);
+    verify(repository, times(1)).getById(sessionId);
+    verify(repository, times(1)).save(any(Session.class));
+    verify(eventBus, times(1)).publish(any());
   }
 
   @Test
-  @DisplayName("should propagate exception from service")
-  void shouldPropagateExceptionFromService() {
-    var command = new CancelSessionCommand(new SessionId(UUID.randomUUID()));
-    doThrow(new RuntimeException("Service error")).when(service).cancel(command);
+  @DisplayName("should publish failure event and propagate exception")
+  void shouldPublishFailureAndPropagate() {
+    var sessionId = new SessionId(UUID.randomUUID());
+    var command = new CancelSessionCommand(sessionId);
+    doThrow(new RuntimeException("Session not found")).when(repository).getById(sessionId);
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));
+    verify(eventBus, times(1)).publish(any());
   }
 }
