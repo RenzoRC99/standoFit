@@ -1,0 +1,276 @@
+{
+  "info": {
+    "name": "StandoFit API - Full Workout & Session Flow",
+    "description": "Complete flow: plan a routine then execute a session from it",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "exerciseId1", "value": "" },
+    { "key": "exerciseId2", "value": "" },
+    { "key": "exerciseId3", "value": "" },
+    { "key": "workoutId", "value": "" },
+    { "key": "dayId", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "logId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Planning - Create Exercises",
+      "description": "Create exercises to use in the workout routine",
+      "item": [
+        {
+          "name": "Create Bench Press",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId1', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bench Press\",\n  \"description\": \"Barbell bench press\",\n  \"muscleGroup\": \"CHEST\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/exercises", "host": ["{{baseUrl}}"], "path": ["api", "exercises"] }
+          }
+        },
+        {
+          "name": "Create Squat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId2', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Squat\",\n  \"description\": \"Barbell back squat\",\n  \"muscleGroup\": \"LEGS\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/exercises", "host": ["{{baseUrl}}"], "path": ["api", "exercises"] }
+          }
+        },
+        {
+          "name": "Create Pull Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId3', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pull Up\",\n  \"description\": \"Wide grip pull up\",\n  \"muscleGroup\": \"BACK\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/exercises", "host": ["{{baseUrl}}"], "path": ["api", "exercises"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Planning - Create Workout Routine",
+      "description": "Create a workout with days and assign exercises to each day",
+      "item": [
+        {
+          "name": "Create Upper/Lower Split",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('workoutId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Upper/Lower Split\",\n  \"description\": \"4-day upper/lower split routine\",\n  \"days\": [\n    {\n      \"name\": \"Upper Body\",\n      \"exercises\": [\n        { \"exerciseId\": \"{{exerciseId1}}\", \"sets\": 4, \"reps\": 10, \"restSeconds\": 90 },\n        { \"exerciseId\": \"{{exerciseId3}}\", \"sets\": 3, \"reps\": 12, \"restSeconds\": 60 }\n      ]\n    },\n    {\n      \"name\": \"Lower Body\",\n      \"exercises\": [\n        { \"exerciseId\": \"{{exerciseId2}}\", \"sets\": 5, \"reps\": 8, \"restSeconds\": 120 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/workouts", "host": ["{{baseUrl}}"], "path": ["api", "workouts"] }
+          }
+        },
+        {
+          "name": "Get Workout by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/workouts/{{workoutId}}", "host": ["{{baseUrl}}"], "path": ["api", "workouts", "{{workoutId}}"] }
+          }
+        },
+        {
+          "name": "Add a New Day",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayName\": \"Arms & Abs\",\n  \"exercises\": [\n    { \"exerciseId\": \"{{exerciseId1}}\", \"sets\": 3, \"reps\": 15, \"restSeconds\": 45 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/days", "host": ["{{baseUrl}}"], "path": ["api", "workouts", "{{workoutId}}", "days"] }
+          }
+        },
+        {
+          "name": "Save the First Day ID",
+          "description": "Extract the first day ID from the workout to use it for starting a session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('dayId', json.days[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/workouts/{{workoutId}}", "host": ["{{baseUrl}}"], "path": ["api", "workouts", "{{workoutId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Execution - Start & Complete Session",
+      "description": "Start a training session using the planned routine, log exercises, and finish",
+      "item": [
+        {
+          "name": "Start Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var body = pm.response.text();",
+                  "pm.collectionVariables.set('sessionId', body.replace(/\"/g, ''));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayId\": \"{{dayId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sessions", "host": ["{{baseUrl}}"], "path": ["api", "sessions"] }
+          }
+        },
+        {
+          "name": "Get Session by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}"] }
+          }
+        },
+        {
+          "name": "Add Exercise Log (Bench Press)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('logId', json.logId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": \"{{exerciseId1}}\",\n  \"sets\": 4,\n  \"reps\": 10,\n  \"weight\": 60\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}", "logs"] }
+          }
+        },
+        {
+          "name": "Update Weight",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 65\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs/{{logId}}/weight", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}", "logs", "{{logId}}", "weight"] }
+          }
+        },
+        {
+          "name": "Add Exercise Log (Squat)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": \"{{exerciseId2}}\",\n  \"sets\": 5,\n  \"reps\": 8,\n  \"weight\": 80\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}", "logs"] }
+          }
+        },
+        {
+          "name": "Update Session Notes",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Great session! Increased bench press weight by 5kg.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/notes", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}", "notes"] }
+          }
+        },
+        {
+          "name": "Finish Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/finish", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}", "finish"] }
+          }
+        },
+        {
+          "name": "Verify Completed Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/sessions/{{sessionId}}", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "{{sessionId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
