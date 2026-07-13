@@ -4,6 +4,7 @@ import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureErrors;
 import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureException;
+import com.standofit.back.modules.training.execution.infrastructure.SessionNotFoundException;
 import com.standofit.back.modules.training.execution.infrastructure.mapper.SessionMapper;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.List;
@@ -44,11 +45,7 @@ public class SessionRepositoryJpaImpl implements SessionRepository {
 
   @Override
   public Session getById(SessionId id) {
-    return findById(id)
-        .orElseThrow(
-            () ->
-                new SessionInfrastructureException(
-                    SessionInfrastructureErrors.SESSION_NOT_FOUND.getMessage(id.value())));
+    return findById(id).orElseThrow(() -> new SessionNotFoundException(id.value().toString()));
   }
 
   @Override
