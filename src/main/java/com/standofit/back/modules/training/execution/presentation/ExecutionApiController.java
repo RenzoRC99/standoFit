@@ -14,8 +14,7 @@ import com.standofit.back.modules.training.execution.application.command.update_
 import com.standofit.back.modules.training.execution.application.command.update_session_notes.UpdateSessionNotesCommand;
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
-import com.standofit.back.modules.training.execution.application.query.get_all_sessions.GetAllSessionsQuery;
-import com.standofit.back.modules.training.execution.application.query.get_session_by_id.GetSessionByIdQuery;
+import com.standofit.back.modules.training.execution.application.query.search_sessions.SearchSessionsQuery;
 import com.standofit.back.modules.training.execution.domain.vo.*;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
@@ -41,7 +40,7 @@ public class ExecutionApiController implements ExecutionApi {
 
   @Override
   public ResponseEntity<SessionListDTO> getAllSessions() {
-    SessionListDto result = queryBus.ask(new GetAllSessionsQuery());
+    SessionListDto result = queryBus.ask(SearchSessionsQuery.all());
     if (result.sessions().isEmpty()) {
       return ResponseEntity.noContent().build();
     }
@@ -50,7 +49,8 @@ public class ExecutionApiController implements ExecutionApi {
 
   @Override
   public ResponseEntity<SessionDTO> getSessionById(UUID sessionId) {
-    SessionDto result = queryBus.ask(new GetSessionByIdQuery(new SessionId(sessionId)));
+    SessionListDto list = queryBus.ask(SearchSessionsQuery.byId(new SessionId(sessionId)));
+    SessionDto result = list.sessions().getFirst();
     return ResponseEntity.ok(SessionApiMapper.toApi(result));
   }
 

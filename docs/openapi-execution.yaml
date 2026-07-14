@@ -60,19 +60,12 @@ paths:
       responses:
         '201':
           description: Sesión creada
-          headers:
-            Location:
-              schema:
-                type: string
-                format: uri
-                example: "http://localhost:8080/api/sessions/50000000-0000-0000-0000-000000000003"
-              description: URL de la sesión creada
           content:
-            text/plain:
+            application/json:
               schema:
                 type: string
                 format: uuid
-              example: "50000000-0000-0000-0000-000000000003"
+                example: "50000000-0000-0000-0000-000000000001"
 
   /api/sessions/{sessionId}:
     get:
@@ -449,6 +442,10 @@ components:
             - CANCELLED
         notes:
           type: string
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseLogDTO'
         startedAt:
           type: string
         finishedAt:
@@ -471,6 +468,10 @@ components:
         exerciseId:
           type: string
           format: uuid
+        exerciseName:
+          type: string
+        muscleGroup:
+          type: string
         sets:
           type: integer
         reps:

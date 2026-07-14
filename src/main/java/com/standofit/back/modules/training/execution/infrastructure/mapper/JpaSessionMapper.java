@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SessionMapper {
+public class JpaSessionMapper {
 
   public SessionJpaEntity toEntity(Session session) {
     SessionJpaEntity entity =

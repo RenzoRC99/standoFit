@@ -9,7 +9,9 @@ public enum SessionDomainErrors implements EnumContract {
   SESSION_ALREADY_CANCELLED("Session already cancelled"),
   SESSION_CANNOT_BE_FINISHED("Session cannot be finished"),
   SESSION_CANNOT_BE_CANCELLED("Session cannot be cancelled"),
-  LOG_NOT_FOUND("Log not found");
+  LOG_NOT_FOUND("Log not found"),
+  EXERCISE_NOT_FOUND("Exercise not found in catalog"),
+  DAY_NOT_FOUND("Workout day not found in planning");
 
   private final String message;
 

@@ -1,6 +1,7 @@
 package com.standofit.back.configuration.web;
 
 import com.standofit.back.configuration.web.dto.ErrorDTO;
+import com.standofit.back.modules.training.execution.infrastructure.SessionNotFoundException;
 import com.standofit.back.modules.training.planning.infrastructure.WorkoutNotFoundException;
 import com.standofit.back.shared.domain.DomainException;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,8 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
-  @ExceptionHandler(WorkoutNotFoundException.class)
-  public ResponseEntity<ErrorDTO> handleWorkoutNotFoundException(WorkoutNotFoundException ex) {
+  @ExceptionHandler({WorkoutNotFoundException.class, SessionNotFoundException.class})
+  public ResponseEntity<ErrorDTO> handleNotFoundException(RuntimeException ex) {
     ErrorDTO error = new ErrorDTO("NOT_FOUND", ex.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }

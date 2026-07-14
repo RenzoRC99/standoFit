@@ -11,9 +11,9 @@ services:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U standofit"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 3s
+      timeout: 3s
+      retries: 10
 
   app:
     build: .
@@ -23,9 +23,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/standofit
       SPRING_DATASOURCE_USERNAME: standofit
       SPRING_DATASOURCE_PASSWORD: standofit
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
     depends_on:
       db:
         condition: service_healthy
