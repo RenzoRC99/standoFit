@@ -9,7 +9,11 @@ import com.standofit.back.api.execution.dto.*;
 import com.standofit.back.modules.exercises.Exercise;
 import com.standofit.back.modules.exercises.ExerciseMuscleGroup;
 import com.standofit.back.modules.exercises.repository.ExerciseRepository;
+import com.standofit.back.modules.training.planning.infrastructure.entity.WorkoutDayJpaEntity;
+import com.standofit.back.modules.training.planning.infrastructure.entity.WorkoutJpaEntity;
+import com.standofit.back.modules.training.planning.infrastructure.repository.WorkoutJpaRepository;
 import com.standofit.back.shared.AbstractIntegrationTest;
+import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,13 +32,18 @@ class ExecutionRestApiIntegrationTest extends AbstractIntegrationTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private WorkoutJpaRepository workoutJpaRepository;
 
   private UUID exerciseId;
+  private UUID dayId;
 
   @BeforeEach
   void setUp() {
     exerciseRepository.deleteAll();
+    workoutJpaRepository.deleteAll();
+
     exerciseId = createAndSaveExercise("Bench Press", ExerciseMuscleGroup.CHEST);
+    dayId = createAndSaveWorkoutWithDay("Test Workout", "Test Day");
   }
 
   private UUID createAndSaveExercise(String name, ExerciseMuscleGroup group) {
@@ -45,10 +54,20 @@ class ExecutionRestApiIntegrationTest extends AbstractIntegrationTest {
     return UUID.fromString(exerciseRepository.save(exercise).getId());
   }
 
+  private UUID createAndSaveWorkoutWithDay(String workoutName, String dayName) {
+    var workout =
+        new WorkoutJpaEntity(
+            UUID.randomUUID(), workoutName, "Test description", Instant.now(), Instant.now());
+    var day = new WorkoutDayJpaEntity(UUID.randomUUID(), dayName, 0);
+    workout.addDay(day);
+    workoutJpaRepository.save(workout);
+    return day.getId();
+  }
+
   @Test
   @DisplayName("full session lifecycle: start, add log, finish, delete")
   void fullSessionLifecycle() throws Exception {
-    var startRequest = new StartSessionRequest(UUID.randomUUID());
+    var startRequest = new StartSessionRequest(dayId);
 
     var createResponse =
         mockMvc
@@ -100,6 +119,50 @@ class ExecutionRestApiIntegrationTest extends AbstractIntegrationTest {
     mockMvc.perform(delete("/api/sessions/" + sessionId)).andExpect(status().isNoContent());
 
     mockMvc.perform(get("/api/sessions/" + sessionId)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("should return 400 when starting session with invalid dayId")
+  void shouldReturn400WhenDayNotFound() throws Exception {
+    var startRequest = new StartSessionRequest(UUID.randomUUID());
+
+    mockMvc
+        .perform(
+            post("/api/sessions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(startRequest)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_ARGUMENT"));
+  }
+
+  @Test
+  @DisplayName("should return 400 when adding log with invalid exerciseId")
+  void shouldReturn400WhenExerciseNotFound() throws Exception {
+    var startRequest = new StartSessionRequest(dayId);
+
+    var createResponse =
+        mockMvc
+            .perform(
+                post("/api/sessions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(startRequest)))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String sessionId = createResponse.replace("\"", "");
+
+    var addLogRequest =
+        new AddExerciseLogRequest().exerciseId(UUID.randomUUID()).sets(4).reps(10).weight(60);
+
+    mockMvc
+        .perform(
+            post("/api/sessions/" + sessionId + "/logs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addLogRequest)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_ARGUMENT"));
   }
 
   @Test
