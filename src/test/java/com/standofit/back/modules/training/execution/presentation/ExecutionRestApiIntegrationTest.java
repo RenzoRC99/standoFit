@@ -80,6 +80,12 @@ class ExecutionRestApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(status().isCreated());
 
     mockMvc
+        .perform(get("/api/sessions/" + sessionId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.logs[0].exerciseName").value("Bench Press"))
+        .andExpect(jsonPath("$.logs[0].muscleGroup").value(ExerciseMuscleGroup.CHEST.name()));
+
+    mockMvc
         .perform(
             post("/api/sessions/" + sessionId + "/finish")
                 .contentType(MediaType.APPLICATION_JSON)
