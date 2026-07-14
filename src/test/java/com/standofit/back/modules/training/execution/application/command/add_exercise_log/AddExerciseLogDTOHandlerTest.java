@@ -4,12 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.standofit.back.modules.exercises.repository.ExerciseRepository;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
+import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
@@ -27,17 +29,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AddExerciseLogDTOHandlerTest {
 
   @Mock private SessionRepository repository;
+  @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
+  @Mock private ExerciseRepository exerciseRepository;
 
   private AddExerciseLogHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new AddExerciseLogHandler(repository, eventBus);
+    handler = new AddExerciseLogHandler(repository, readViewUpdater, eventBus, exerciseRepository);
   }
 
   @Test
-  @DisplayName("should add exercise log and save session on success")
+  @DisplayName("should add exercise log, save and update read view on success")
   void shouldAddLogAndSave() {
     var sessionId = new SessionId(UUID.randomUUID());
     var command =
@@ -50,12 +54,14 @@ class AddExerciseLogDTOHandlerTest {
             new ExerciseLogWeight(50));
     var session = Session.create(sessionId, new SessionDayId(UUID.randomUUID()));
     when(repository.getById(sessionId)).thenReturn(session);
-    when(repository.save(any(Session.class))).thenReturn(session);
+    when(repository.save(any(Session.class))).thenAnswer(i -> i.getArgument(0));
+    when(exerciseRepository.existsById(anyString())).thenReturn(true);
 
-    handler.handle(command);
+    handler.execute(command);
 
     verify(repository, times(1)).getById(sessionId);
     verify(repository, times(1)).save(any(Session.class));
+    verify(readViewUpdater, times(1)).upsert(any(Session.class));
     verify(eventBus, times(1)).publish(any());
   }
 
@@ -72,8 +78,9 @@ class AddExerciseLogDTOHandlerTest {
             new ExerciseLogReps(10),
             new ExerciseLogWeight(50));
     doThrow(new RuntimeException("Session not found")).when(repository).getById(sessionId);
+    when(exerciseRepository.existsById(anyString())).thenReturn(true);
 
-    assertThrows(RuntimeException.class, () -> handler.handle(command));
+    assertThrows(RuntimeException.class, () -> handler.execute(command));
     verify(eventBus, times(1)).publish(any());
   }
 }
