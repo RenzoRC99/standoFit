@@ -468,6 +468,10 @@ components:
         exerciseId:
           type: string
           format: uuid
+        exerciseName:
+          type: string
+        muscleGroup:
+          type: string
         sets:
           type: integer
         reps:

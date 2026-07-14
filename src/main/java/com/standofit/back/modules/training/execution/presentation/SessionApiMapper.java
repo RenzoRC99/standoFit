@@ -24,6 +24,8 @@ public class SessionApiMapper {
     return new ExerciseLogDTO()
         .id(dto.id())
         .exerciseId(dto.exerciseId())
+        .exerciseName(dto.exerciseName())
+        .muscleGroup(dto.muscleGroup())
         .sets(dto.sets())
         .reps(dto.reps())
         .weight(dto.weight());
