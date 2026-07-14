@@ -6,6 +6,7 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
+import com.standofit.back.modules.training.planning.domain.service.WorkoutDomainValidator;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutDayName;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseReps;
 import com.standofit.back.modules.training.planning.domain.vo.WorkoutExerciseRest;
@@ -21,11 +22,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class AddDayToWorkoutService extends PlanningUseCase {
 
+  private final WorkoutDomainValidator workoutDomainValidator;
+
   public AddDayToWorkoutService(
       WorkoutRepository repository,
       WorkoutDtoMapper mapper,
-      ApplicationEventBus applicationEventBus) {
+      ApplicationEventBus applicationEventBus,
+      WorkoutDomainValidator workoutDomainValidator) {
     super(repository, mapper, applicationEventBus);
+    this.workoutDomainValidator = workoutDomainValidator;
   }
 
   public void addDay(AddDayToWorkoutCommand command) {
@@ -33,7 +38,11 @@ public class AddDayToWorkoutService extends PlanningUseCase {
       Workout workout = repository.getById(command.workoutId());
 
       List<WorkoutExercise> exercises = new ArrayList<>();
+      List<com.standofit.back.shared.domain.valueobjects.ids.ExerciseId> exerciseIds =
+          new ArrayList<>();
+
       for (AddDayToWorkoutCommand.ExerciseInput exInput : command.exercises()) {
+        exerciseIds.add(exInput.exerciseId());
         exercises.add(
             WorkoutExercise.create(
                 new WorkoutExerciseId(UUID.randomUUID()),
@@ -42,6 +51,8 @@ public class AddDayToWorkoutService extends PlanningUseCase {
                 new WorkoutExerciseReps(exInput.reps()),
                 new WorkoutExerciseRest(exInput.restSeconds())));
       }
+
+      workoutDomainValidator.ensureExercisesExist(exerciseIds);
 
       WorkoutDay newDay =
           WorkoutDay.create(
