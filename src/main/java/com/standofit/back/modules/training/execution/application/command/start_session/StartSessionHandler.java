@@ -6,6 +6,7 @@ import com.standofit.back.modules.training.execution.application.event.Execution
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
 import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
@@ -19,14 +20,17 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
   private final SessionRepository repository;
   private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
+  private final SessionDomainValidator sessionDomainValidator;
 
   public StartSessionHandler(
       SessionRepository repository,
       SessionReadViewUpdater readViewUpdater,
-      ApplicationEventBus eventBus) {
+      ApplicationEventBus eventBus,
+      SessionDomainValidator sessionDomainValidator) {
     this.repository = repository;
     this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
+    this.sessionDomainValidator = sessionDomainValidator;
   }
 
   @Override
@@ -38,6 +42,7 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
   public UUID handle(StartSessionCommand command) {
     UUID id = UUID.randomUUID();
     try {
+      sessionDomainValidator.ensureDayExists(command.dayId());
       Session session = Session.create(new SessionId(id), command.dayId());
       Session saved = repository.save(session);
       readViewUpdater.upsert(saved);

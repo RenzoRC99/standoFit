@@ -2,14 +2,12 @@ package com.standofit.back.modules.training.execution.application.command.add_ex
 
 import static com.standofit.back.modules.training.execution.application.ErrorDetailResolver.resolve;
 
-import com.standofit.back.modules.exercises.repository.ExerciseRepository;
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
-import com.standofit.back.modules.training.execution.domain.SessionDomainErrors;
-import com.standofit.back.modules.training.execution.domain.SessionDomainException;
 import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
 import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
@@ -21,17 +19,17 @@ public class AddExerciseLogHandler implements VoidCommandHandler<AddExerciseLogC
   private final SessionRepository repository;
   private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
-  private final ExerciseRepository exerciseRepository;
+  private final SessionDomainValidator sessionDomainValidator;
 
   public AddExerciseLogHandler(
       SessionRepository repository,
       SessionReadViewUpdater readViewUpdater,
       ApplicationEventBus eventBus,
-      ExerciseRepository exerciseRepository) {
+      SessionDomainValidator sessionDomainValidator) {
     this.repository = repository;
     this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
-    this.exerciseRepository = exerciseRepository;
+    this.sessionDomainValidator = sessionDomainValidator;
   }
 
   @Override
@@ -42,9 +40,7 @@ public class AddExerciseLogHandler implements VoidCommandHandler<AddExerciseLogC
   @Override
   public void execute(AddExerciseLogCommand command) {
     try {
-      if (!exerciseRepository.existsById(command.exerciseId().value().toString())) {
-        throw new SessionDomainException(SessionDomainErrors.EXERCISE_NOT_FOUND.getMessage());
-      }
+      sessionDomainValidator.ensureExerciseExists(command.exerciseId());
       Session session = repository.getById(command.sessionId());
       ExerciseLog newLog =
           ExerciseLog.create(
