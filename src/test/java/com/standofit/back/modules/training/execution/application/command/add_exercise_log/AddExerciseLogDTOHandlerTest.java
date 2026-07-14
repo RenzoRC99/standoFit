@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.standofit.back.modules.exercises.repository.ExerciseRepository;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
@@ -31,13 +31,14 @@ class AddExerciseLogDTOHandlerTest {
   @Mock private SessionRepository repository;
   @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
-  @Mock private ExerciseRepository exerciseRepository;
+  @Mock private SessionDomainValidator sessionDomainValidator;
 
   private AddExerciseLogHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new AddExerciseLogHandler(repository, readViewUpdater, eventBus, exerciseRepository);
+    handler =
+        new AddExerciseLogHandler(repository, readViewUpdater, eventBus, sessionDomainValidator);
   }
 
   @Test
@@ -55,10 +56,10 @@ class AddExerciseLogDTOHandlerTest {
     var session = Session.create(sessionId, new SessionDayId(UUID.randomUUID()));
     when(repository.getById(sessionId)).thenReturn(session);
     when(repository.save(any(Session.class))).thenAnswer(i -> i.getArgument(0));
-    when(exerciseRepository.existsById(anyString())).thenReturn(true);
 
     handler.execute(command);
 
+    verify(sessionDomainValidator, times(1)).ensureExerciseExists(command.exerciseId());
     verify(repository, times(1)).getById(sessionId);
     verify(repository, times(1)).save(any(Session.class));
     verify(readViewUpdater, times(1)).upsert(any(Session.class));
@@ -78,9 +79,9 @@ class AddExerciseLogDTOHandlerTest {
             new ExerciseLogReps(10),
             new ExerciseLogWeight(50));
     doThrow(new RuntimeException("Session not found")).when(repository).getById(sessionId);
-    when(exerciseRepository.existsById(anyString())).thenReturn(true);
 
     assertThrows(RuntimeException.class, () -> handler.execute(command));
+    verify(sessionDomainValidator, times(1)).ensureExerciseExists(command.exerciseId());
     verify(eventBus, times(1)).publish(any());
   }
 }

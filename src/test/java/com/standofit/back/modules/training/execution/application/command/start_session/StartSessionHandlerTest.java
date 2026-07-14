@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
 import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
@@ -24,12 +25,14 @@ class StartSessionHandlerTest {
   @Mock private SessionRepository repository;
   @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
+  @Mock private SessionDomainValidator sessionDomainValidator;
 
   private StartSessionHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new StartSessionHandler(repository, readViewUpdater, eventBus);
+    handler =
+        new StartSessionHandler(repository, readViewUpdater, eventBus, sessionDomainValidator);
   }
 
   @Test
@@ -41,6 +44,7 @@ class StartSessionHandlerTest {
     UUID result = handler.handle(command);
 
     assertNotNull(result);
+    verify(sessionDomainValidator, times(1)).ensureDayExists(command.dayId());
     verify(repository, times(1)).save(any(Session.class));
     verify(readViewUpdater, times(1)).upsert(any(Session.class));
     verify(eventBus, times(1)).publish(any());
@@ -53,6 +57,7 @@ class StartSessionHandlerTest {
     doThrow(new RuntimeException("DB error")).when(repository).save(any(Session.class));
 
     assertThrows(RuntimeException.class, () -> handler.handle(command));
+    verify(sessionDomainValidator, times(1)).ensureDayExists(command.dayId());
     verify(eventBus, times(1)).publish(any());
   }
 }
