@@ -1,10 +1,10 @@
 package com.standofit.back.modules.training.planning.application.command.reorder_days;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Void> {
+public class ReorderDaysHandler implements VoidCommandHandler<ReorderDaysCommand> {
 
   private final ReorderDaysService service;
 
@@ -18,8 +18,7 @@ public class ReorderDaysHandler implements CommandHandler<ReorderDaysCommand, Vo
   }
 
   @Override
-  public Void handle(ReorderDaysCommand command) {
+  public void execute(ReorderDaysCommand command) {
     service.reorder(command);
-    return null;
   }
 }

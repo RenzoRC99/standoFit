@@ -1,11 +1,11 @@
 package com.standofit.back.modules.training.planning.application.command.change_workout_description;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ChangeWorkoutDescriptionHandler
-    implements CommandHandler<ChangeWorkoutDescriptionCommand, Void> {
+    implements VoidCommandHandler<ChangeWorkoutDescriptionCommand> {
 
   private final ChangeWorkoutDescriptionService service;
 
@@ -19,8 +19,7 @@ public class ChangeWorkoutDescriptionHandler
   }
 
   @Override
-  public Void handle(ChangeWorkoutDescriptionCommand command) {
+  public void execute(ChangeWorkoutDescriptionCommand command) {
     service.changeDescription(command);
-    return null;
   }
 }

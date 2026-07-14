@@ -1,10 +1,10 @@
 package com.standofit.back.modules.training.planning.application.command.rename_day;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RenameDayHandler implements CommandHandler<RenameDayCommand, Void> {
+public class RenameDayHandler implements VoidCommandHandler<RenameDayCommand> {
 
   private final RenameDayService service;
 
@@ -18,8 +18,7 @@ public class RenameDayHandler implements CommandHandler<RenameDayCommand, Void> 
   }
 
   @Override
-  public Void handle(RenameDayCommand command) {
+  public void execute(RenameDayCommand command) {
     service.rename(command);
-    return null;
   }
 }
