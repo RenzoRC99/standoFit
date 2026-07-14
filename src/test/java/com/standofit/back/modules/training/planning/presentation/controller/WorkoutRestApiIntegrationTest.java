@@ -247,4 +247,32 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
                 .content(objectMapper.writeValueAsString(new RenameRequest("New Name"))))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  @DisplayName("should return 400 when creating workout with invalid exerciseId")
+  void shouldReturn400WhenExerciseNotFound() throws Exception {
+    var request =
+        new PlanWorkoutRequest()
+            .name("Invalid Routine")
+            .description("Has fake exercise")
+            .days(
+                List.of(
+                    new DayInputDTO()
+                        .name("Day 1")
+                        .exercises(
+                            List.of(
+                                new ExerciseInputDTO()
+                                    .exerciseId(UUID.randomUUID())
+                                    .sets(3)
+                                    .reps(10)
+                                    .restSeconds(60)))));
+
+    mockMvc
+        .perform(
+            post("/api/workouts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_ARGUMENT"));
+  }
 }
