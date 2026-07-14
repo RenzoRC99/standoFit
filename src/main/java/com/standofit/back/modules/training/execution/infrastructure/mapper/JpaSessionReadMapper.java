@@ -2,14 +2,14 @@ package com.standofit.back.modules.training.execution.infrastructure.mapper;
 
 import com.standofit.back.modules.training.execution.application.dto.ExerciseLogDto;
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
-import com.standofit.back.modules.training.execution.infrastructure.entity.ExerciseLogJpaEntity;
-import com.standofit.back.modules.training.execution.infrastructure.entity.SessionJpaEntity;
+import com.standofit.back.modules.training.execution.infrastructure.entity.readview.ExerciseLogReadViewJpaEntity;
+import com.standofit.back.modules.training.execution.infrastructure.entity.readview.SessionReadViewJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JpaSessionReadMapper {
 
-  public SessionDto toDto(SessionJpaEntity entity) {
+  public SessionDto toDto(SessionReadViewJpaEntity entity) {
     return new SessionDto(
         entity.getId(),
         entity.getDayId(),
@@ -20,10 +20,12 @@ public class JpaSessionReadMapper {
         entity.getUpdatedAt().toString());
   }
 
-  public ExerciseLogDto toExerciseDto(ExerciseLogJpaEntity entity) {
+  public ExerciseLogDto toExerciseDto(ExerciseLogReadViewJpaEntity entity) {
     return new ExerciseLogDto(
         entity.getId(),
         entity.getExerciseId(),
+        entity.getExerciseName(),
+        entity.getMuscleGroup(),
         entity.getSets(),
         entity.getReps(),
         entity.getWeight());

@@ -1,13 +1,10 @@
 package com.standofit.back.modules.training.execution.application.query;
 
 import com.standofit.back.modules.training.execution.application.dto.SessionDto;
-import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
-import java.util.Optional;
-import java.util.UUID;
+import com.standofit.back.shared.domain.criteria.Criteria;
+import com.standofit.back.shared.domain.criteria.PagedResult;
 
 public interface SessionReadRepository {
 
-  SessionListDto findAllAsDtos();
-
-  Optional<SessionDto> findDtoById(UUID id);
+  PagedResult<SessionDto> searchByCriteria(Criteria criteria);
 }
