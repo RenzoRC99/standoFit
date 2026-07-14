@@ -1,10 +1,10 @@
 package com.standofit.back.modules.training.planning.application.command.add_day_to_workout;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCommand, Void> {
+public class AddDayToWorkoutHandler implements VoidCommandHandler<AddDayToWorkoutCommand> {
 
   private final AddDayToWorkoutService service;
 
@@ -18,8 +18,7 @@ public class AddDayToWorkoutHandler implements CommandHandler<AddDayToWorkoutCom
   }
 
   @Override
-  public Void handle(AddDayToWorkoutCommand command) {
+  public void execute(AddDayToWorkoutCommand command) {
     service.addDay(command);
-    return null;
   }
 }

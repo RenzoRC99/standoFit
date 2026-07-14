@@ -1,10 +1,10 @@
 package com.standofit.back.modules.training.planning.application.command.rename_workout;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand, Void> {
+public class RenameWorkoutHandler implements VoidCommandHandler<RenameWorkoutCommand> {
 
   private final RenameWorkoutService service;
 
@@ -18,8 +18,7 @@ public class RenameWorkoutHandler implements CommandHandler<RenameWorkoutCommand
   }
 
   @Override
-  public Void handle(RenameWorkoutCommand command) {
+  public void execute(RenameWorkoutCommand command) {
     service.rename(command);
-    return null;
   }
 }
