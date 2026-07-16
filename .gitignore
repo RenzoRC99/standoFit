@@ -40,3 +40,6 @@ out/
 src/main/java/com/standofit/back/api/execution/
 /ExecutionApi.java
 /PlanningApi.java
+
+### Environment ###
+.env
