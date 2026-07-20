@@ -1,16 +1,16 @@
 package com.standofit.back.modules.training.execution.application.query.search_sessions;
 
-import com.standofit.back.modules.training.execution.application.dto.SessionListDto;
+import com.standofit.back.modules.training.execution.application.dto.SessionDto;
 import com.standofit.back.modules.training.execution.application.query.SessionReadRepository;
 import com.standofit.back.modules.training.execution.infrastructure.SessionNotFoundException;
 import com.standofit.back.shared.domain.bus.query.QueryHandler;
 import com.standofit.back.shared.domain.criteria.Criteria;
-import com.standofit.back.shared.domain.criteria.Filter;
 import com.standofit.back.shared.domain.criteria.PagedResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SearchSessionsHandler implements QueryHandler<SearchSessionsQuery, SessionListDto> {
+public class SearchSessionsHandler
+    implements QueryHandler<SearchSessionsQuery, PagedResult<SessionDto>> {
 
   private final SessionReadRepository readRepository;
 
@@ -24,26 +24,30 @@ public class SearchSessionsHandler implements QueryHandler<SearchSessionsQuery, 
   }
 
   @Override
-  public SessionListDto handle(SearchSessionsQuery query) {
-    Criteria criteria = buildCriteria(query);
-    PagedResult<com.standofit.back.modules.training.execution.application.dto.SessionDto> result =
-        readRepository.searchByCriteria(criteria);
-    if (query.sessionId() != null && result.items().isEmpty()) {
-      throw new SessionNotFoundException(query.sessionId().value().toString());
-    }
-    return new SessionListDto(result.items());
-  }
+  public PagedResult<SessionDto> handle(SearchSessionsQuery query) {
+    var criteria =
+        Criteria.fromFilterValues(
+            query.orderBy(), query.order(), query.page(), query.pageSize(), query.filters());
 
-  private Criteria buildCriteria(SearchSessionsQuery query) {
-    var builder = Criteria.builder().page(query.page(), query.pageSize()).desc("createdAt");
+    PagedResult<SessionDto> result = readRepository.searchByCriteria(criteria);
 
-    if (query.sessionId() != null) {
-      builder.filter(Filter.equal("id", query.sessionId().value()));
-    }
-    if (query.status() != null) {
-      builder.filter(Filter.equal("status", query.status()));
+    boolean isByIdLookup =
+        query.filters().stream()
+            .anyMatch(
+                f ->
+                    "id".equals(f.get("field"))
+                        && "=".equals(f.get("operator"))
+                        && query.pageSize() == 1);
+
+    if (isByIdLookup && result.items().isEmpty()) {
+      throw new SessionNotFoundException(
+          query.filters().stream()
+              .filter(f -> "id".equals(f.get("field")))
+              .findFirst()
+              .map(f -> f.get("value"))
+              .orElse("unknown"));
     }
 
-    return builder.build();
+    return result;
   }
 }

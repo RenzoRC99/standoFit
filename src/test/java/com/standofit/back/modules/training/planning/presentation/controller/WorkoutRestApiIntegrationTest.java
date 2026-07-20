@@ -121,7 +121,7 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
 
     mockMvc
         .perform(
-            put("/api/workouts/" + workoutId + "/name")
+            patch("/api/workouts/" + workoutId + "/name")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     objectMapper.writeValueAsString(new RenameRequest("Upper/Lower Split V2"))))
@@ -133,7 +133,7 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
 
     mockMvc
         .perform(
-            put("/api/workouts/" + workoutId + "/description")
+            patch("/api/workouts/" + workoutId + "/description")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     objectMapper.writeValueAsString(new DescriptionRequest("Updated description"))))
@@ -173,7 +173,7 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
 
     mockMvc
         .perform(
-            put("/api/workouts/" + workoutId + "/days/reorder")
+            patch("/api/workouts/" + workoutId + "/days/reorder")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     objectMapper.writeValueAsString(
@@ -242,7 +242,7 @@ class WorkoutRestApiIntegrationTest extends AbstractIntegrationTest {
     var fakeId = UUID.randomUUID();
     mockMvc
         .perform(
-            put("/api/workouts/" + fakeId + "/name")
+            patch("/api/workouts/" + fakeId + "/name")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new RenameRequest("New Name"))))
         .andExpect(status().isNotFound());

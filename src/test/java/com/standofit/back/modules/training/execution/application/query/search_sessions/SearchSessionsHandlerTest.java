@@ -42,7 +42,7 @@ class SearchSessionsHandlerTest {
     var result = handler.handle(query);
 
     assertNotNull(result);
-    assertTrue(result.sessions().isEmpty());
+    assertTrue(result.items().isEmpty());
     verify(readRepository, times(1)).searchByCriteria(any(Criteria.class));
   }
 
@@ -55,11 +55,18 @@ class SearchSessionsHandlerTest {
         new SessionDto(
             sessionId.value(),
             UUID.randomUUID(),
+            "Push Pull Legs",
+            "Push Day",
             "IN_PROGRESS",
             List.of(
                 new ExerciseLogDto(
                     UUID.randomUUID(), UUID.randomUUID(), "Bench Press", "CHEST", 3, 10, 50)),
+            List.of(),
             "",
+            null,
+            null,
+            null,
+            null,
             "",
             "");
     var pagedResult = PagedResult.<SessionDto>of(List.of(dto), 1, 0, Integer.MAX_VALUE);
@@ -68,8 +75,8 @@ class SearchSessionsHandlerTest {
     var result = handler.handle(query);
 
     assertNotNull(result);
-    assertEquals(1, result.sessions().size());
-    assertEquals(sessionId.value(), result.sessions().get(0).id());
+    assertEquals(1, result.items().size());
+    assertEquals(sessionId.value(), result.items().get(0).id());
     verify(readRepository, times(1)).searchByCriteria(any(Criteria.class));
   }
 }

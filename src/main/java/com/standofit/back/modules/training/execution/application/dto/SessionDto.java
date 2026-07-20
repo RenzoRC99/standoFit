@@ -7,8 +7,15 @@ import java.util.UUID;
 public record SessionDto(
     UUID id,
     UUID dayId,
+    String workoutName,
+    String dayName,
     String status,
     List<ExerciseLogDto> exercises,
+    List<PlannedExerciseDto> plannedExercises,
     String notes,
+    Integer durationMinutes,
+    Integer totalVolume,
+    Integer totalExercises,
+    Integer totalSets,
     String startedAt,
     String finishedAt) {}

@@ -10,40 +10,6 @@ servers:
 
 paths:
   /api/sessions:
-    get:
-      summary: Listar todas las sesiones
-      operationId: getAllSessions
-      tags:
-        - Sessions
-      responses:
-        '200':
-          description: Lista de sesiones
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SessionListDTO'
-              example:
-                sessions:
-                  - id: "50000000-0000-0000-0000-000000000001"
-                    dayId: "80000000-0000-0000-0000-000000000001"
-                    status: "COMPLETED"
-                    notes: "Buena sesión de pecho"
-                    startedAt: "2026-01-20T10:00:00Z"
-                    finishedAt: "2026-01-20T11:30:00Z"
-                  - id: "50000000-0000-0000-0000-000000000002"
-                    dayId: "80000000-0000-0000-0000-000000000002"
-                    status: "IN_PROGRESS"
-                    notes: null
-                    startedAt: "2026-01-20T14:00:00Z"
-                    finishedAt: null
-        '204':
-          description: No hay sesiones
-        '400':
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDTO'
     post:
       summary: Iniciar una nueva sesión
       operationId: startSession
@@ -66,6 +32,55 @@ paths:
                 type: string
                 format: uuid
                 example: "50000000-0000-0000-0000-000000000001"
+
+  /api/sessions/search:
+    post:
+      summary: Buscar sesiones
+      operationId: searchSessions
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchSessionsRequest'
+            example:
+              orderBy: "createdAt"
+              order: "DESC"
+              page: 0
+              pageSize: 10
+              filters:
+                - field: "status"
+                  operator: "="
+                  value: "COMPLETED"
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionPageDTO'
+              example:
+                content:
+                  - id: "50000000-0000-0000-0000-000000000001"
+                    dayId: "80000000-0000-0000-0000-000000000001"
+                    status: "COMPLETED"
+                    notes: "Buena sesión"
+                    startedAt: "2026-01-20T10:00:00Z"
+                    finishedAt: "2026-01-20T11:30:00Z"
+                totalElements: 1
+                totalPages: 1
+                pageNumber: 0
+                pageSize: 10
+        '204':
+          description: No se encontraron sesiones
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
 
   /api/sessions/{sessionId}:
     get:
@@ -119,7 +134,7 @@ paths:
           description: Sesión eliminada
 
   /api/sessions/{sessionId}/finish:
-    post:
+    patch:
       summary: Finalizar sesión
       operationId: finishSession
       tags:
@@ -143,7 +158,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/sessions/{sessionId}/cancel:
-    post:
+    patch:
       summary: Cancelar sesión
       operationId: cancelSession
       tags:
@@ -350,7 +365,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/sessions/{sessionId}/notes:
-    put:
+    patch:
       summary: Actualizar notas de la sesión
       operationId: updateSessionNotes
       tags:
@@ -434,6 +449,10 @@ components:
         dayId:
           type: string
           format: uuid
+        workoutName:
+          type: string
+        dayName:
+          type: string
         status:
           type: string
           enum:
@@ -442,22 +461,42 @@ components:
             - CANCELLED
         notes:
           type: string
+        durationMinutes:
+          type: integer
+        totalVolume:
+          type: integer
+        totalExercises:
+          type: integer
+        totalSets:
+          type: integer
         logs:
           type: array
           items:
             $ref: '#/components/schemas/ExerciseLogDTO'
+        plannedExercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlannedExerciseDTO'
         startedAt:
           type: string
         finishedAt:
           type: string
 
-    SessionListDTO:
+    SessionPageDTO:
       type: object
       properties:
-        sessions:
+        content:
           type: array
           items:
             $ref: '#/components/schemas/SessionDTO'
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
 
     ExerciseLogDTO:
       type: object
@@ -477,6 +516,23 @@ components:
         reps:
           type: integer
         weight:
+          type: integer
+
+    PlannedExerciseDTO:
+      type: object
+      properties:
+        exerciseId:
+          type: string
+          format: uuid
+        exerciseName:
+          type: string
+        muscleGroup:
+          type: string
+        sets:
+          type: integer
+        reps:
+          type: integer
+        restSeconds:
           type: integer
 
     StartSessionRequest:
@@ -549,4 +605,38 @@ components:
         - notes
       properties:
         notes:
+          type: string
+
+    SearchSessionsRequest:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterRequest'
+        orderBy:
+          type: string
+        order:
+          type: string
+          enum: [ASC, DESC]
+          default: ASC
+        page:
+          type: integer
+          default: 0
+        pageSize:
+          type: integer
+          default: 10
+
+    FilterRequest:
+      type: object
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+        operator:
+          type: string
+        value:
           type: string
