@@ -106,7 +106,7 @@ class ExecutionRestApiIntegrationTest extends AbstractIntegrationTest {
 
     mockMvc
         .perform(
-            post("/api/sessions/" + sessionId + "/finish")
+            patch("/api/sessions/" + sessionId + "/finish")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
         .andExpect(status().isNoContent());

@@ -194,7 +194,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorDTO'
 
-    put:
+    patch:
       summary: Actualizar metadatos del plan (nombre y/o descripción)
       operationId: updateWorkout
       tags:
@@ -248,7 +248,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/workouts/{workoutId}/name:
-    put:
+    patch:
       summary: Renombrar plan
       operationId: renameWorkout
       tags:
@@ -279,7 +279,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/workouts/{workoutId}/description:
-    put:
+    patch:
       summary: Cambiar descripción del plan
       operationId: changeWorkoutDescription
       tags:
@@ -352,7 +352,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/workouts/{workoutId}/days/{dayId}:
-    put:
+    patch:
       summary: Actualizar día del plan (nombre y/o ejercicios)
       operationId: updateWorkoutDay
       tags:
@@ -422,7 +422,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDTO'
 
   /api/workouts/{workoutId}/days/reorder:
-    put:
+    patch:
       summary: Reordenar días del plan
       operationId: reorderDays
       tags:

@@ -1,14 +1,17 @@
 package com.standofit.back.modules.training.execution.infrastructure.query;
 
-import com.standofit.back.modules.exercises.Exercise;
-import com.standofit.back.modules.exercises.repository.ExerciseRepository;
+import com.standofit.back.modules.training.execution.domain.catalog.ExerciseResolver;
+import com.standofit.back.modules.training.execution.domain.catalog.WorkoutResolver;
 import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.infrastructure.SessionInfrastructureException;
 import com.standofit.back.modules.training.execution.infrastructure.entity.readview.ExerciseLogReadViewJpaEntity;
+import com.standofit.back.modules.training.execution.infrastructure.entity.readview.PlannedExerciseReadViewJpaEntity;
 import com.standofit.back.modules.training.execution.infrastructure.entity.readview.SessionReadViewJpaEntity;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,12 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class SessionReadViewUpdater {
 
   private final SessionReadViewJpaRepository readViewRepository;
-  private final ExerciseRepository exerciseRepository;
+  private final ExerciseResolver exerciseResolver;
+  private final WorkoutResolver workoutResolver;
 
   public SessionReadViewUpdater(
-      SessionReadViewJpaRepository readViewRepository, ExerciseRepository exerciseRepository) {
+      SessionReadViewJpaRepository readViewRepository,
+      ExerciseResolver exerciseResolver,
+      WorkoutResolver workoutResolver) {
     this.readViewRepository = readViewRepository;
-    this.exerciseRepository = exerciseRepository;
+    this.exerciseResolver = exerciseResolver;
+    this.workoutResolver = workoutResolver;
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
@@ -42,20 +49,37 @@ public class SessionReadViewUpdater {
   }
 
   private SessionReadViewJpaEntity toEntity(Session session) {
-    Map<UUID, Exercise> exerciseMap = loadExercises(session.getLogs());
+    Map<UUID, ExerciseResolver.ExerciseInfo> exerciseMap = loadExercises(session.getLogs());
+
+    Optional<WorkoutResolver.WorkoutInfo> workoutInfoOpt =
+        workoutResolver.resolveByDayId(session.getDayId().value());
+
+    String workoutName = workoutInfoOpt.map(WorkoutResolver.WorkoutInfo::workoutName).orElse(null);
+    String dayName = workoutInfoOpt.map(WorkoutResolver.WorkoutInfo::dayName).orElse(null);
+
+    Integer durationMinutes = null;
+    if (session.getCreatedAt() != null && session.getUpdatedAt() != null) {
+      durationMinutes =
+          (int)
+              Duration.between(session.getCreatedAt().value(), session.getUpdatedAt().value())
+                  .toMinutes();
+    }
 
     var entity =
         new SessionReadViewJpaEntity(
             session.getId().value(),
             session.getDayId().value(),
+            workoutName,
+            dayName,
             session.getStatus().name(),
             session.getNotes().value(),
+            durationMinutes,
             session.getCreatedAt().value(),
             session.getUpdatedAt().value());
 
     for (ExerciseLog log : session.getLogs()) {
-      Exercise exercise = exerciseMap.get(log.getExerciseId().value());
-      if (exercise == null) {
+      ExerciseResolver.ExerciseInfo info = exerciseMap.get(log.getExerciseId().value());
+      if (info == null) {
         throw new SessionInfrastructureException(
             "Exercise not found in catalog: " + log.getExerciseId().value());
       }
@@ -63,25 +87,37 @@ public class SessionReadViewUpdater {
           new ExerciseLogReadViewJpaEntity(
               log.getId().value(),
               log.getExerciseId().value(),
-              exercise.getName(),
-              exercise.getMuscleGroup().name(),
+              info.name(),
+              info.muscleGroup(),
               log.getSets().value(),
               log.getReps().value(),
               log.getWeight().value()));
     }
 
+    workoutInfoOpt.ifPresent(
+        info -> {
+          int idx = 0;
+          for (var pe : info.plannedExercises()) {
+            entity.addPlannedExercise(
+                new PlannedExerciseReadViewJpaEntity(
+                    UUID.randomUUID(),
+                    pe.exerciseId(),
+                    pe.sets(),
+                    pe.reps(),
+                    pe.restSeconds(),
+                    idx++));
+          }
+        });
+
     return entity;
   }
 
-  private Map<UUID, Exercise> loadExercises(List<ExerciseLog> logs) {
-    Set<String> stringIds =
-        logs.stream()
-            .map(log -> log.getExerciseId().value().toString())
-            .collect(Collectors.toSet());
-    if (stringIds.isEmpty()) {
+  private Map<UUID, ExerciseResolver.ExerciseInfo> loadExercises(List<ExerciseLog> logs) {
+    Set<UUID> ids =
+        logs.stream().map(log -> log.getExerciseId().value()).collect(Collectors.toSet());
+    if (ids.isEmpty()) {
       return Map.of();
     }
-    return exerciseRepository.findAllById(stringIds).stream()
-        .collect(Collectors.toMap(ex -> UUID.fromString(ex.getId()), ex -> ex));
+    return exerciseResolver.resolve(ids);
   }
 }
