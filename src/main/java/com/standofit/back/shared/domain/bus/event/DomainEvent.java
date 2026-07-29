@@ -4,12 +4,33 @@ import com.standofit.back.shared.domain.valueobjects.Id;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface DomainEvent {
-  String StringName();
+public abstract class DomainEvent {
 
-  Id aggregateId();
+  private final UUID eventId;
+  private final Instant occurredOn;
+  private final Id aggregateId;
+  private final String eventName;
 
-  UUID eventId();
+  protected DomainEvent(Id aggregateId, String eventName) {
+    this.eventId = UUID.randomUUID();
+    this.occurredOn = Instant.now();
+    this.aggregateId = aggregateId;
+    this.eventName = eventName;
+  }
 
-  Instant occurredOn();
+  public String StringName() {
+    return eventName;
+  }
+
+  public Id aggregateId() {
+    return aggregateId;
+  }
+
+  public UUID eventId() {
+    return eventId;
+  }
+
+  public Instant occurredOn() {
+    return occurredOn;
+  }
 }
