@@ -1,7 +1,5 @@
 package com.standofit.back.shared.domain.bus.application_event;
 
-public interface ApplicationEventHandler<T extends ApplicationEvent> {
-  Class<T> eventType();
+import com.standofit.back.shared.domain.bus.event.EventHandler;
 
-  void handle(T event);
-}
+public interface ApplicationEventHandler<T extends ApplicationEvent> extends EventHandler<T> {}
