@@ -1,11 +1,10 @@
 package com.standofit.back.modules.training.planning.application.command.replace_day_exercises;
 
-import com.standofit.back.shared.domain.bus.command.CommandHandler;
+import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReplaceDayExercisesHandler
-    implements CommandHandler<ReplaceDayExercisesCommand, Void> {
+public class ReplaceDayExercisesHandler implements VoidCommandHandler<ReplaceDayExercisesCommand> {
 
   private final ReplaceDayExercisesService service;
 
@@ -19,8 +18,7 @@ public class ReplaceDayExercisesHandler
   }
 
   @Override
-  public Void handle(ReplaceDayExercisesCommand command) {
+  public void execute(ReplaceDayExercisesCommand command) {
     service.replace(command);
-    return null;
   }
 }

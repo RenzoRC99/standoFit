@@ -10,7 +10,8 @@ public enum WorkoutDomainErrors implements EnumContract {
   DAYS_CANNOT_BE_NULL_OR_EMPTY("Days cannot be null or empty"),
   DAY_IDS_CANNOT_BE_NULL_OR_EMPTY("Day IDs cannot be null or empty"),
   DAYS_COUNT_MISMATCH("Days count mismatch"),
-  EXERCISES_CANNOT_BE_NULL_OR_EMPTY("Exercises cannot be null or empty");
+  EXERCISES_CANNOT_BE_NULL_OR_EMPTY("Exercises cannot be null or empty"),
+  EXERCISE_NOT_FOUND_IN_CATALOG("Exercise not found in catalog");
 
   private final String message;
 

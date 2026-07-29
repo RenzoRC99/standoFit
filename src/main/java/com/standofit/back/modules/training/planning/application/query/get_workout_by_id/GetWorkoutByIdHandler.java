@@ -1,16 +1,19 @@
 package com.standofit.back.modules.training.planning.application.query.get_workout_by_id;
 
 import com.standofit.back.modules.training.planning.application.dto.WorkoutDto;
+import com.standofit.back.modules.training.planning.application.query.WorkoutReadRepository;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureErrors;
+import com.standofit.back.modules.training.planning.infrastructure.WorkoutInfrastructureException;
 import com.standofit.back.shared.domain.bus.query.QueryHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GetWorkoutByIdHandler implements QueryHandler<GetWorkoutByIdQuery, WorkoutDto> {
 
-  private final GetWorkoutByIdService service;
+  private final WorkoutReadRepository readRepository;
 
-  public GetWorkoutByIdHandler(GetWorkoutByIdService service) {
-    this.service = service;
+  public GetWorkoutByIdHandler(WorkoutReadRepository readRepository) {
+    this.readRepository = readRepository;
   }
 
   @Override
@@ -20,6 +23,12 @@ public class GetWorkoutByIdHandler implements QueryHandler<GetWorkoutByIdQuery, 
 
   @Override
   public WorkoutDto handle(GetWorkoutByIdQuery query) {
-    return service.findById(query);
+    return readRepository
+        .findById(query.workoutId())
+        .orElseThrow(
+            () ->
+                new WorkoutInfrastructureException(
+                    WorkoutInfrastructureErrors.WORKOUT_NOT_FOUND.getMessage(
+                        query.workoutId().value())));
   }
 }

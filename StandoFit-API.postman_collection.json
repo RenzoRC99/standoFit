@@ -1,0 +1,1003 @@
+{
+  "info": {
+    "name": "StandoFit API - Full Collection",
+    "description": "All 33 endpoints: Exercises, Planning (Workouts), and Execution (Sessions)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "exerciseId1",
+      "value": ""
+    },
+    {
+      "key": "exerciseId2",
+      "value": ""
+    },
+    {
+      "key": "exerciseId3",
+      "value": ""
+    },
+    {
+      "key": "workoutId",
+      "value": ""
+    },
+    {
+      "key": "dayId",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "logId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Exercises",
+      "description": "Exercise catalog: CRUD, search, filter by muscle group",
+      "item": [
+        {
+          "name": "1. Create Bench Press",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId1', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bench Press\",\n  \"description\": \"Barbell bench press\",\n  \"muscleGroup\": \"CHEST\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Create Squat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId2', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Squat\",\n  \"description\": \"Barbell back squat\",\n  \"muscleGroup\": \"LEGS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Create Pull Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('exerciseId3', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pull Up\",\n  \"description\": \"Wide grip pull up\",\n  \"muscleGroup\": \"BACK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. List All Exercises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Get Exercise by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises/{{exerciseId1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises",
+                "{{exerciseId1}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Filter by Muscle Group",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises/muscle-group/CHEST",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises",
+                "muscle-group",
+                "CHEST"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Search by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises/search?name=bench",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "bench"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Update Exercise",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bench Press (Barbell)\",\n  \"description\": \"Updated description\",\n  \"muscleGroup\": \"CHEST\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises/{{exerciseId1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises",
+                "{{exerciseId1}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. Delete Exercise",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises/{{exerciseId1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exercises",
+                "{{exerciseId1}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Planning - Workouts",
+      "description": "Workout planning: CRUD, search, days management, reorder, duplicate",
+      "item": [
+        {
+          "name": "1. Create Workout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('workoutId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Upper/Lower Split\",\n  \"description\": \"4-day upper/lower split routine\",\n  \"days\": [\n    {\n      \"name\": \"Upper Body\",\n      \"exercises\": [\n        { \"exerciseId\": \"{{exerciseId1}}\", \"sets\": 4, \"reps\": 10, \"restSeconds\": 90 },\n        { \"exerciseId\": \"{{exerciseId3}}\", \"sets\": 3, \"reps\": 12, \"restSeconds\": 60 }\n      ]\n    },\n    {\n      \"name\": \"Lower Body\",\n      \"exercises\": [\n        { \"exerciseId\": \"{{exerciseId2}}\", \"sets\": 5, \"reps\": 8, \"restSeconds\": 120 }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. List All Workouts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Search Workouts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderBy\": \"createdAt\",\n  \"order\": \"DESC\",\n  \"page\": 0,\n  \"pageSize\": 10,\n  \"filters\": [\n    {\n      \"field\": \"name\",\n      \"operator\": \"LIKE\",\n      \"value\": \"upper\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "search"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Get Workout by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.days && json.days.length > 0) {",
+                  "  pm.collectionVariables.set('dayId', json.days[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Update Workout Metadata",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Upper/Lower Split v2\",\n  \"description\": \"Updated 4-day split routine\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Rename Workout",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Upper/Lower Split (Renamed)\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/name",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "name"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Change Description",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"A new description for the workout plan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/description",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "description"
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Duplicate Workout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('workoutId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newName\": \"Copy of Upper/Lower Split\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/duplicate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "duplicate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. Add Day to Workout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('dayId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayName\": \"Cardio Day\",\n  \"exercises\": [\n    { \"exerciseId\": \"{{exerciseId1}}\", \"sets\": 3, \"reps\": 15, \"restSeconds\": 45 },\n    { \"exerciseId\": \"{{exerciseId2}}\", \"sets\": 3, \"reps\": 15, \"restSeconds\": 45 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/days",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "days"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10. Update Workout Day",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cardio Day Updated\",\n  \"exercises\": [\n    { \"exerciseId\": \"{{exerciseId1}}\", \"sets\": 4, \"reps\": 12, \"restSeconds\": 60 },\n    { \"exerciseId\": \"{{exerciseId2}}\", \"sets\": 4, \"reps\": 12, \"restSeconds\": 60 },\n    { \"exerciseId\": \"{{exerciseId3}}\", \"sets\": 3, \"reps\": 10, \"restSeconds\": 45 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/days/{{dayId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "days",
+                "{{dayId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11. Remove Day from Workout",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/days/{{dayId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "days",
+                "{{dayId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12. Reorder Days",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayIds\": [\n    \"00000000-0000-0000-0000-000000000000\",\n    \"00000000-0000-0000-0000-000000000000\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}/days/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}",
+                "days",
+                "reorder"
+              ]
+            }
+          }
+        },
+        {
+          "name": "13. Delete Workout",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/workouts/{{workoutId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "workouts",
+                "{{workoutId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execution - Sessions",
+      "description": "Session execution: start, finish, cancel, delete, exercise logs CRUD, notes update",
+      "item": [
+        {
+          "name": "1. Start Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var body = pm.response.text();",
+                  "var id = body.replace(/\"/g, '');",
+                  "pm.collectionVariables.set('sessionId', id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayId\": \"{{dayId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Search Sessions (List & Filter)",
+          "description": "Use empty body to list all. Add filters to search.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderBy\": \"createdAt\",\n  \"order\": \"DESC\",\n  \"page\": 0,\n  \"pageSize\": 10,\n  \"filters\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "search"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Get Session by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Add Exercise Log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var body = pm.response.text();",
+                  "try {",
+                  "  var json = JSON.parse(body);",
+                  "  if (json.id) { pm.collectionVariables.set('logId', json.id); }",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": \"{{exerciseId1}}\",\n  \"sets\": 4,\n  \"reps\": 10,\n  \"weight\": 60\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "logs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Update Exercise Log Sets",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sets\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs/{{logId}}/sets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "logs",
+                "{{logId}}",
+                "sets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Update Exercise Log Reps",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reps\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs/{{logId}}/reps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "logs",
+                "{{logId}}",
+                "reps"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Update Exercise Log Weight",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 70\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs/{{logId}}/weight",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "logs",
+                "{{logId}}",
+                "weight"
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Update Session Notes",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Great session! Increased weight by 5kg.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "notes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. Finish Session",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "finish"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10. Cancel Session",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "cancel"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11. Remove Exercise Log",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/logs/{{logId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}",
+                "logs",
+                "{{logId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12. Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sessions/{{sessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "{{sessionId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

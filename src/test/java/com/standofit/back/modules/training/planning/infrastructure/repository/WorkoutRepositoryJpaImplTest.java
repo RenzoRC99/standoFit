@@ -6,6 +6,7 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.vo.*;
+import com.standofit.back.shared.AbstractIntegrationTest;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.WorkoutId;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("Workout Repository Tests")
 @Transactional
 @Rollback(false)
-class WorkoutRepositoryJpaImplTest {
+class WorkoutRepositoryJpaImplTest extends AbstractIntegrationTest {
 
   @Autowired private WorkoutRepositoryJpaImpl repository;
 

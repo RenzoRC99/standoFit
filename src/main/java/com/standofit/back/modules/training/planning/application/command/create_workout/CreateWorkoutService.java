@@ -6,6 +6,7 @@ import com.standofit.back.modules.training.planning.domain.entity.Workout;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutDay;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutExercise;
 import com.standofit.back.modules.training.planning.domain.entity.WorkoutRepository;
+import com.standofit.back.modules.training.planning.domain.service.WorkoutDomainValidator;
 import com.standofit.back.modules.training.planning.domain.vo.*;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
@@ -20,22 +21,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class CreateWorkoutService extends PlanningUseCase {
 
+  private final WorkoutDomainValidator workoutDomainValidator;
+
   public CreateWorkoutService(
       WorkoutRepository repository,
       WorkoutDtoMapper mapper,
-      ApplicationEventBus applicationEventBus) {
+      ApplicationEventBus applicationEventBus,
+      WorkoutDomainValidator workoutDomainValidator) {
     super(repository, mapper, applicationEventBus);
+    this.workoutDomainValidator = workoutDomainValidator;
   }
 
   public UUID create(CreateWorkoutCommand command) {
     WorkoutId workoutId = new WorkoutId(UUID.randomUUID());
     try {
+      List<ExerciseId> exerciseIds = new ArrayList<>();
       List<WorkoutDay> days = new ArrayList<>();
 
       for (CreateWorkoutCommand.DayInput dayInput : command.days()) {
         List<WorkoutExercise> exercises = new ArrayList<>();
 
         for (CreateWorkoutCommand.ExerciseInput exInput : dayInput.exercises()) {
+          exerciseIds.add(new ExerciseId(exInput.exerciseId()));
           WorkoutExercise exercise =
               WorkoutExercise.create(
                   new WorkoutExerciseId(UUID.randomUUID()),
@@ -53,6 +60,8 @@ public class CreateWorkoutService extends PlanningUseCase {
                 exercises);
         days.add(day);
       }
+
+      workoutDomainValidator.ensureExercisesExist(exerciseIds);
 
       Workout workout =
           Workout.create(
