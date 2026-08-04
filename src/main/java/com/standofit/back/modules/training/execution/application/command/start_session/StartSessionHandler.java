@@ -7,7 +7,6 @@ import com.standofit.back.modules.training.execution.application.event.SessionAc
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
@@ -18,17 +17,14 @@ import org.springframework.stereotype.Component;
 public class StartSessionHandler implements CommandHandler<StartSessionCommand, UUID> {
 
   private final SessionRepository repository;
-  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
   private final SessionDomainValidator sessionDomainValidator;
 
   public StartSessionHandler(
       SessionRepository repository,
-      SessionReadViewUpdater readViewUpdater,
       ApplicationEventBus eventBus,
       SessionDomainValidator sessionDomainValidator) {
     this.repository = repository;
-    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
     this.sessionDomainValidator = sessionDomainValidator;
   }
@@ -44,8 +40,7 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
     try {
       sessionDomainValidator.ensureDayExists(command.dayId());
       Session session = Session.create(new SessionId(id), command.dayId());
-      Session saved = repository.save(session);
-      readViewUpdater.upsert(saved);
+      repository.save(session);
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_STARTED,

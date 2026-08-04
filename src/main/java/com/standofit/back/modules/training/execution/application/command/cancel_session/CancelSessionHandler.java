@@ -6,7 +6,6 @@ import com.standofit.back.modules.training.execution.application.event.Execution
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
@@ -15,15 +14,10 @@ import org.springframework.stereotype.Component;
 public class CancelSessionHandler implements VoidCommandHandler<CancelSessionCommand> {
 
   private final SessionRepository repository;
-  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
 
-  public CancelSessionHandler(
-      SessionRepository repository,
-      SessionReadViewUpdater readViewUpdater,
-      ApplicationEventBus eventBus) {
+  public CancelSessionHandler(SessionRepository repository, ApplicationEventBus eventBus) {
     this.repository = repository;
-    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
   }
 
@@ -36,8 +30,7 @@ public class CancelSessionHandler implements VoidCommandHandler<CancelSessionCom
   public void execute(CancelSessionCommand command) {
     try {
       Session session = repository.getById(command.sessionId());
-      Session saved = repository.save(session.cancel());
-      readViewUpdater.upsert(saved);
+      repository.save(session.cancel());
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_CANCELLED,
