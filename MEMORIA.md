@@ -1,13 +1,13 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v2 · 2026-08-04 · Bootstrap completado
+> **Sello:** v3 · 2026-08-04 · Event-driven completado
 
 ## 1 · Cronología
 
 | Fecha | Versión | Hito |
 |---|---|---|
 | 2026-08-04 | v1 | Bootstrap inicial. Preflight de entorno. Análisis del código existente. |
-| 2026-08-04 | v2 | Creados INSTRUCCIONES.md, PROYECTO.md, MEMORIA.md. Entrevista de definición completada. |
+| 2026-08-04 | v3 | Migración event-driven completada: EventDrivenSessionRepository + 9 DomainEventHandlers. 112 tests pasan. Abierta P0 de Event Sourcing. |
 
 ---
 
@@ -18,7 +18,8 @@
 | D01 | 2026-08-04 | Stack Java 21 + Spring Boot 3.4 + PostgreSQL | Según build.gradle | Registrado |
 | D02 | 2026-08-04 | Arquitectura DDD + Hexagonal + CQRS | Según estructura del código (buses cmd/query/event) | Registrado |
 | D03 | 2026-08-04 | Multi-user con JWT | Confirmado por Renzo. Diseño específico pendiente. | Pendiente |
-| D04 | 2026-08-04 | Migrar execution de relacional a event-driven | Prioridad P0. Ya existen eventos de dominio. | Pendiente |
+| D04 | 2026-08-04 | Migrar execution de relacional a event-driven (usando eventos de dominio ya existentes) | Se creó EventDrivenSessionRepository + 9 DomainEventHandler. Eventos se publican al EventBus y el read-view se actualiza reactivamente. | Hecho |
+| D05 | 2026-08-04 | Migrar de event-driven a Event Sourcing (tabla event_store + reconstrucción de aggregate) | Se añade como nueva P0. El paso actual (event-driven) es la base. Falta: persistir eventos en BD, reconstruir Session desde historial, snapshotting. | Pendiente |
 
 ---
 
@@ -65,5 +66,6 @@
 - [ ] Verificar si hay CI/CD configurado en `.github/`.
 - [ ] Verificar que `./gradlew build` compila correctamente.
 - [ ] Diseñar e implementar autenticación JWT + entidad Usuario.
-- [ ] Migrar módulo de execution a event-driven (usando eventos de dominio ya existentes).
+- [x] Migrar módulo de execution a event-driven (usando eventos de dominio ya existentes).
+- [ ] Migrar módulo de execution a Event Sourcing (persistir eventos en event_store).
 - [ ] Implementar estadísticas y métricas avanzadas.

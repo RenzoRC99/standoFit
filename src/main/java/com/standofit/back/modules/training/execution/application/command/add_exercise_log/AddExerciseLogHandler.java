@@ -8,7 +8,6 @@ import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
@@ -17,17 +16,14 @@ import org.springframework.stereotype.Component;
 public class AddExerciseLogHandler implements VoidCommandHandler<AddExerciseLogCommand> {
 
   private final SessionRepository repository;
-  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
   private final SessionDomainValidator sessionDomainValidator;
 
   public AddExerciseLogHandler(
       SessionRepository repository,
-      SessionReadViewUpdater readViewUpdater,
       ApplicationEventBus eventBus,
       SessionDomainValidator sessionDomainValidator) {
     this.repository = repository;
-    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
     this.sessionDomainValidator = sessionDomainValidator;
   }
@@ -50,8 +46,7 @@ public class AddExerciseLogHandler implements VoidCommandHandler<AddExerciseLogC
               command.reps(),
               command.weight());
       Session updatedSession = session.addLog(newLog);
-      Session saved = repository.save(updatedSession);
-      readViewUpdater.upsert(saved);
+      repository.save(updatedSession);
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_EXERCISE_ADDED,

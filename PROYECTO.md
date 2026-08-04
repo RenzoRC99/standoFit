@@ -51,7 +51,8 @@ Catálogo de ejercicios con nombre, descripción, grupo muscular. CRUD completo.
 
 | Prioridad | Feature | Estado |
 |---|---|---|
-| 🔴 P0 | Migrar sesiones de modelo relacional a event-driven | Pendiente |
+| 🔴 P0 | Migrar sesiones a event-driven (EventBus + DomainEventHandlers) | ✅ Hecho |
+| 🔴 P0 | Event Sourcing — persistir eventos en event store + reconstruir aggregate | Pendiente |
 | 🔴 P0 | Autenticación JWT + gestión de usuarios | Pendiente (diseño no decidido) |
 | 🟡 P1 | Estadísticas y progreso (gráficas, histórico) | Pendiente |
 | 🟡 P1 | Métricas avanzadas (1RM, volumen, rachas) | Pendiente |

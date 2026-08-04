@@ -11,7 +11,6 @@ import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogReps;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogSets;
 import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogWeight;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.ExerciseId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
@@ -29,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AddExerciseLogDTOHandlerTest {
 
   @Mock private SessionRepository repository;
-  @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
   @Mock private SessionDomainValidator sessionDomainValidator;
 
@@ -37,8 +35,7 @@ class AddExerciseLogDTOHandlerTest {
 
   @BeforeEach
   void setUp() {
-    handler =
-        new AddExerciseLogHandler(repository, readViewUpdater, eventBus, sessionDomainValidator);
+    handler = new AddExerciseLogHandler(repository, eventBus, sessionDomainValidator);
   }
 
   @Test
@@ -62,7 +59,6 @@ class AddExerciseLogDTOHandlerTest {
     verify(sessionDomainValidator, times(1)).ensureExerciseExists(command.exerciseId());
     verify(repository, times(1)).getById(sessionId);
     verify(repository, times(1)).save(any(Session.class));
-    verify(readViewUpdater, times(1)).upsert(any(Session.class));
     verify(eventBus, times(1)).publish(any());
   }
 
