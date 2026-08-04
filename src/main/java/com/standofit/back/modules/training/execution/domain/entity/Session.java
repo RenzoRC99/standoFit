@@ -2,6 +2,15 @@ package com.standofit.back.modules.training.execution.domain.entity;
 
 import com.standofit.back.modules.training.execution.domain.SessionDomainErrors;
 import com.standofit.back.modules.training.execution.domain.SessionDomainException;
+import com.standofit.back.modules.training.execution.domain.event.ExerciseLogAdded;
+import com.standofit.back.modules.training.execution.domain.event.ExerciseLogRemoved;
+import com.standofit.back.modules.training.execution.domain.event.ExerciseLogRepsUpdated;
+import com.standofit.back.modules.training.execution.domain.event.ExerciseLogSetsUpdated;
+import com.standofit.back.modules.training.execution.domain.event.ExerciseLogWeightUpdated;
+import com.standofit.back.modules.training.execution.domain.event.SessionCancelled;
+import com.standofit.back.modules.training.execution.domain.event.SessionFinished;
+import com.standofit.back.modules.training.execution.domain.event.SessionNotesChanged;
+import com.standofit.back.modules.training.execution.domain.event.SessionStarted;
 import com.standofit.back.modules.training.execution.domain.vo.*;
 import com.standofit.back.shared.domain.aggregate.AggregateRoot;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
@@ -38,14 +47,17 @@ public final class Session extends AggregateRoot {
   }
 
   public static Session create(SessionId id, SessionDayId dayId) {
-    return new Session(
-        id,
-        dayId,
-        WorkoutSessionStatus.IN_PROGRESS,
-        new ArrayList<>(),
-        new WorkoutSessionNotes(""),
-        new SessionCreatedAt(Instant.now()),
-        new SessionUpdatedAt(Instant.now()));
+    Session session =
+        new Session(
+            id,
+            dayId,
+            WorkoutSessionStatus.IN_PROGRESS,
+            new ArrayList<>(),
+            new WorkoutSessionNotes(""),
+            new SessionCreatedAt(Instant.now()),
+            new SessionUpdatedAt(Instant.now()));
+    session.record(new SessionStarted(id, dayId));
+    return session;
   }
 
   public static Session copy(
@@ -74,7 +86,10 @@ public final class Session extends AggregateRoot {
     if (status == WorkoutSessionStatus.CANCELLED) {
       throw new SessionDomainException(SessionDomainErrors.SESSION_CANNOT_BE_FINISHED.getMessage());
     }
-    return update(WorkoutSessionStatus.COMPLETED, logs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated =
+        update(WorkoutSessionStatus.COMPLETED, logs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new SessionFinished(id));
+    return updated;
   }
 
   public Session cancel() {
@@ -85,19 +100,26 @@ public final class Session extends AggregateRoot {
     if (status == WorkoutSessionStatus.CANCELLED) {
       throw new SessionDomainException(SessionDomainErrors.SESSION_ALREADY_CANCELLED.getMessage());
     }
-    return update(WorkoutSessionStatus.CANCELLED, logs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated =
+        update(WorkoutSessionStatus.CANCELLED, logs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new SessionCancelled(id));
+    return updated;
   }
 
   public Session changeNotes(WorkoutSessionNotes notes) {
     ensureInProgress();
-    return update(status, this.logs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, this.logs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new SessionNotesChanged(id, notes));
+    return updated;
   }
 
   public Session addLog(ExerciseLog log) {
     ensureInProgress();
     List<ExerciseLog> newLogs = new ArrayList<>(this.logs);
     newLogs.add(log);
-    return update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new ExerciseLogAdded(id, log.getId()));
+    return updated;
   }
 
   public Session removeLog(ExerciseLogId logId) {
@@ -105,7 +127,9 @@ public final class Session extends AggregateRoot {
     ensureLogExists(logId);
     List<ExerciseLog> newLogs =
         this.logs.stream().filter(log -> !log.getId().value().equals(logId.value())).toList();
-    return update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new ExerciseLogRemoved(id, logId));
+    return updated;
   }
 
   public Session updateLogSets(ExerciseLogId logId, ExerciseLogSets sets) {
@@ -115,7 +139,9 @@ public final class Session extends AggregateRoot {
         this.logs.stream()
             .map(log -> log.getId().value().equals(logId.value()) ? log.updateSets(sets) : log)
             .toList();
-    return update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new ExerciseLogSetsUpdated(id, logId, sets));
+    return updated;
   }
 
   public Session updateLogReps(ExerciseLogId logId, ExerciseLogReps reps) {
@@ -125,7 +151,9 @@ public final class Session extends AggregateRoot {
         this.logs.stream()
             .map(log -> log.getId().value().equals(logId.value()) ? log.updateReps(reps) : log)
             .toList();
-    return update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new ExerciseLogRepsUpdated(id, logId, reps));
+    return updated;
   }
 
   public Session updateLogWeight(ExerciseLogId logId, ExerciseLogWeight weight) {
@@ -135,7 +163,9 @@ public final class Session extends AggregateRoot {
         this.logs.stream()
             .map(log -> log.getId().value().equals(logId.value()) ? log.updateWeight(weight) : log)
             .toList();
-    return update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    Session updated = update(status, newLogs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new ExerciseLogWeightUpdated(id, logId, weight));
+    return updated;
   }
 
   private void ensureInProgress() {
