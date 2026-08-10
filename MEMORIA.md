@@ -71,6 +71,7 @@
 
 ## 6 · Pendientes (siguiente sesión)
 
+- [ ] Implementar evento `SessionDeleted` y soporte en `SessionReconstructor` — actualmente `deleteById()` es no-op en el event store (append-only). El `SessionReconstructor` debe lanzar `SessionNotFoundException` si el último evento es `SessionDeleted`, para que `getById()` no reconstruya sesiones borradas.
 - [ ] Mover `@Transactional` de controllers a command handlers en Execution (StartSessionHandler, FinishSessionHandler, etc.)
 - [ ] Añadir `@Transactional(propagation = MANDATORY)` a repos de Planning (mismo patrón que SessionReadViewUpdater)
 - [ ] Auditar manejo de errores en `InMemoryBus` — captura la excepción pero la TX sigue marcada rollback-only
