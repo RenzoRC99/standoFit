@@ -44,7 +44,7 @@ public class EventSourcedSessionRepository implements SessionRepository {
 
   @Override
   public void deleteById(SessionId id) {
-    throw new UnsupportedOperationException(
-        "Session aggregate cannot be deleted, use cancel() or finish() instead");
+    // Event store is append-only. The DeleteSessionHandler
+    // already removes the read-view entry via readViewUpdater.remove()
   }
 }
