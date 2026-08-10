@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v3 · 2026-08-04 · Event-driven completado
+> **Sello:** v4 · 2026-08-06 · Revisión de reglas de negocio, documentación y gaps identificados
 
 ## 1 · Cronología
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | 2026-08-04 | v1 | Bootstrap inicial. Preflight de entorno. Análisis del código existente. |
 | 2026-08-04 | v3 | Migración event-driven completada: EventDrivenSessionRepository + 9 DomainEventHandlers. 112 tests pasan. Abierta P0 de Event Sourcing. |
+| 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
 
 ---
 
@@ -20,6 +21,9 @@
 | D03 | 2026-08-04 | Multi-user con JWT | Confirmado por Renzo. Diseño específico pendiente. | Pendiente |
 | D04 | 2026-08-04 | Migrar execution de relacional a event-driven (usando eventos de dominio ya existentes) | Se creó EventDrivenSessionRepository + 9 DomainEventHandler. Eventos se publican al EventBus y el read-view se actualiza reactivamente. | Hecho |
 | D05 | 2026-08-04 | Migrar de event-driven a Event Sourcing (tabla event_store + reconstrucción de aggregate) | Se añade como nueva P0. El paso actual (event-driven) es la base. Falta: persistir eventos en BD, reconstruir Session desde historial, snapshotting. | Pendiente |
+| D06 | 2026-08-06 | Soft-delete en Exercises en lugar de borrado físico | Evita datos huérfanos en Planning y Execution sin introducir FK entre bounded contexts. Patrón estándar para catálogos compartidos. | Pendiente |
+| D07 | 2026-08-06 | Mover @Transactional de controllers a command handlers | La atomicidad debe vivir en el caso de uso (aplicación), no en el adaptador HTTP (presentación). Permite reutilizar comandos desde jobs, mensajes o tests sin depender del controller. | Pendiente |
+| D08 | 2026-08-06 | Documentar reglas de negocio de cada bounded context en PROYECTO.md | Facilita entrevistas técnicas, onboarding y sirve como referencia viva del dominio. | Hecho |
 
 ---
 
@@ -27,7 +31,12 @@
 
 - El proyecto ya tiene código sustancial (~130 ficheros Java). No es un proyecto vacío.
 - Arquitectura DDD + Hexagonal + CQRS con buses de command/query/event.
-- Dos módulos principales: `planning` (workouts) y `execution` (sesiones).
+- Tres bounded contexts: Exercises (catálogo), Planning (workouts), Execution (sesiones).
+- La comunicación entre contextos es por ID tipado, sin FK en BD. Correcto para DDD pero requiere protección en capa de aplicación (soft-delete, validación pre-delete).
+- 9 eventos de dominio específicos en Execution (no un SessionUpdated genérico) — cada uno con intención de negocio. Facilitan read-view, auditoría y futuro Event Sourcing.
+- Los @Transactional están en los controllers, no en los handlers. Esto debería invertirse para que el caso de uso controle la atomicidad.
+- Planning no usa @Transactional en handlers ni MANDATORY en infraestructura. Execution tiene MANDATORY en SessionReadViewUpdater.
+- InMemoryBus se traga excepciones de los handlers pero Spring ya marca la TX como rollback-only. El error resultante es confuso para el cliente.
 - Generación de código desde OpenAPI (openapi-execution.yaml, openapi-planning.yaml).
 - Se usa Gradle wrapper (`./gradlew`), no Gradle global.
 - Docker Compose con PostgreSQL 16 para desarrollo local.
@@ -59,13 +68,12 @@
 
 ---
 
-## 6 · Pendientes
+## 6 · Pendientes (siguiente sesión)
 
-- [x] Crear `INSTRUCCIONES.md` en raíz del proyecto.
-- [x] Crear `PROYECTO.md` (entrevista de definición completada).
-- [ ] Verificar si hay CI/CD configurado en `.github/`.
-- [ ] Verificar que `./gradlew build` compila correctamente.
-- [ ] Diseñar e implementar autenticación JWT + entidad Usuario.
-- [x] Migrar módulo de execution a event-driven (usando eventos de dominio ya existentes).
-- [ ] Migrar módulo de execution a Event Sourcing (persistir eventos en event_store).
-- [ ] Implementar estadísticas y métricas avanzadas.
+- [ ] Mover `@Transactional` de controllers a command handlers en Execution (StartSessionHandler, FinishSessionHandler, etc.)
+- [ ] Añadir `@Transactional(propagation = MANDATORY)` a repos de Planning (mismo patrón que SessionReadViewUpdater)
+- [ ] Auditar manejo de errores en `InMemoryBus` — captura la excepción pero la TX sigue marcada rollback-only
+- [ ] Añadir `rollbackFor = Exception.class` explícito en todos los `@Transactional`
+- [ ] Implementar soft-delete (`active=false`) en Exercise + validación pre-delete
+- [ ] Añadir verificación de sesiones activas antes de borrar workout/día
+- [ ] Normalizar Exercises a value objects para consistencia con el resto de módulos
