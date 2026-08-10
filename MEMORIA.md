@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v4 · 2026-08-06 · Revisión de reglas de negocio, documentación y gaps identificados
+> **Sello:** v5 · 2026-08-10 · Event Sourcing completado
 
 ## 1 · Cronología
 
@@ -9,6 +9,7 @@
 | 2026-08-04 | v1 | Bootstrap inicial. Preflight de entorno. Análisis del código existente. |
 | 2026-08-04 | v3 | Migración event-driven completada: EventDrivenSessionRepository + 9 DomainEventHandlers. 112 tests pasan. Abierta P0 de Event Sourcing. |
 | 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
+| 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
 
 ---
 
@@ -19,8 +20,8 @@
 | D01 | 2026-08-04 | Stack Java 21 + Spring Boot 3.4 + PostgreSQL | Según build.gradle | Registrado |
 | D02 | 2026-08-04 | Arquitectura DDD + Hexagonal + CQRS | Según estructura del código (buses cmd/query/event) | Registrado |
 | D03 | 2026-08-04 | Multi-user con JWT | Confirmado por Renzo. Diseño específico pendiente. | Pendiente |
-| D04 | 2026-08-04 | Migrar execution de relacional a event-driven (usando eventos de dominio ya existentes) | Se creó EventDrivenSessionRepository + 9 DomainEventHandler. Eventos se publican al EventBus y el read-view se actualiza reactivamente. | Hecho |
-| D05 | 2026-08-04 | Migrar de event-driven a Event Sourcing (tabla event_store + reconstrucción de aggregate) | Se añade como nueva P0. El paso actual (event-driven) es la base. Falta: persistir eventos en BD, reconstruir Session desde historial, snapshotting. | Pendiente |
+| D04 | 2026-08-04 | Migrar execution de relacional a event-driven (usando eventos de dominio ya existentes) | Se creó EventSourcedSessionRepository + 9 DomainEventHandler. Eventos se persisten en event_store, se publican al EventBus y la read-view se actualiza reactivamente. | Hecho |
+| D05 | 2026-08-04 → 2026-08-10 | Migrar de event-driven a Event Sourcing (tabla event_store + reconstrucción de aggregate) | Creada tabla event_store con EventStoreJpaEntity. EventStore (puerto) + JpaEventStore (adaptador). DomainEventSerializer con 9 factories por evento. SessionReconstructor (domain service) reconstruye el aggregate desde eventos. EventSourcedSessionRepository (@Primary) reemplaza al JPA. Eliminadas SessionJpaEntity, JpaSessionMapper, JpaSessionRepository. | Hecho |
 | D06 | 2026-08-06 | Soft-delete en Exercises en lugar de borrado físico | Evita datos huérfanos en Planning y Execution sin introducir FK entre bounded contexts. Patrón estándar para catálogos compartidos. | Pendiente |
 | D07 | 2026-08-06 | Mover @Transactional de controllers a command handlers | La atomicidad debe vivir en el caso de uso (aplicación), no en el adaptador HTTP (presentación). Permite reutilizar comandos desde jobs, mensajes o tests sin depender del controller. | Pendiente |
 | D08 | 2026-08-06 | Documentar reglas de negocio de cada bounded context en PROYECTO.md | Facilita entrevistas técnicas, onboarding y sirve como referencia viva del dominio. | Hecho |

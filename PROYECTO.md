@@ -114,7 +114,7 @@ Toda mutación (`finish()`, `cancel()`, `addLog()`, `removeLog()`, `updateLog*()
 
 **Eventos de dominio**
 
-Cada transición registra un evento en el aggregate. Al persistir, `EventDrivenSessionRepository` los publica al `EventBus` y los `DomainEventHandler` actualizan la read-view desnormalizada para consultas eficientes:
+Cada transición registra un evento en el aggregate. Al persistir, `EventSourcedSessionRepository` appendea los eventos al `EventStore` y los publica al `EventBus`. Los `DomainEventHandler` actualizan la read-view desnormalizada para consultas eficientes:
 
 | Operación | Evento |
 |---|---|
@@ -172,7 +172,7 @@ Solución pendiente: implementar soft-delete (`active=false`) en Exercises y añ
 | Prioridad | Feature | Estado |
 |---|---|---|
 | 🔴 P0 | Migrar sesiones a event-driven (EventBus + DomainEventHandlers) | ✅ Hecho |
-| 🔴 P0 | Event Sourcing — persistir eventos en event store + reconstruir aggregate | Pendiente |
+| 🔴 P0 | Event Sourcing — persistir eventos en event store + reconstruir aggregate | ✅ Hecho |
 | 🔴 P0 | Autenticación JWT + gestión de usuarios | Pendiente (diseño no decidido) |
 | 🟡 P1 | Proteger borrado de ejercicios (soft-delete + validación pre-delete) | Pendiente |
 | 🟡 P1 | Estadísticas y progreso (gráficas, histórico) | Pendiente |
