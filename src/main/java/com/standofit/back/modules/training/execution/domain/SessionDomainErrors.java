@@ -13,7 +13,8 @@ public enum SessionDomainErrors implements EnumContract {
   EXERCISE_NOT_FOUND("Exercise not found in catalog"),
   DAY_NOT_FOUND("Workout day not found in planning"),
   REPLAY_EMPTY_EVENTS("Cannot replay empty event sequence"),
-  REPLAY_REQUIRES_SESSION_STARTED("First event must be SessionStarted");
+  REPLAY_REQUIRES_SESSION_STARTED("First event must be SessionStarted"),
+  REPLAY_UNHANDLED_EVENT("Replay cannot handle event of type '%s'");
 
   private final String message;
 

@@ -37,7 +37,9 @@ public final class SessionReconstructor {
             case ExerciseLogWeightUpdated u -> session.updateLogWeight(u.logId(), u.weight());
             default ->
                 throw new SessionDomainException(
-                    "Unknown event type: " + event.getClass().getSimpleName());
+                    String.format(
+                        SessionDomainErrors.REPLAY_UNHANDLED_EVENT.getMessage(),
+                        event.getClass().getSimpleName()));
           };
     }
 
