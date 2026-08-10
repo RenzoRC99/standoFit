@@ -1,9 +1,9 @@
 package com.standofit.back.modules.training.execution.infrastructure.repository;
 
 import com.standofit.back.modules.training.execution.domain.EventStore;
+import com.standofit.back.modules.training.execution.domain.SessionReconstructor;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.domain.service.SessionReconstructor;
 import com.standofit.back.shared.domain.bus.event.DomainEvent;
 import com.standofit.back.shared.domain.bus.event.EventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;

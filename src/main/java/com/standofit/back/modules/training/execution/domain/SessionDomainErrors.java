@@ -11,7 +11,9 @@ public enum SessionDomainErrors implements EnumContract {
   SESSION_CANNOT_BE_CANCELLED("Session cannot be cancelled"),
   LOG_NOT_FOUND("Log not found"),
   EXERCISE_NOT_FOUND("Exercise not found in catalog"),
-  DAY_NOT_FOUND("Workout day not found in planning");
+  DAY_NOT_FOUND("Workout day not found in planning"),
+  REPLAY_EMPTY_EVENTS("Cannot replay empty event sequence"),
+  REPLAY_REQUIRES_SESSION_STARTED("First event must be SessionStarted");
 
   private final String message;
 

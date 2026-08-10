@@ -1,4 +1,4 @@
-package com.standofit.back.modules.training.execution.domain.service;
+package com.standofit.back.modules.training.execution.domain;
 
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.event.*;
@@ -11,9 +11,14 @@ public final class SessionReconstructor {
   private SessionReconstructor() {}
 
   public static Session replay(List<DomainEvent> events) {
+    if (events.isEmpty()) {
+      throw new SessionDomainException(SessionDomainErrors.REPLAY_EMPTY_EVENTS.getMessage());
+    }
+
     DomainEvent first = events.get(0);
     if (!(first instanceof SessionStarted s)) {
-      throw new IllegalArgumentException("First event must be SessionStarted");
+      throw new SessionDomainException(
+          SessionDomainErrors.REPLAY_REQUIRES_SESSION_STARTED.getMessage());
     }
 
     Session session = Session.create(new SessionId(s.aggregateId().value()), s.dayId());
@@ -31,7 +36,7 @@ public final class SessionReconstructor {
             case ExerciseLogRepsUpdated u -> session.updateLogReps(u.logId(), u.reps());
             case ExerciseLogWeightUpdated u -> session.updateLogWeight(u.logId(), u.weight());
             default ->
-                throw new IllegalArgumentException(
+                throw new SessionDomainException(
                     "Unknown event type: " + event.getClass().getSimpleName());
           };
     }
