@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v6 · 2026-09-15 · Pendientes actualizados (chat de revisión)
+> **Sello:** v7 · 2026-09-15 · Cierre de chat: gaps documentados + regla de versioning
 
 ## 1 · Cronología
 
@@ -11,6 +11,7 @@
 | 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
 | 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
 | 2026-09-15 | v6 | Revisión de estado del Event Sourcing en Execution. Confirmado en vivo: agregado Session es 100% event-sourced (sin `SessionJpaEntity`, `JpaSessionRepository` ni `JpaSessionMapper`). Solo persisten entidades JPA: `EventStoreJpaEntity` (event store) + 3 read-views (`SessionReadViewJpaEntity`, `ExerciseLogReadViewJpaEntity`, `PlannedExerciseReadViewJpaEntity`) como cachés derivados para queries. Sin acción de código, solo actualización de pendientes. |
+| 2026-09-15 | v7 | Cierre de chat. Sin cambios de código de negocio. Se documentan 3 gaps nuevos en §6 (ActivityEvent solo-en-fallo, segregación de errores en GlobalExceptionHandler, refactor del DomainEventSerializer con evaluación de opciones A/D/C) y se añade regla §8: incrementar sello de versión al cerrar cada chat. |
 
 ---
 
@@ -96,3 +97,15 @@
 - [ ] Consumidores de Application Event Bus: `PlanningActivityEvent` y `SessionActivityEvent` se publican desde los handlers de Planning y Execution pero no tienen suscriptores → WARN `No subscriber found` en `InMemoryBus`. Decidir destino: tabla `activity_log` para auditoría interna, stream externo (Kafka/SSE), o silenciar el WARN a DEBUG. No es bug funcional; el sistema trabaja correctamente.
 - [ ] ActivityEvent deben publicarse **solo en failure** (no en éxito). Diseño orientado a futuro consumer Kafka: `PlanningActivityEvent.failure(...)` y `SessionActivityEvent.failure(...)` quedan dentro del `catch (Exception)` de cada handler; las llamadas `.success(...)` en el path de éxito se eliminan. Hoy `event_store` ya actúa como log de auditoría de operaciones exitosas, por lo que perder el `success` no implica perder trazabilidad. Pendiente: localizar todos los publishers, eliminar solo los `success`, mantener las clases `ActivityEvent`/`ActivityType` por si Kafka las consume, actualizar tests. No se implementa hoy el adapter Kafka.
 - [ ] **Segregación de errores en `GlobalExceptionHandler`**: existe inconsistencia entre errores de dominio (`SessionDomainException("Session not found")`) que mapean a **400 `INVALID_ARGUMENT`**, e infraestructura (`SessionNotFoundException`/`WorkoutNotFoundException`) que mapean a **404 `NOT_FOUND`**. Mismo concepto (sesión/workout no existe) produce respuestas HTTP distintas según el path. El reconstructor lanza `SessionDomainException` con mensaje "Session not found" → cliente recibe 400 en lugar de 404. Decidir: (a) que el dominio lance una excepción tipada (ej. `SessionNotFoundDomainException extends DomainException`) mapeada explícitamente a 404, o (b) que `GlobalExceptionHandler` mapee `SessionDomainException` con mensaje "not found" a 404 por convención. El `try/catch` de los handlers **no afecta** al `GlobalExceptionHandler` porque los handlers hacen `throw e;` y la excepción burbujea correctamente — el problema es solo de **mapeo de tipos**, no de swallowing.
+- [ ] **Refactor de `DomainEventSerializer`** (`execution/infrastructure/serialization/DomainEventSerializer.java`): el serializer actual tiene `instanceof` chain en `extractPayload()` y `Map.ofEntries(...)` con un factory lambda por evento en `buildFactories()`. **Dos puntos de cambio por evento nuevo**, fallo silencioso si un evento cae en el `else` (payload vacío sin error). Opciones evaluadas:
+  - **A. Jackson polimórfico (`@JsonTypeInfo` + `@JsonSubTypes`)**: cero boilerplate, Jackson dispatcha. Acopla el dominio a Jackson.
+  - **D. Self-describing events** (Recommended para hoy): cada evento implementa `toPayload()` + `fromPayload(...)`. Registry estático en `DomainEvent`. `DomainEventSerializer` se reduce a ~30 líneas. DDD-puro, payloads JSON idénticos a los actuales → cero migración en `event_store`.
+  - **C. Avro / Protobuf**: schemas binarios, Schema Registry, versionado fuerte. Requiere migrar `event_store.payload` a `BYTEA`. Solo si en el futuro se monta Kafka entre bounded contexts.
+  - Decisión pendiente. Por defecto ir a **D** salvo que se prevea Kafka inter-bounded-context a corto plazo.
+
+---
+
+## 7 · Reglas operativas del agente
+
+- **Versionado de `MEMORIA.md`**: al cerrar cada chat (sea con commits de código o solo con documentación), el agente **debe incrementar el sello de versión** (`vN` → `vN+1`) en la cabecera del documento, añadir la entrada correspondiente en la tabla de cronología (§1) con la fecha y el resumen de lo tratado, y hacer commit con prefijo `docs(memoria): sello vN+1 — <resumen>`. Esto aplica incluso cuando el chat no produjo código (solo gaps/reglas), para que el sello refleje cualquier actividad del agente sobre el repositorio.
+- **No saltar sellos**: aunque en un chat solo se haya hablado sin tocar archivos, el sello se incrementa. Sirve como bitácora mínima de actividad.
