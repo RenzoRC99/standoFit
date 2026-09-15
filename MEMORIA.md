@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v7 · 2026-09-15 · Cierre de chat: gaps documentados + regla de versioning
+> **Sello:** v8 · 2026-09-15 · Regla de versionado añadida a INSTRUCCIONES.md
 
 ## 1 · Cronología
 
@@ -12,6 +12,7 @@
 | 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
 | 2026-09-15 | v6 | Revisión de estado del Event Sourcing en Execution. Confirmado en vivo: agregado Session es 100% event-sourced (sin `SessionJpaEntity`, `JpaSessionRepository` ni `JpaSessionMapper`). Solo persisten entidades JPA: `EventStoreJpaEntity` (event store) + 3 read-views (`SessionReadViewJpaEntity`, `ExerciseLogReadViewJpaEntity`, `PlannedExerciseReadViewJpaEntity`) como cachés derivados para queries. Sin acción de código, solo actualización de pendientes. |
 | 2026-09-15 | v7 | Cierre de chat. Sin cambios de código de negocio. Se documentan 3 gaps nuevos en §6 (ActivityEvent solo-en-fallo, segregación de errores en GlobalExceptionHandler, refactor del DomainEventSerializer con evaluación de opciones A/D/C) y se añade regla §8: incrementar sello de versión al cerrar cada chat. |
+| 2026-09-15 | v8 | Regla operativa de versionado de MEMORIA incorporada a `INSTRUCCIONES.md §7.2`: incrementar sello `vN → vN+1` en cada cierre de chat, incluso sin cambios de código. La bitácora refleja toda actividad del agente sobre el repositorio. |
 
 ---
 
