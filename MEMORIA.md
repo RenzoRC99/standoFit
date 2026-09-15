@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v7 · 2026-09-15 · Puerto 5432 expuesto en compose local + nota sobre limitación de interpolación
+> **Sello:** v6 · 2026-09-15 · Pendientes actualizados (chat de revisión)
 
 ## 1 · Cronología
 
@@ -11,7 +11,6 @@
 | 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
 | 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
 | 2026-09-15 | v6 | Revisión de estado del Event Sourcing en Execution. Confirmado en vivo: agregado Session es 100% event-sourced (sin `SessionJpaEntity`, `JpaSessionRepository` ni `JpaSessionMapper`). Solo persisten entidades JPA: `EventStoreJpaEntity` (event store) + 3 read-views (`SessionReadViewJpaEntity`, `ExerciseLogReadViewJpaEntity`, `PlannedExerciseReadViewJpaEntity`) como cachés derivados para queries. Sin acción de código, solo actualización de pendientes. |
-| 2026-09-15 | v7 | Expuesto puerto 5432 del servicio `db` en `docker-compose.local.yml` para conectar DB viewers externos (DBeaver, psql). Compose cloud intacto (sigue sin exponer → seguridad). Validación del flujo `SessionDeleted` en DBeaver: `event_store` contiene el evento y `session_read_view` queda vacía. |
 
 ---
 
