@@ -5,6 +5,7 @@ import com.standofit.back.shared.utils.EnumContract;
 public enum SessionDomainErrors implements EnumContract {
   SESSION_NOT_FOUND("Session not found"),
   SESSION_CANNOT_BE_MODIFIED("Session cannot be modified"),
+  SESSION_CANNOT_BE_DELETED("Session cannot be deleted because it is in progress"),
   SESSION_ALREADY_FINISHED("Session already finished"),
   SESSION_ALREADY_CANCELLED("Session already cancelled"),
   SESSION_CANNOT_BE_FINISHED("Session cannot be finished"),

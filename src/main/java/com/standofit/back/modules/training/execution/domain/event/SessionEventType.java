@@ -6,6 +6,7 @@ public enum SessionEventType implements EnumContract {
   SESSION_STARTED("session.started"),
   SESSION_FINISHED("session.finished"),
   SESSION_CANCELLED("session.cancelled"),
+  SESSION_DELETED("session.deleted"),
   SESSION_NOTES_CHANGED("session.notes_changed"),
   EXERCISE_LOG_ADDED("session.exercise_log_added"),
   EXERCISE_LOG_REMOVED("session.exercise_log_removed"),

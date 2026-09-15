@@ -44,11 +44,8 @@ public class EventSourcedSessionRepository implements SessionRepository {
 
   @Override
   public void deleteById(SessionId id) {
-    // TODO: Crear evento SessionDeleted y añadir soporte en SessionReconstructor
-    // para que getById() lance SessionNotFoundException si el último evento es
-    // SessionDeleted. Así los eventos no se borran del store (append-only) pero
-    // la sesión queda oculta / inaccesible como ocurre con un borrado lógico.
-    //
-    // El DeleteSessionHandler ya borra la read-view vía readViewUpdater.remove()
+    Session session = getById(id);
+    Session deleted = session.delete();
+    save(deleted);
   }
 }

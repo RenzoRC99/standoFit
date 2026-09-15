@@ -21,6 +21,10 @@ public final class SessionReconstructor {
           SessionDomainErrors.REPLAY_REQUIRES_SESSION_STARTED.getMessage());
     }
 
+    if (events.get(events.size() - 1) instanceof SessionDeleted) {
+      throw new SessionDomainException(SessionDomainErrors.SESSION_NOT_FOUND.getMessage());
+    }
+
     Session session = Session.create(new SessionId(s.aggregateId().value()), s.dayId());
 
     for (DomainEvent event : events.subList(1, events.size())) {

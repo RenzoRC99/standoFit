@@ -8,6 +8,7 @@ import com.standofit.back.modules.training.execution.domain.event.ExerciseLogRep
 import com.standofit.back.modules.training.execution.domain.event.ExerciseLogSetsUpdated;
 import com.standofit.back.modules.training.execution.domain.event.ExerciseLogWeightUpdated;
 import com.standofit.back.modules.training.execution.domain.event.SessionCancelled;
+import com.standofit.back.modules.training.execution.domain.event.SessionDeleted;
 import com.standofit.back.modules.training.execution.domain.event.SessionFinished;
 import com.standofit.back.modules.training.execution.domain.event.SessionNotesChanged;
 import com.standofit.back.modules.training.execution.domain.event.SessionStarted;
@@ -103,6 +104,15 @@ public final class Session extends AggregateRoot {
     Session updated =
         update(WorkoutSessionStatus.CANCELLED, logs, notes, new SessionUpdatedAt(Instant.now()));
     updated.record(new SessionCancelled(id));
+    return updated;
+  }
+
+  public Session delete() {
+    if (status != WorkoutSessionStatus.COMPLETED && status != WorkoutSessionStatus.CANCELLED) {
+      throw new SessionDomainException(SessionDomainErrors.SESSION_CANNOT_BE_DELETED.getMessage());
+    }
+    Session updated = update(status, logs, notes, new SessionUpdatedAt(Instant.now()));
+    updated.record(new SessionDeleted(id));
     return updated;
   }
 

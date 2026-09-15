@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v5 · 2026-08-10 · Event Sourcing completado
+> **Sello:** v6 · 2026-09-15 · Pendientes actualizados (chat de revisión)
 
 ## 1 · Cronología
 
@@ -10,6 +10,7 @@
 | 2026-08-04 | v3 | Migración event-driven completada: EventDrivenSessionRepository + 9 DomainEventHandlers. 112 tests pasan. Abierta P0 de Event Sourcing. |
 | 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
 | 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
+| 2026-09-15 | v6 | Revisión de estado del Event Sourcing en Execution. Confirmado en vivo: agregado Session es 100% event-sourced (sin `SessionJpaEntity`, `JpaSessionRepository` ni `JpaSessionMapper`). Solo persisten entidades JPA: `EventStoreJpaEntity` (event store) + 3 read-views (`SessionReadViewJpaEntity`, `ExerciseLogReadViewJpaEntity`, `PlannedExerciseReadViewJpaEntity`) como cachés derivados para queries. Sin acción de código, solo actualización de pendientes. |
 
 ---
 
@@ -71,11 +72,23 @@
 
 ## 6 · Pendientes (siguiente sesión)
 
+### Event Sourcing — Execution
 - [ ] Implementar evento `SessionDeleted` y soporte en `SessionReconstructor` — actualmente `deleteById()` es no-op en el event store (append-only). El `SessionReconstructor` debe lanzar `SessionNotFoundException` si el último evento es `SessionDeleted`, para que `getById()` no reconstruya sesiones borradas.
+- [ ] Definir política de snapshots si la cadena de eventos crece (rebobinar N eventos en cada `getById()` puede degradarse). Criterio de decisión: nº de eventos por agregado o tiempo desde el último snapshot.
+
+### Transacciones y buses
 - [ ] Mover `@Transactional` de controllers a command handlers en Execution (StartSessionHandler, FinishSessionHandler, etc.)
 - [ ] Añadir `@Transactional(propagation = MANDATORY)` a repos de Planning (mismo patrón que SessionReadViewUpdater)
 - [ ] Auditar manejo de errores en `InMemoryBus` — captura la excepción pero la TX sigue marcada rollback-only
 - [ ] Añadir `rollbackFor = Exception.class` explícito en todos los `@Transactional`
-- [ ] Implementar soft-delete (`active=false`) en Exercise + validación pre-delete
-- [ ] Añadir verificación de sesiones activas antes de borrar workout/día
-- [ ] Normalizar Exercises a value objects para consistencia con el resto de módulos
+
+### Integridad referencial entre bounded contexts
+- [ ] Implementar soft-delete (`active=false`) en Exercise + validación pre-delete — actualmente borrar un ejercicio referenciado provoca: null silencioso en Planning (DTO) y error 500 en Execution (`SessionReadViewUpdater` no resuelve el nombre).
+- [ ] Añadir verificación de sesiones activas antes de borrar workout/día — evitar workouts huérfanos con sesiones en `IN_PROGRESS` apuntando a días inexistentes.
+
+### Exercises
+- [ ] Normalizar Exercises a value objects para consistencia con el resto de módulos (actualmente validación solo a nivel JPA/BD, sin invariantes de dominio).
+
+### Operación / futuras
+- [ ] Diseñar e implementar autenticación JWT + gestión de usuarios (D03). Bloquea multi-tenancy real.
+- [ ] Decidir persistencia de read-views ante fallo del bus: hoy un fallo en `SessionReadViewUpdater` puede dejar el agregado y la read-view divergentes si la TX no rollbackea el append.
