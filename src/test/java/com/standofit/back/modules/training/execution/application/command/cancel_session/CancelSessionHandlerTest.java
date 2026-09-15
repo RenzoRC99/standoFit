@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
@@ -23,14 +22,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CancelSessionHandlerTest {
 
   @Mock private SessionRepository repository;
-  @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
 
   private CancelSessionHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new CancelSessionHandler(repository, readViewUpdater, eventBus);
+    handler = new CancelSessionHandler(repository, eventBus);
   }
 
   @Test
@@ -46,7 +44,6 @@ class CancelSessionHandlerTest {
 
     verify(repository, times(1)).getById(sessionId);
     verify(repository, times(1)).save(any(Session.class));
-    verify(readViewUpdater, times(1)).upsert(any(Session.class));
     verify(eventBus, times(1)).publish(any());
   }
 

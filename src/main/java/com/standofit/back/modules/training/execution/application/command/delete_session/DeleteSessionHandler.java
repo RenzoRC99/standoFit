@@ -5,7 +5,6 @@ import static com.standofit.back.modules.training.execution.application.ErrorDet
 import com.standofit.back.modules.training.execution.application.event.ExecutionActivityType;
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
@@ -14,15 +13,10 @@ import org.springframework.stereotype.Component;
 public class DeleteSessionHandler implements VoidCommandHandler<DeleteSessionCommand> {
 
   private final SessionRepository repository;
-  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
 
-  public DeleteSessionHandler(
-      SessionRepository repository,
-      SessionReadViewUpdater readViewUpdater,
-      ApplicationEventBus eventBus) {
+  public DeleteSessionHandler(SessionRepository repository, ApplicationEventBus eventBus) {
     this.repository = repository;
-    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
   }
 
@@ -35,7 +29,6 @@ public class DeleteSessionHandler implements VoidCommandHandler<DeleteSessionCom
   public void execute(DeleteSessionCommand command) {
     try {
       repository.deleteById(command.sessionId());
-      readViewUpdater.remove(command.sessionId().value());
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_DELETED,

@@ -6,7 +6,6 @@ import com.standofit.back.modules.training.execution.application.event.Execution
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
@@ -16,15 +15,10 @@ public class UpdateExerciseLogRepsHandler
     implements VoidCommandHandler<UpdateExerciseLogRepsCommand> {
 
   private final SessionRepository repository;
-  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
 
-  public UpdateExerciseLogRepsHandler(
-      SessionRepository repository,
-      SessionReadViewUpdater readViewUpdater,
-      ApplicationEventBus eventBus) {
+  public UpdateExerciseLogRepsHandler(SessionRepository repository, ApplicationEventBus eventBus) {
     this.repository = repository;
-    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
   }
 
@@ -38,8 +32,7 @@ public class UpdateExerciseLogRepsHandler
     try {
       Session session = repository.getById(command.sessionId());
       Session updatedSession = session.updateLogReps(command.logId(), command.reps());
-      Session saved = repository.save(updatedSession);
-      readViewUpdater.upsert(saved);
+      repository.save(updatedSession);
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_EXERCISE_REPS_UPDATED,
