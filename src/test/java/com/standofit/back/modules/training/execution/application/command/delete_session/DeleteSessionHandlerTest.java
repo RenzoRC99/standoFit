@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
-import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 import java.util.UUID;
@@ -20,18 +19,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DeleteSessionHandlerTest {
 
   @Mock private SessionRepository repository;
-  @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
 
   private DeleteSessionHandler handler;
 
   @BeforeEach
   void setUp() {
-    handler = new DeleteSessionHandler(repository, readViewUpdater, eventBus);
+    handler = new DeleteSessionHandler(repository, eventBus);
   }
 
   @Test
-  @DisplayName("should delete session and remove from read view on success")
+  @DisplayName("should delete session and publish success event")
   void shouldDeleteSession() {
     var sessionId = new SessionId(UUID.randomUUID());
     var command = new DeleteSessionCommand(sessionId);
@@ -39,7 +37,6 @@ class DeleteSessionHandlerTest {
     handler.execute(command);
 
     verify(repository, times(1)).deleteById(sessionId);
-    verify(readViewUpdater, times(1)).remove(sessionId.value());
     verify(eventBus, times(1)).publish(any());
   }
 

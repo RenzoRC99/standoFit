@@ -1,5 +1,7 @@
 package com.standofit.back.modules.training.execution.infrastructure.repository;
 
+import com.standofit.back.modules.training.execution.domain.EventStore;
+import com.standofit.back.modules.training.execution.domain.SessionReconstructor;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.shared.domain.bus.event.DomainEvent;
@@ -12,33 +14,38 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Primary
-public class EventDrivenSessionRepository implements SessionRepository {
+public class EventSourcedSessionRepository implements SessionRepository {
 
-  private final JpaSessionRepository delegate;
+  private static final String AGGREGATE_TYPE = "Session";
+
+  private final EventStore eventStore;
   private final EventBus eventBus;
 
-  public EventDrivenSessionRepository(JpaSessionRepository delegate, @Lazy EventBus eventBus) {
-    this.delegate = delegate;
+  public EventSourcedSessionRepository(EventStore eventStore, @Lazy EventBus eventBus) {
+    this.eventStore = eventStore;
     this.eventBus = eventBus;
   }
 
   @Override
   public Session save(Session session) {
     List<DomainEvent> events = session.pullDomainEvents();
-    Session saved = delegate.save(session);
+    eventStore.append(events, AGGREGATE_TYPE, session.getId().value());
     if (!events.isEmpty()) {
       eventBus.publish(events);
     }
-    return saved;
+    return session;
   }
 
   @Override
   public Session getById(SessionId id) {
-    return delegate.getById(id);
+    List<DomainEvent> events = eventStore.loadEvents(id.value());
+    return SessionReconstructor.replay(events);
   }
 
   @Override
   public void deleteById(SessionId id) {
-    delegate.deleteById(id);
+    Session session = getById(id);
+    Session deleted = session.delete();
+    save(deleted);
   }
 }

@@ -94,10 +94,21 @@ Al finalizar una tarea, feature o al cerrar la sesión:
 
 1. **Auto-Update de Documentación:** Actualiza `MEMORIA.md` (incrementa el sello de versión +1, fecha, decisiones y
    pendientes) y `PROYECTO.md` si varió el alcance.
-2. **Preflight de Git:** Ejecuta `git status`. Si hay cambios pendientes:
+2. **Regla de versionado de `MEMORIA.md` (obligatoria en cada cierre de chat):**
+    * **Siempre** se incrementa el sello `vN` → `vN+1` al cerrar un chat, **incluso si no se modificó código de
+      negocio** (solo se documentaron gaps, se añadieron reglas, se respondió preguntas o se hicieron cambios puramente
+      operativos).
+    * Actualizar la cabecera de `MEMORIA.md`: `> **Sello:** vN+1 · <YYYY-MM-DD> · <resumen breve del cierre>`.
+    * Añadir entrada en §1 (Cronología) con fecha, número de versión y resumen de lo tratado.
+    * Si se introdujeron gaps nuevos en §6 o reglas nuevas en §7, comprobar que están reflejadas antes de cerrar.
+    * Esta regla sirve como bitácora mínima: el sello refleja cualquier actividad del agente sobre el repositorio, no
+      solo los commits de código.
+3. **Preflight de Git:** Ejecuta `git status`. Si hay cambios pendientes:
     * **Comprobar remoto primero:** Ejecuta `git pull --rebase` (o `git pull`) en la rama actual para asegurar que estás
       al día con el origen y resolver cualquier ajuste antes de subir nada.
     * **Commit claro:** Realiza un `git add .` y un `git commit` con un mensaje conciso y descriptivo en español
-      (formato: `feat: ...`, `fix: ...`, `docs: ...`).
+      (formato: `feat: ...`, `fix: ...`, `docs: ...`). Para commits de versionado de `MEMORIA.md` usar el prefijo
+      `docs(memoria): sello vN+1 — <resumen>`.
     * **Push automático:** Ejecuta `git push` a la rama remota.
-3. **Resumen:** Muestra en el chat el hash del commit, el estado de la rama y el resumen para la siguiente sesión.
+4. **Resumen:** Muestra en el chat el hash del commit, el estado de la rama y el resumen para la siguiente sesión.
+   Confirmar explícitamente el sello final de `MEMORIA.md` (ej. "Cerrado en v7").

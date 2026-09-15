@@ -1,19 +1,19 @@
 package com.standofit.back.modules.training.execution.domain.event;
 
-import com.standofit.back.modules.training.execution.domain.vo.ExerciseLogId;
+import com.standofit.back.modules.training.execution.domain.entity.ExerciseLog;
 import com.standofit.back.shared.domain.bus.event.DomainEvent;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionId;
 
 public final class ExerciseLogAdded extends DomainEvent {
 
-  private final ExerciseLogId logId;
+  private final ExerciseLog log;
 
-  public ExerciseLogAdded(SessionId sessionId, ExerciseLogId logId) {
+  public ExerciseLogAdded(SessionId sessionId, ExerciseLog log) {
     super(sessionId, SessionEventType.EXERCISE_LOG_ADDED.getMessage());
-    this.logId = logId;
+    this.log = log;
   }
 
-  public ExerciseLogId logId() {
-    return logId;
+  public ExerciseLog log() {
+    return log;
   }
 }
