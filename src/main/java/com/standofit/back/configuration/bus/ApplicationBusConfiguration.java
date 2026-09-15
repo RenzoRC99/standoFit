@@ -4,13 +4,10 @@ import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBu
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventHandler;
 import com.standofit.back.shared.domain.bus.command.CommandBus;
 import com.standofit.back.shared.domain.bus.command.CommandHandler;
-import com.standofit.back.shared.domain.bus.event.DomainEventHandler;
-import com.standofit.back.shared.domain.bus.event.EventBus;
 import com.standofit.back.shared.domain.bus.query.QueryBus;
 import com.standofit.back.shared.domain.bus.query.QueryHandler;
 import com.standofit.back.shared.infrastructure.bus.command.InMemoryCommandBus;
 import com.standofit.back.shared.infrastructure.bus.event.InMemoryApplicationEventBus;
-import com.standofit.back.shared.infrastructure.bus.event.InMemoryEventBus;
 import com.standofit.back.shared.infrastructure.bus.query.InMemoryQueryBus;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +29,5 @@ public class ApplicationBusConfiguration {
   @Bean
   public ApplicationEventBus applicationEventBus(List<ApplicationEventHandler<?>> handlers) {
     return new InMemoryApplicationEventBus(handlers);
-  }
-
-  @Bean
-  public EventBus eventBus(List<DomainEventHandler<?>> handlers) {
-    return new InMemoryEventBus(handlers);
   }
 }

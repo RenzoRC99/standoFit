@@ -6,6 +6,7 @@ import com.standofit.back.modules.training.execution.application.event.Execution
 import com.standofit.back.modules.training.execution.application.event.SessionActivityEvent;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
+import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.bus.command.VoidCommandHandler;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,15 @@ import org.springframework.stereotype.Component;
 public class UpdateSessionNotesHandler implements VoidCommandHandler<UpdateSessionNotesCommand> {
 
   private final SessionRepository repository;
+  private final SessionReadViewUpdater readViewUpdater;
   private final ApplicationEventBus eventBus;
 
-  public UpdateSessionNotesHandler(SessionRepository repository, ApplicationEventBus eventBus) {
+  public UpdateSessionNotesHandler(
+      SessionRepository repository,
+      SessionReadViewUpdater readViewUpdater,
+      ApplicationEventBus eventBus) {
     this.repository = repository;
+    this.readViewUpdater = readViewUpdater;
     this.eventBus = eventBus;
   }
 
@@ -31,7 +37,8 @@ public class UpdateSessionNotesHandler implements VoidCommandHandler<UpdateSessi
     try {
       Session session = repository.getById(command.sessionId());
       Session updatedSession = session.changeNotes(command.notes());
-      repository.save(updatedSession);
+      Session saved = repository.save(updatedSession);
+      readViewUpdater.upsert(saved);
       eventBus.publish(
           SessionActivityEvent.success(
               ExecutionActivityType.SESSION_NOTES_UPDATED,

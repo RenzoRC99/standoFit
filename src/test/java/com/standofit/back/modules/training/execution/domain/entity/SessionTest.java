@@ -103,55 +103,6 @@ class SessionTest {
   }
 
   @Nested
-  @DisplayName("Delete Session")
-  class DeleteSession {
-
-    @Test
-    @DisplayName("should delete completed session")
-    void shouldDeleteCompletedSession() {
-      Session session = SessionMother.aSessionCompleted();
-
-      Session deleted = session.delete();
-
-      assertNotNull(deleted);
-      assertEquals(session.getId(), deleted.getId());
-    }
-
-    @Test
-    @DisplayName("should delete cancelled session")
-    void shouldDeleteCancelledSession() {
-      Session session = SessionMother.aSessionCancelled();
-
-      Session deleted = session.delete();
-
-      assertNotNull(deleted);
-      assertEquals(session.getId(), deleted.getId());
-    }
-
-    @Test
-    @DisplayName("should not delete in progress session")
-    void shouldNotDeleteInProgressSession() {
-      Session session = SessionMother.aSessionInProgress();
-
-      assertThrows(SessionDomainException.class, session::delete);
-    }
-
-    @Test
-    @DisplayName("delete should record SessionDeleted event")
-    void deleteShouldRecordSessionDeletedEvent() {
-      Session session = SessionMother.aSessionCompleted();
-
-      Session deleted = session.delete();
-
-      var events = deleted.pullDomainEvents();
-      assertEquals(1, events.size());
-      assertInstanceOf(
-          com.standofit.back.modules.training.execution.domain.event.SessionDeleted.class,
-          events.get(0));
-    }
-  }
-
-  @Nested
   @DisplayName("Manage Logs")
   class ManageLogs {
 

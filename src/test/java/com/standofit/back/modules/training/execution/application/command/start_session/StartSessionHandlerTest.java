@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.standofit.back.modules.training.execution.domain.entity.Session;
 import com.standofit.back.modules.training.execution.domain.entity.SessionRepository;
 import com.standofit.back.modules.training.execution.domain.service.SessionDomainValidator;
+import com.standofit.back.modules.training.execution.infrastructure.query.SessionReadViewUpdater;
 import com.standofit.back.shared.domain.bus.application_event.ApplicationEventBus;
 import com.standofit.back.shared.domain.valueobjects.ids.SessionDayId;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StartSessionHandlerTest {
 
   @Mock private SessionRepository repository;
+  @Mock private SessionReadViewUpdater readViewUpdater;
   @Mock private ApplicationEventBus eventBus;
   @Mock private SessionDomainValidator sessionDomainValidator;
 
@@ -29,7 +31,8 @@ class StartSessionHandlerTest {
 
   @BeforeEach
   void setUp() {
-    handler = new StartSessionHandler(repository, eventBus, sessionDomainValidator);
+    handler =
+        new StartSessionHandler(repository, readViewUpdater, eventBus, sessionDomainValidator);
   }
 
   @Test
@@ -43,6 +46,7 @@ class StartSessionHandlerTest {
     assertNotNull(result);
     verify(sessionDomainValidator, times(1)).ensureDayExists(command.dayId());
     verify(repository, times(1)).save(any(Session.class));
+    verify(readViewUpdater, times(1)).upsert(any(Session.class));
     verify(eventBus, times(1)).publish(any());
   }
 

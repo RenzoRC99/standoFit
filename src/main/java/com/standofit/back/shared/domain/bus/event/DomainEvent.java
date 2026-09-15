@@ -1,36 +1,16 @@
 package com.standofit.back.shared.domain.bus.event;
 
-import com.standofit.back.shared.domain.valueobjects.Id;
 import java.time.Instant;
 import java.util.UUID;
 
 public abstract class DomainEvent {
-
   private final UUID eventId;
-  private final Instant occurredOn;
-  private final Id aggregateId;
-  private final String eventName;
+  private final Instant ocurredOn;
 
-  protected DomainEvent(Id aggregateId, String eventName) {
+  protected DomainEvent() {
     this.eventId = UUID.randomUUID();
-    this.occurredOn = Instant.now();
-    this.aggregateId = aggregateId;
-    this.eventName = eventName;
+    this.ocurredOn = Instant.now();
   }
 
-  public String StringName() {
-    return eventName;
-  }
-
-  public Id aggregateId() {
-    return aggregateId;
-  }
-
-  public UUID eventId() {
-    return eventId;
-  }
-
-  public Instant occurredOn() {
-    return occurredOn;
-  }
+  public abstract String StringName();
 }
