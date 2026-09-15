@@ -1,6 +1,6 @@
 # MEMORIA.md — standoFit
 
-> **Sello:** v6 · 2026-09-15 · Pendientes actualizados (chat de revisión)
+> **Sello:** v7 · 2026-09-15 · Puerto 5432 expuesto en compose local + nota sobre limitación de interpolación
 
 ## 1 · Cronología
 
@@ -11,6 +11,7 @@
 | 2026-08-06 | v4 | Revisión integral de reglas de negocio. Documentadas en PROYECTO.md. Identificados gaps: borrado de ejercicios sin validación, borrado de workouts con sesiones huérfanas, límites transaccionales en controller en lugar de handlers, manejo de errores en InMemoryBus. |
 | 2026-08-10 | v5 | Event Sourcing completado: tabla event_store + DomainEventSerializer con factories + SessionReconstructor + EventSourcedSessionRepository. Eliminado repositorio JPA (workout_sessions). 8 commits. |
 | 2026-09-15 | v6 | Revisión de estado del Event Sourcing en Execution. Confirmado en vivo: agregado Session es 100% event-sourced (sin `SessionJpaEntity`, `JpaSessionRepository` ni `JpaSessionMapper`). Solo persisten entidades JPA: `EventStoreJpaEntity` (event store) + 3 read-views (`SessionReadViewJpaEntity`, `ExerciseLogReadViewJpaEntity`, `PlannedExerciseReadViewJpaEntity`) como cachés derivados para queries. Sin acción de código, solo actualización de pendientes. |
+| 2026-09-15 | v7 | Expuesto puerto 5432 del servicio `db` en `docker-compose.local.yml` para conectar DB viewers externos (DBeaver, psql). Compose cloud intacto (sigue sin exponer → seguridad). Validación del flujo `SessionDeleted` en DBeaver: `event_store` contiene el evento y `session_read_view` queda vacía. |
 
 ---
 
@@ -42,6 +43,7 @@
 - Generación de código desde OpenAPI (openapi-execution.yaml, openapi-planning.yaml).
 - Se usa Gradle wrapper (`./gradlew`), no Gradle global.
 - Docker Compose con PostgreSQL 16 para desarrollo local.
+- Docker Compose **no permite interpolación fiable de variables del `.env` en la clave `ports:`** (la sintaxis `"${VAR}:5432"` falla o se ignora según el contexto). El mapeo de puertos queda **literal en el yml**. `.env` se usa solo para credenciales, URLs JDBC y configuración de Spring. Si se quiere parametrizar el puerto, hay que usar un `docker-compose.override.yml`.
 
 ---
 
